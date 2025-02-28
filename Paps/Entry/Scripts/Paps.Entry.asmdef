@@ -1,0 +1,20 @@
+{
+    "name": "Paps.Entry",
+    "rootNamespace": "Paps.Entry",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:4d30a9cc5cb282744b5a2fe2728cb18c",
+        "GUID:1b69c9ae65d6a6e468348e472a8adfd7",
+        "GUID:534b73861e2d950419fb4074f4b1262a",
+        "GUID:7abe13b523af55a4d8dc795009f46d78"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

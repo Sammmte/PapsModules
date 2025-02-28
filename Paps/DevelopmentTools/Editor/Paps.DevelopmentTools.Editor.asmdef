@@ -1,0 +1,26 @@
+{
+    "name": "Paps.DevelopmentTools.Editor",
+    "rootNamespace": "Paps.DevelopmentTools.Editor",
+    "references": [
+        "GUID:8d62da4aabd2a19419c7378d23ea5849",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:1b69c9ae65d6a6e468348e472a8adfd7",
+        "GUID:4d30a9cc5cb282744b5a2fe2728cb18c",
+        "GUID:534b73861e2d950419fb4074f4b1262a",
+        "GUID:a086f2f33537541d1b1e8cde513be9e4",
+        "GUID:235ce026b69921b4b99d52aaece5e139",
+        "GUID:7abe13b523af55a4d8dc795009f46d78",
+        "GUID:2765e68924a08a94ea0ea66b31c0168f"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,12 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <engine:VisualElement name="MainContainer" style="flex-grow: 1;">
+        <engine:VisualElement name="OptionsContainer" style="flex-grow: 1; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px;">
+            <engine:TextField label="Assembly Name" name="AssemblyNameField" />
+            <engine:Toggle label="Custom Namespace" name="CustomNamespaceToggle" />
+            <engine:TextField label="Root Namespace" name="AssemblyRootNamespaceField" readonly="true" />
+            <engine:Toggle label="Editor Only" name="EditorOnlyToggle" />
+            <editor:PropertyField name="AssemblyReferencesField" label="Assembly References" />
+        </engine:VisualElement>
+        <engine:Button text="Create" name="CreateButton" />
+    </engine:VisualElement>
+</engine:UXML>

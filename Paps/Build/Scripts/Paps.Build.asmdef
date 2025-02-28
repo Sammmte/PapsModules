@@ -1,0 +1,19 @@
+{
+    "name": "Paps.Build",
+    "rootNamespace": "Paps.Build",
+    "references": [
+        "GUID:69448af7b92c7f342b298e06a37122aa",
+        "GUID:2765e68924a08a94ea0ea66b31c0168f"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

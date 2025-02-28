@@ -1,0 +1,17 @@
+{
+    "name": "Paps.Pause",
+    "rootNamespace": "Paps.Pause",
+    "references": [
+        "GUID:834d5a11da3c34e438d3ecb06f9556a5",
+        "GUID:17b5d7b1f0766ee4c9016f575ef471cb"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

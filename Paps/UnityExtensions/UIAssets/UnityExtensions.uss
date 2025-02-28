@@ -1,0 +1,3 @@
+.auto-size-label {
+    flex-grow: 1;
+}

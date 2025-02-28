@@ -1,0 +1,34 @@
+{
+    "name": "CheatActions",
+    "maps": [
+        {
+            "name": "Cheats",
+            "id": "f1537c26-f541-4836-9002-e3f40c7f7423",
+            "actions": [
+                {
+                    "name": "ToggleVisibility",
+                    "type": "Button",
+                    "id": "7c1e9419-07e7-4d64-a841-b3b48fb1d001",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "b3fba604-25d1-48c4-bc9e-a034ca5628e8",
+                    "path": "<Keyboard>/backquote",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleVisibility",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

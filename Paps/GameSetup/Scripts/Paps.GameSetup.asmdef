@@ -1,0 +1,17 @@
+{
+    "name": "Paps.GameSetup",
+    "rootNamespace": "Paps.GameSetup",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:276fb2fc1687fe74c9c6ce7174a1073f"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

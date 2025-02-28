@@ -1,0 +1,21 @@
+{
+    "name": "Paps.LevelSetup",
+    "rootNamespace": "Paps.LevelSetup",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:534b73861e2d950419fb4074f4b1262a",
+        "GUID:4d30a9cc5cb282744b5a2fe2728cb18c",
+        "GUID:caca889fed6088d40b22c2d7e2909c31",
+        "GUID:677f4d7febad68e4194ce8008eff07f8",
+        "GUID:23eed6c2401dca1419d1ebd180e58c5a"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

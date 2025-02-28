@@ -1,0 +1,18 @@
+{
+    "name": "Paps.Audio",
+    "rootNamespace": "Paps.Audio",
+    "references": [
+        "GUID:677f4d7febad68e4194ce8008eff07f8",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:834d5a11da3c34e438d3ecb06f9556a5"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

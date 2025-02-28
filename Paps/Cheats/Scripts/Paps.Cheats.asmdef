@@ -1,0 +1,24 @@
+{
+    "name": "Paps.Cheats",
+    "rootNamespace": "Paps.Cheats",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:677f4d7febad68e4194ce8008eff07f8",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:593a5b492d29ac6448b1ebf7f035ef33",
+        "GUID:9e24947de15b9834991c9d8411ea37cf",
+        "GUID:84651a3751eca9349aac36a66bba901b",
+        "GUID:a00d710b062668a46b8ebf64b9e61d6e"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_EDITOR || CHEATS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

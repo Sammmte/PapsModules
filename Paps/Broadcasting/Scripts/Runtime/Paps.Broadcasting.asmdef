@@ -1,0 +1,14 @@
+{
+    "name": "Paps.Broadcasting",
+    "rootNamespace": "Paps.Broadcasting",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

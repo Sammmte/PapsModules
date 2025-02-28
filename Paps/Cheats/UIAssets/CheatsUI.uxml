@@ -1,0 +1,16 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Paps.Cheats.CheatsUI style="flex-grow: 1; justify-content: center;">
+        <engine:VisualElement name="Panel" style="width: 90%; height: 90%; align-self: center; background-color: rgb(53, 53, 53);">
+            <engine:VisualElement name="Header" style="min-height: 140px;">
+                <engine:Label text="Cheats" style="color: rgb(255, 11, 11); height: 50px; font-size: 40px; -unity-text-align: upper-center; -unity-font-style: bold;" />
+                <engine:Button text="Close" name="CloseButton" style="font-size: 40px;" />
+            </engine:VisualElement>
+            <engine:ScrollView name="ButtonsContainer" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" style="flex-grow: 1;" />
+            <engine:VisualElement name="SubmenuContainerParent" style="flex-grow: 1; display: none;">
+                <Paps.UnityExtensions.AutoSizeLabel name="SubmenuDisplayNameLabel" text="Cheats" style="height: 50px; -unity-font-style: bold; font-size: 40px; color: rgb(255, 11, 11); -unity-text-align: upper-center;" />
+                <engine:Button text="Back" name="BackButton" style="font-size: 40px;" />
+                <engine:ScrollView name="SubmenuContainer" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" style="margin-top: 20px; margin-right: 20px; margin-bottom: 10px; margin-left: 20px; background-color: rgb(217, 217, 217);" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </Paps.Cheats.CheatsUI>
+</engine:UXML>

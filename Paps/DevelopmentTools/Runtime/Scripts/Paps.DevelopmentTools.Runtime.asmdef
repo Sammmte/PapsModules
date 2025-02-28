@@ -1,0 +1,22 @@
+{
+    "name": "Paps.DevelopmentTools.Runtime",
+    "rootNamespace": "Paps.DevelopmentTools.Runtime",
+    "references": [
+        "GUID:834d5a11da3c34e438d3ecb06f9556a5",
+        "GUID:a00d710b062668a46b8ebf64b9e61d6e",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:677f4d7febad68e4194ce8008eff07f8",
+        "GUID:3de88c88fbbb8f944b9210d496af9762",
+        "GUID:06ca7dd9872e30d4ea2cbfe868727d68"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

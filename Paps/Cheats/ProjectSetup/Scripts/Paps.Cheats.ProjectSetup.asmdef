@@ -1,0 +1,23 @@
+{
+    "name": "Paps.Cheats.ProjectSetup",
+    "rootNamespace": "Paps.Cheats.ProjectSetup",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:a00d710b062668a46b8ebf64b9e61d6e",
+        "GUID:276fb2fc1687fe74c9c6ce7174a1073f",
+        "GUID:23eed6c2401dca1419d1ebd180e58c5a",
+        "GUID:1e526cf5a40adba418a298c242e9faa8",
+        "GUID:69448af7b92c7f342b298e06a37122aa"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

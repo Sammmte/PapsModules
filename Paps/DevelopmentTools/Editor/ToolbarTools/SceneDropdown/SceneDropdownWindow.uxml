@@ -1,0 +1,14 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <engine:VisualElement name="WindowContainer" style="width: 400px; height: 150px; border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px; border-left-color: rgba(0, 0, 0, 0.99); border-right-color: rgba(0, 0, 0, 0.99); border-top-color: rgba(0, 0, 0, 0.99); border-bottom-color: rgba(0, 0, 0, 0.99); padding-top: 3px; padding-right: 3px; padding-bottom: 3px; padding-left: 3px;">
+        <engine:VisualElement name="MainContainer" style="flex-grow: 1; flex-direction: row;">
+            <engine:VisualElement name="StaticScenes" style="flex-grow: 1; margin-right: 5px;">
+                <engine:Label text="Static" name="Title" style="border-bottom-width: 2px; border-bottom-color: rgb(82, 82, 82);" />
+                <engine:ScrollView name="StaticScenesScrollView" style="margin-top: 8px; background-color: rgb(43, 43, 43); padding-top: 3px; padding-right: 3px; padding-bottom: 3px; padding-left: 3px; flex-grow: 1;" />
+            </engine:VisualElement>
+            <engine:VisualElement name="LevelScenes" style="flex-grow: 1; margin-right: 5px;">
+                <engine:Label text="Levels" name="Title" style="border-bottom-width: 2px; border-bottom-color: rgb(82, 82, 82);" />
+                <engine:ScrollView name="LevelScenesScrollView" style="margin-top: 8px; background-color: rgb(43, 43, 43); flex-grow: 1; padding-top: 3px; padding-right: 3px; padding-bottom: 3px; padding-left: 3px;" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>
