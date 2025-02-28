@@ -8,6 +8,9 @@ namespace Paps.Persistence
     public class StorageHandler
     {
         public static bool PersistenceEnabled { get; set; }
+#if PERSISTENCE && !UNITY_EDITOR
+        = true;
+#endif
 
         private InMemoryStorage _inMemoryStorage = new InMemoryStorage();
         private IStorage _actualStorage;
