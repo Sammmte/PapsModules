@@ -20,5 +20,21 @@ namespace Paps.Cheats
         {
             return await Addressables.LoadAssetAsync<T>(address);
         }
+
+        public static int GetInt(this TextField textField, int defaultValue = default)
+        {
+            if (int.TryParse(textField.text, out var result))
+                return result;
+
+            return defaultValue;
+        }
+
+        public static float GetFloat(this TextField textField, float defaultValue = default)
+        {
+            if (float.TryParse(textField.text, out var result))
+                return result;
+
+            return defaultValue;
+        }
     }
 }
