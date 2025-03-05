@@ -16,7 +16,6 @@ namespace Paps.GameSettings.Cheats
         private Label _currentFrameRateLabel;
         private TextField _frameRateField;
         private Button _changeFrameRateButton;
-        private Toggle _vsyncToggle;
 
         public VisualElement GetVisualElement()
         {
@@ -43,8 +42,6 @@ namespace Paps.GameSettings.Cheats
             _changeFrameRateButton = new Button();
             _changeFrameRateButton.text = "Change Frame Rate";
             _changeFrameRateButton.clicked += ChangeFrameRate;
-
-            _vsyncToggle = new Toggle("VSync");
 
             _container.Add(_currentResolutionLabel);
             _container.Add(_widthField);
