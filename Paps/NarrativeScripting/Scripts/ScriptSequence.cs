@@ -7,35 +7,27 @@ using System.Linq;
 namespace Paps.NarrativeScripting
 {
     [Serializable]
-    public struct ScriptSequence : IScript
+    public class ScriptSequence : IScript
     {
         [SerializeField] private SerializableInterface<IScript>[] _scripts;
 
-        private IScript[] _cachedScripts;
-
-        private IScript[] Scripts
-        {
-            get
-            {
-                if (_cachedScripts == null)
-                    _cachedScripts = _scripts.Select(script => script.Value).ToArray();
-
-                return _cachedScripts;
-            }
-        }
+        private IScript[] _byConstructorScripts;
+        
+        public ScriptSequence() {}
 
         public ScriptSequence(IScript[] scripts)
         {
-            _scripts = null;
-            _cachedScripts = scripts;
+            _byConstructorScripts = scripts;
         }
 
         public async UniTask Execute()
         {
-            var scripts = Scripts;
-
-            for (int i = 0; i < scripts.Length; i++)
-                await scripts[i].Execute();
+            if(_byConstructorScripts != null)
+                for (int i = 0; i < _byConstructorScripts.Length; i++)
+                    await _byConstructorScripts[i].Execute();
+            else if (_scripts != null)
+                for (int i = 0; i < _scripts.Length; i++)
+                    await _scripts[i].Value.Execute();
         }
     }
 }

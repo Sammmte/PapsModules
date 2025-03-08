@@ -7,32 +7,25 @@ using System.Linq;
 namespace Paps.NarrativeScripting
 {
     [Serializable]
-    public struct ScriptParallel : IScript
+    public class ScriptParallel : IScript
     {
         [SerializeField] private SerializableInterface<IScript>[] _scripts;
 
-        private IScript[] _cachedScripts;
-
-        private IScript[] Scripts
-        {
-            get
-            {
-                if (_cachedScripts == null)
-                    _cachedScripts = _scripts.Select(script => script.Value).ToArray();
-
-                return _cachedScripts;
-            }
-        }
+        private IScript[] _byConstructorScripts;
+        
+        public ScriptParallel() {}
 
         public ScriptParallel(IScript[] scripts)
         {
-            _scripts = null;
-            _cachedScripts = scripts;
+            _byConstructorScripts = scripts;
         }
 
         public async UniTask Execute()
         {
-            await UniTask.WhenAll(Scripts.Select(script => script.Execute()));
+            if(_byConstructorScripts != null)
+                await UniTask.WhenAll(_byConstructorScripts.Select(script => script.Execute()));
+            else if (_scripts != null)
+                await UniTask.WhenAll(_scripts.Select(script => script.Value.Execute()));
         }
     }
 }

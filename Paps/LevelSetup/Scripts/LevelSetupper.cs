@@ -111,23 +111,52 @@ namespace Paps.LevelSetup
             await UniTask.WhenAll(GetAllExistingLevelSetuppables().Select(l => l.Unload()));
         }
 
-        private static ILevelSetuppable[] GetAllExistingLevelSetuppables()
+        private static IEnumerable<ILevelSetuppable> GetAllExistingLevelSetuppables()
         {
-            return _sceneBoundLevelSetuppables.Values.SelectMany(l => l)
-                .Concat(_everPresentLevelSetuppables)
-                .Where(IsNotNull)
-                .ToArray();
+            var list = new List<ILevelSetuppable>();
+
+            foreach (var levelSetuppables in _sceneBoundLevelSetuppables.Values)
+            {
+                for (int i = 0; i < levelSetuppables.Count; i++)
+                {
+                    var levelSetuppable = levelSetuppables[i];
+                    if(Exists(levelSetuppable))
+                        list.Add(levelSetuppable);
+                }
+            }
+
+            foreach (var levelSetuppable in _everPresentLevelSetuppables)
+            {
+                if(Exists(levelSetuppable))
+                    list.Add(levelSetuppable);
+            }
+
+            return list;
         }
 
-        private static ILevelSetuppable[] GetAllExistingLevelSetuppablesFrom(SceneGroup sceneGroup)
+        private static IEnumerable<ILevelSetuppable> GetAllExistingLevelSetuppablesFrom(SceneGroup sceneGroup)
         {
-            return _sceneBoundLevelSetuppables.Where(s => sceneGroup.Scenes.Contains(s.Key))
-                .SelectMany(keyValue => keyValue.Value)
-                .Where(IsNotNull)
-                .ToArray();
+            var list = new List<ILevelSetuppable>();
+
+            foreach (var sceneWithSetuppables in _sceneBoundLevelSetuppables)
+            {
+                if (sceneGroup.Scenes.Contains(sceneWithSetuppables.Key))
+                {
+                    var levelSetuppables = sceneWithSetuppables.Value;
+                    
+                    for (int i = 0; i < levelSetuppables.Count; i++)
+                    {
+                        var levelSetuppable = levelSetuppables[i];
+                        if(Exists(levelSetuppable))
+                            list.Add(levelSetuppable);
+                    }
+                }
+            }
+
+            return list;
         }
 
-        private static bool IsNotNull(ILevelSetuppable levelSetuppable)
+        private static bool Exists(ILevelSetuppable levelSetuppable)
         {
             if (levelSetuppable is UnityEngine.Object obj) // needed to check if unity object was destroyed
                 return obj != null;

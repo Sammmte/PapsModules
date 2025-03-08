@@ -1,7 +1,7 @@
 ﻿using Eflatun.SceneReference;
 using System;
-using System.Linq;
 using UnityEngine;
+using Paps.UnityExtensions;
 
 namespace Paps.SceneLoading
 {
@@ -15,7 +15,7 @@ namespace Paps.SceneLoading
             if (serializableSceneGroup._scenes == null)
                 return new SceneGroup(null);
 
-            return new SceneGroup(serializableSceneGroup._scenes.Select<SceneReference, Scene>(s => s).ToArray());
+            return new SceneGroup(serializableSceneGroup._scenes.ToArray<SceneReference, Scene>(s => s));
         }
     }
 }

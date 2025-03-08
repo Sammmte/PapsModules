@@ -1,7 +1,6 @@
-﻿using System.Linq;
-using UnityEngine;
-using UnityEngine.Localization;
+﻿using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
+using Paps.UnityExtensions;
 
 namespace Paps.Localization
 {
@@ -9,7 +8,7 @@ namespace Paps.Localization
     {
         public Language[] GetLanguages()
         {
-            return LocalizationSettings.AvailableLocales.Locales.Select(l => new Language(l.Identifier.Code, l.LocaleName)).ToArray();
+            return LocalizationSettings.AvailableLocales.Locales.ToArray(l => new Language(l.Identifier.Code, l.LocaleName));
         }
 
         public LocalizedText GetLocalizedText(string tableId, string localizationId)
