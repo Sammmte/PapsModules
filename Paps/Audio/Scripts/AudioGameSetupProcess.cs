@@ -10,10 +10,11 @@ namespace Paps.Audio
     public class AudioGameSetupProcess : GameSetupProcess
     {
         [SerializeField] private AudioMixer _audioMixer;
+        [SerializeField] private AudioEmitter _audioEmitterPrefab;
 
         public override async UniTask Setup()
         {
-            var audioService = new AudioService(_audioMixer);
+            var audioService = new AudioService(_audioMixer, _audioEmitterPrefab);
             Locator.Create(audioService);
         }
     }

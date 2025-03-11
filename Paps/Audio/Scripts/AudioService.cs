@@ -1,44 +1,61 @@
-﻿using UnityEngine.Audio;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.Pool;
 
 namespace Paps.Audio
 {
     public class AudioService
     {
-        private AudioMixer _audioMixer;
+        public AudioMixer AudioMixer { get; }
+        
+        private Transform _audioEmittersParent;
+        private AudioEmitter _audioEmitterPrefab;
+        private ObjectPool<AudioEmitter> _audioEmitterPool;
+        private List<AudioEmitter> _activePooledAudioEmitters = new List<AudioEmitter>();
 
-        public AudioService(AudioMixer audioMixer)
+        public AudioService(AudioMixer audioMixer, AudioEmitter audioEmitterPrefab)
         {
-            _audioMixer = audioMixer;
+            AudioMixer = audioMixer;
+            _audioEmitterPrefab = audioEmitterPrefab;
+            _audioEmittersParent = new GameObject("AudioEmittersParent").transform;
+            GameObject.DontDestroyOnLoad(_audioEmittersParent.gameObject);
+            _audioEmitterPool = new ObjectPool<AudioEmitter>(CreateAudioEmitter, OnGetAudioEmitter, OnReleaseAudioEmitter);
         }
 
-        public float MasterVolume { 
-            get
-            {
-                _audioMixer.GetFloat("MasterVolume", out float value);
-
-                return value;
-            }
-            set => _audioMixer.SetFloat("MasterVolume", value);
-        }
-        public float MusicVolume
+        private AudioEmitter CreateAudioEmitter()
         {
-            get
-            {
-                _audioMixer.GetFloat("MusicVolume", out float value);
-
-                return value;
-            }
-            set => _audioMixer.SetFloat("MusicVolume", value);
+            var newAudioEmitter = GameObject.Instantiate(_audioEmitterPrefab, _audioEmittersParent);
+            newAudioEmitter.OnStopped += Release;
+            return newAudioEmitter;
         }
-        public float SFXVolume
-        {
-            get
-            {
-                _audioMixer.GetFloat("SFXVolume", out float value);
 
-                return value;
-            }
-            set => _audioMixer.SetFloat("SFXVolume", value);
+        private void Release(AudioEmitter audioEmitter) => _audioEmitterPool.Release(audioEmitter);
+
+        private void OnGetAudioEmitter(AudioEmitter audioEmitter)
+        {
+            _activePooledAudioEmitters.Add(audioEmitter);
+        }
+
+        private void OnReleaseAudioEmitter(AudioEmitter audioEmitter)
+        {
+            _activePooledAudioEmitters.Remove(audioEmitter);
+        }
+
+        public AudioEmitter Play(AudioParameters audioParameters)
+        {
+            var audioEmitter = _audioEmitterPool.Get();
+            audioEmitter.Play(audioParameters);
+            return audioEmitter;
+        }
+        
+        public void Play(AudioEmitter audioEmitter, AudioParameters audioParameters) => audioEmitter.Play(audioParameters);
+
+        public void Play(AudioEmitter audioEmitter) => audioEmitter.Play();
+
+        public void Stop(AudioEmitter audioEmitter)
+        {
+            audioEmitter.Stop();
         }
     }
 }
