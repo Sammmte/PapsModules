@@ -48,5 +48,12 @@ namespace Paps.Audio
             if(!_audioSource.isPlaying)
                 Stop();
         }
+
+        private void OnDestroy()
+        {
+            this.UnregisterInManager();
+            
+            _audioSource.Stop();
+        }
     }
 }
