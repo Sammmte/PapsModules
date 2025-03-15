@@ -14,6 +14,7 @@ namespace Paps.Localization
             return UniTask.Create(async () =>
             {
                 await LocalizationSettings.InitializationOperation.ToUniTask();
+                await UniTask.NextFrame(); // this prevents errors from calling localized strings the same frame initialization finishes
 
                 var localizationService = new UnityLocalizationService();
                 Locator.Create<ILocalizationService>(localizationService);
