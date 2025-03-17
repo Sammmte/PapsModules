@@ -1,4 +1,5 @@
 ﻿using Gilzoide.UpdateManager;
+using Paps.Optionals;
 using System;
 using UnityEngine;
 
@@ -13,12 +14,12 @@ namespace Paps.Audio
 
         internal void Play(AudioParameters audioParameters)
         {
-            _audioSource.clip = audioParameters.AudioClip;
-            _audioSource.outputAudioMixerGroup = audioParameters.AudioMixerGroup;
-            _audioSource.volume = audioParameters.Volume;
-            _audioSource.spatialBlend = audioParameters.SpatialBlend;
-            _audioSource.loop = audioParameters.Loop;
-            transform.position = audioParameters.Position;
+            _audioSource.clip = audioParameters.AudioClip.ValueOrDefault(_audioSource.clip);
+            _audioSource.outputAudioMixerGroup = audioParameters.AudioMixerGroup.ValueOrDefault(_audioSource.outputAudioMixerGroup);
+            _audioSource.volume = audioParameters.Volume.ValueOrDefault(_audioSource.volume);
+            _audioSource.spatialBlend = audioParameters.SpatialBlend.ValueOrDefault(_audioSource.spatialBlend);
+            _audioSource.loop = audioParameters.Loop.ValueOrDefault(_audioSource.loop);
+            transform.position = audioParameters.Position.ValueOrDefault(transform.position);
             
             Play();
         }

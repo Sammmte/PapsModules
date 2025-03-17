@@ -27,6 +27,7 @@ namespace Paps.Audio
         {
             var newAudioEmitter = GameObject.Instantiate(_audioEmitterPrefab, _audioEmittersParent);
             newAudioEmitter.OnStopped += Release;
+            newAudioEmitter.gameObject.SetActive(false);
             return newAudioEmitter;
         }
 
@@ -35,11 +36,13 @@ namespace Paps.Audio
         private void OnGetAudioEmitter(AudioEmitter audioEmitter)
         {
             _activePooledAudioEmitters.Add(audioEmitter);
+            audioEmitter.gameObject.SetActive(true);
         }
 
         private void OnReleaseAudioEmitter(AudioEmitter audioEmitter)
         {
             _activePooledAudioEmitters.Remove(audioEmitter);
+            audioEmitter.gameObject.SetActive(false);
         }
 
         public AudioEmitter Play(AudioParameters audioParameters)

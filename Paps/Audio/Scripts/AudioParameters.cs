@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Paps.Optionals;
+using System;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -7,21 +8,60 @@ namespace Paps.Audio
     [Serializable]
     public struct AudioParameters
     {
-        [SerializeField] public AudioClip AudioClip;
-        [SerializeField] public AudioMixerGroup AudioMixerGroup;
-        [SerializeField] [Range(0f, 1f)] public float Volume;
-        [SerializeField] [Range(0f, 1f)] public float SpatialBlend;
-        [SerializeField] public Vector3 Position;
-        [SerializeField] public bool Loop;
-        
-        public AudioParameters(AudioClip clip, AudioMixerGroup audioMixerGroup)
+        [SerializeField] private Optional<AudioClip> _audioClip;
+        [SerializeField] private Optional<AudioMixerGroup> _audioMixerGroup;
+        [SerializeField] private Optional<float> _volume;
+        [SerializeField] private Optional<float> _spatialBlend;
+        [SerializeField] private Optional<Transform> _positionTransform;
+        [SerializeField] private Optional<Vector3> _position;
+        [SerializeField] private Optional<bool> _loop;
+
+        public Optional<AudioClip> AudioClip
         {
-            AudioClip = clip;
-            AudioMixerGroup = audioMixerGroup;
-            Volume = 1;
-            SpatialBlend = 0;
-            Position = Vector3.zero;
-            Loop = false;
+            get => _audioClip;
+            set => _audioClip = value;
+        }
+
+        public Optional<AudioMixerGroup> AudioMixerGroup
+        {
+            get => _audioMixerGroup;
+            set => _audioMixerGroup = value;
+        }
+
+        public Optional<float> Volume
+        {
+            get => _volume;
+            set => _volume = value;
+        }
+
+        public Optional<float> SpatialBlend
+        {
+            get => _spatialBlend;
+            set => _spatialBlend = value;
+        }
+
+        public Optional<Vector3> Position
+        {
+            get
+            {
+                if (_positionTransform.HasValue)
+                    return _positionTransform.Value.position;
+
+                return _position;
+            }
+
+            set
+            {
+                _positionTransform = Optional<Transform>.None();
+
+                _position = value;
+            }
+        }
+
+        public Optional<bool> Loop
+        {
+            get => _loop;
+            set => _loop = value;
         }
     }
 }
