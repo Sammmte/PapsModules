@@ -4,7 +4,7 @@ using TNRD;
 using UnityEngine;
 using System.Linq;
 
-namespace Paps.NarrativeScripting
+namespace Paps.InGameScripts
 {
     [Serializable]
     public class ScriptParallel : IScript

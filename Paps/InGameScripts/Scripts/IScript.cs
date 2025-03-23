@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 
-namespace Paps.NarrativeScripting
+namespace Paps.InGameScripts
 {
     public interface IScript
     {
