@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Paps.InGameScripts
 {
-    [CreateAssetMenu(menuName = "Paps/Narrative Scripting/Script Asset")]
+    [CreateAssetMenu(menuName = "Paps/In Game Scripts/Script Asset")]
     public class ScriptAsset : ScriptableObject, IScript
     {
         [SerializeField] private SerializableInterface<IScript> _script;
