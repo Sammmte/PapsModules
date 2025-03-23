@@ -35,5 +35,35 @@ namespace Paps.UnityExtensions
 
             return arrayOutput;
         }
+        
+        public static List<TOutput> ToList<TSource, TOutput>(this IEnumerable<TSource> enumerable, Func<TSource, TOutput> selector)
+        {
+            var list = new List<TOutput>(enumerable.Count());
+            
+            for(int i = 0; i < enumerable.Count(); i++)
+                list.Add(selector(enumerable.ElementAt(i)));
+
+            return list;
+        }
+        
+        public static List<TOutput> ToList<TSource, TOutput>(this TSource[] array, Func<TSource, TOutput> selector)
+        {
+            var listOutput = new List<TOutput>(array.Length);
+            
+            for(int i = 0; i < array.Length; i++)
+                listOutput.Add(selector(array[i]));
+
+            return listOutput;
+        }
+        
+        public static List<TOutput> ToList<TSource, TOutput>(this List<TSource> listInput, Func<TSource, TOutput> selector)
+        {
+            var listOutput = new List<TOutput>(listInput.Count);
+            
+            for(int i = 0; i < listInput.Count; i++)
+                listOutput.Add(selector(listInput[i]));
+
+            return listOutput;
+        }
     }
 }
