@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -14,6 +15,7 @@ namespace Paps.Build
 
         private Toggle _productionToggle;
         private EnumField _buildTargetEnumField;
+        private EnumFlagsField _buildOptionsField;
         private Button _buildButton;
         private VisualElement _customSettingsContainer;
 
@@ -44,6 +46,7 @@ namespace Paps.Build
 
             _productionToggle = rootVisualElement.Q<Toggle>("ProductionToggle");
             _buildTargetEnumField = rootVisualElement.Q<EnumField>("BuildTargetField");
+            _buildOptionsField = rootVisualElement.Q<EnumFlagsField>("BuildOptionsField");
             _buildButton = rootVisualElement.Q<Button>("BuildButton");
             _customSettingsContainer = rootVisualElement.Q("CustomSettingsContainer");
 
@@ -69,7 +72,7 @@ namespace Paps.Build
             {
                 OutputPath = "Build/" + (_productionToggle.value ? "Production" : "Development" ) + $"/{Application.productName}.exe",
                 BuildTarget = (BuildTarget)_buildTargetEnumField.value,
-                BuildOptions = _productionToggle.value ? BuildOptions.None : BuildOptions.Development
+                BuildOptions = (BuildOptions)_buildOptionsField.value
             };
 
             settings.SetScenePaths(EditorBuildSettings.scenes.Select(s => s.path).ToArray());

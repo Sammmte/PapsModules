@@ -5,6 +5,7 @@
             <engine:VisualElement name="StaticSettings" style="flex-grow: 1;">
                 <engine:Toggle label="Production" name="ProductionToggle" />
                 <engine:EnumField label="Build Target" value="StandaloneWindows64" type="UnityEditor.BuildTarget, UnityEditor.CoreModule" name="BuildTargetField" />
+                <editor:EnumFlagsField label="Build Options" value="DynamicTransform" type="UnityEditor.BuildOptions, UnityEditor.CoreModule" name="BuildOptionsField" />
             </engine:VisualElement>
             <engine:VisualElement name="CustomSettingsContainerParent" style="flex-grow: 1; margin-top: 10px;">
                 <engine:Label text="Custom Settings" style="-unity-text-align: upper-center; font-size: 16px; color: rgb(104, 247, 123); -unity-font-style: bold;" />
