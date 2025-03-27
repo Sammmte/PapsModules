@@ -52,6 +52,8 @@ namespace Paps.Build
 
             var existingCustomBuildSettings = TypeCache.GetTypesDerivedFrom<IBuildWindowSettings>().ToArray();
 
+            _buildOptionsField.Init(BuildOptions.None);
+            
             foreach(var customBuildSettingsType in existingCustomBuildSettings)
             {
                 var customBuildSettingsElementTemplate = _customSettingsElement.CloneTree();
