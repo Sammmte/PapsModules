@@ -28,7 +28,8 @@ namespace Paps.Build
             var buildTargetGroup = BuildPipeline.GetBuildTargetGroup(buildSettings.BuildTarget);
             var namedBuildTarget = NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup);
             var previousDefineSymbols = PlayerSettings.GetScriptingDefineSymbols(namedBuildTarget);
-            Debug.Log($"Build goes with define symbols: {JsonSerialization.ToJson(buildSettings.GetDefineSymbols())}");
+            PlayerSettings.SetScriptingDefineSymbols(namedBuildTarget, buildSettings.GetDefineSymbols());
+            Debug.Log($"Build goes with define symbols: {PlayerSettings.GetScriptingDefineSymbols(namedBuildTarget)}");
             var addressableGroupsNotIncluded = buildSettings.GetNotIncludedAddressablesGroups();
             SetAddressablesGroupsAsIncluded(addressableGroupsNotIncluded, false);
             Debug.Log($"Build removes addressables groups: {JsonSerialization.ToJson(addressableGroupsNotIncluded)}");
@@ -39,9 +40,9 @@ namespace Paps.Build
                 options = buildSettings.BuildOptions,
                 scenes = buildSettings.GetScenePaths(),
                 target = buildSettings.BuildTarget,
-                extraScriptingDefines = buildSettings.GetDefineSymbols()
             });
 
+            PlayerSettings.SetScriptingDefineSymbols(namedBuildTarget, previousDefineSymbols);
             SetAddressablesGroupsAsIncluded(buildSettings.GetNotIncludedAddressablesGroups(), true);
         }
 
