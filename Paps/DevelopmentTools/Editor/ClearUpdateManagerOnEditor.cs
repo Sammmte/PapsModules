@@ -13,7 +13,7 @@ namespace Paps.DevelopmentTools.Editor
 
         private static void OnPlayModeStateChanged(PlayModeStateChange playModeStateChange)
         {
-            if (playModeStateChange == PlayModeStateChange.ExitingPlayMode)
+            if (playModeStateChange == PlayModeStateChange.ExitingPlayMode || playModeStateChange == PlayModeStateChange.EnteredEditMode)
                 UpdateManager.Instance.Clear();
         }
     }
