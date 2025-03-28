@@ -20,6 +20,7 @@ namespace Paps.Audio
             _audioSource.spatialBlend = audioParameters.SpatialBlend.ValueOrDefault(_audioSource.spatialBlend);
             _audioSource.loop = audioParameters.Loop.ValueOrDefault(_audioSource.loop);
             transform.position = audioParameters.Position.ValueOrDefault(transform.position);
+            _audioSource.pitch = audioParameters.Pitch.ValueOrDefault(_audioSource.pitch);
             
             Play();
         }

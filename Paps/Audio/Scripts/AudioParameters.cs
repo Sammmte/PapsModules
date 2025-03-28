@@ -15,6 +15,7 @@ namespace Paps.Audio
         [SerializeField] private Optional<Transform> _positionTransform;
         [SerializeField] private Optional<Vector3> _position;
         [SerializeField] private Optional<bool> _loop;
+        [SerializeField] private Optional<float> _pitch;
 
         public Optional<AudioClip> AudioClip
         {
@@ -62,6 +63,12 @@ namespace Paps.Audio
         {
             get => _loop;
             set => _loop = value;
+        }
+
+        public Optional<float> Pitch
+        {
+            get => _pitch;
+            set => _pitch = value;
         }
     }
 }
