@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -21,16 +22,10 @@ namespace Paps.Build
 
         private List<IBuildWindowSettings> _customBuildSettings = new List<IBuildWindowSettings>();
 
-        [MenuItem("Paps/Build/Open Build Path/Development")]
+        [MenuItem("Paps/Build/Open build path")]
         public static void OpenBuildPathDevelopment()
         {
-            EditorUtility.RevealInFinder($"Build/Development/{Application.productName}.exe");
-        }
-
-        [MenuItem("Paps/Build/Open Build Path/Production")]
-        public static void OpenBuildPathProduction()
-        {
-            EditorUtility.RevealInFinder($"Build/Production/{Application.productName}.exe");
+            EditorUtility.RevealInFinder("Build/");
         }
 
         [MenuItem("Paps/Build/Build Window")]
@@ -70,10 +65,14 @@ namespace Paps.Build
 
         private void Build()
         {
+            var buildTarget = (BuildTarget)_buildTargetEnumField.value;
+            var outputPath = Path.Combine("Build", buildTarget.ToString(),
+                (_productionToggle.value ? "Production" : "Development"), GetOutputPathFile(buildTarget));
+            
             var settings = new BuildSettings()
             {
-                OutputPath = "Build/" + (_productionToggle.value ? "Production" : "Development" ) + $"/{Application.productName}.exe",
-                BuildTarget = (BuildTarget)_buildTargetEnumField.value,
+                OutputPath = outputPath,
+                BuildTarget = buildTarget,
                 BuildOptions = (BuildOptions)_buildOptionsField.value
             };
 
@@ -94,6 +93,15 @@ namespace Paps.Build
             EditorUtility.RevealInFinder(settings.OutputPath);
 
             Close();
+        }
+
+        private string GetOutputPathFile(BuildTarget buildTarget)
+        {
+            return buildTarget switch
+            {
+                BuildTarget.Android => $"{Application.productName}.apk",
+                _ => $"{Application.productName}.exe",
+            };
         }
     }
 }
