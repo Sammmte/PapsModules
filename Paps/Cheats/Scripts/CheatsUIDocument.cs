@@ -8,7 +8,6 @@ namespace Paps.Cheats
     public class CheatsUIDocument : MonoBehaviour
     {
         [SerializeField] private UIDocument _uIDocument;
-        [SerializeField] private InputActionReference _toggleVisibilityAction;
 
         private CheatsUI _cheatsUI;
 
@@ -18,7 +17,7 @@ namespace Paps.Cheats
 
             _cheatsUI.Hide();
 
-            await _cheatsUI.Initialize(_toggleVisibilityAction);
+            await _cheatsUI.Initialize();
         }
     }
 }

@@ -26,10 +26,8 @@ namespace Paps.Cheats
 
         public CheatsUI() { }
 
-        public async UniTask Initialize(InputAction toggleVisibilityAction)
+        public async UniTask Initialize()
         {
-            _toggleVisibilityAction = toggleVisibilityAction;
-
             _buttonsContainer = this.Q<ScrollView>("ButtonsContainer");
             _submenuContainerParent = this.Q("SubmenuContainerParent");
             _submenuContainer = this.Q<ScrollView>("SubmenuContainer");
@@ -38,7 +36,10 @@ namespace Paps.Cheats
             _backButton = this.Q<Button>("BackButton");
             _closeButton = this.Q<Button>("CloseButton");
 
+            var cheatActions = await CheatsHelper.LoadAssetAsync<InputActionAsset>("CheatActions");
             var cheatSubmenuButtonVTA = await CheatsHelper.LoadAssetAsync<VisualTreeAsset>("CheatSubmenuButton");
+
+            _toggleVisibilityAction = cheatActions.FindAction("ToggleVisibility");
 
             _backButton.clicked += HideSubmenu;
             _closeButton.clicked += Hide;
