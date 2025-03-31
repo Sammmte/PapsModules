@@ -30,5 +30,17 @@ namespace Paps.ReflectionExtensions
         {
             return (T)obj.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance).GetValue(obj);
         }
+        
+        public static void SetPrivateProperty<T>(this object obj, string fieldName, T value)
+        {
+            var field = obj.GetType().GetProperty(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+
+            field.SetValue(obj, value);
+        }
+
+        public static T GetPrivateProperty<T>(this object obj, string fieldName)
+        {
+            return (T)obj.GetType().GetProperty(fieldName, BindingFlags.NonPublic | BindingFlags.Instance).GetValue(obj);
+        }
     }
 }
