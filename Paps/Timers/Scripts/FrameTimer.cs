@@ -5,7 +5,7 @@ namespace Paps.Timers
 {
     public class FrameTimer : IUpdatable
     {
-        public float Frames { get; set; }
+        public int Frames { get; set; }
         public bool Loop { get; set; }
         public event Action<FrameTimer> OnTick;
         public bool Active { get; private set; }
