@@ -16,6 +16,9 @@ namespace Paps.GameSettings.Cheats
         private Label _currentFrameRateLabel;
         private TextField _frameRateField;
         private Button _changeFrameRateButton;
+        private Label _currentVsyncValueLabel;
+        private SliderInt _vsyncSlider;
+        private Button _changeVsyncButton;
 
         public VisualElement GetVisualElement()
         {
@@ -43,6 +46,12 @@ namespace Paps.GameSettings.Cheats
             _changeFrameRateButton.text = "Change Frame Rate";
             _changeFrameRateButton.clicked += ChangeFrameRate;
 
+            _currentVsyncValueLabel = new Label();
+            _vsyncSlider = new SliderInt(0, 4);
+            _changeVsyncButton = new Button();
+            _changeVsyncButton.text = "Change Vsync";
+            _changeVsyncButton.clicked += ChangeVsync;
+
             _container.Add(_currentResolutionLabel);
             _container.Add(_widthField);
             _container.Add(_heightField);
@@ -50,9 +59,13 @@ namespace Paps.GameSettings.Cheats
             _container.Add(_currentFrameRateLabel);
             _container.Add(_frameRateField);
             _container.Add(_changeFrameRateButton);
+            _container.Add(_currentVsyncValueLabel);
+            _container.Add(_vsyncSlider);
+            _container.Add(_changeVsyncButton);
 
             UpdateResolutionLabel();
             UpdateFrameRateLabel();
+            UpdateVsyncLabel();
         }
 
         private void ChangeResolution()
@@ -72,6 +85,20 @@ namespace Paps.GameSettings.Cheats
             Application.targetFrameRate = frameRate;
 
             UpdateFrameRateLabel();
+        }
+
+        private void ChangeVsync()
+        {
+            var value = _vsyncSlider.value;
+
+            QualitySettings.vSyncCount = value;
+            
+            UpdateVsyncLabel();
+        }
+
+        private void UpdateVsyncLabel()
+        {
+            _currentVsyncValueLabel.text = $"Current Vsync value: {QualitySettings.vSyncCount}";
         }
 
         private void UpdateResolutionLabel()
