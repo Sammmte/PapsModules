@@ -24,6 +24,9 @@ namespace Paps.Cheats
 
         private InputAction _toggleVisibilityAction;
 
+        public static event Action OnCheatsDisplayed;
+        public static event Action OnCheatsHidden;
+
         public CheatsUI() { }
 
         public async UniTask Initialize()
@@ -83,11 +86,15 @@ namespace Paps.Cheats
         public void Show()
         {
             style.display = DisplayStyle.Flex;
+            
+            OnCheatsDisplayed?.Invoke();
         }
 
         public void Hide()
         {
             style.display = DisplayStyle.None;
+            
+            OnCheatsHidden?.Invoke();
         }
 
         private void OpenSubmenu(ICheatSubmenu submenu)
