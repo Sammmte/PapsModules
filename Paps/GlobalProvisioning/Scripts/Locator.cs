@@ -41,7 +41,12 @@ namespace Paps.GlobalProvisioning
 
         public static void Remove<T>() where T : class
         {
-            _instances.Remove(typeof(T));
+            Remove(typeof(T));
+        }
+
+        public static void Remove(Type type)
+        {
+            _instances.Remove(type);
         }
 
         public static void Remove(string name)

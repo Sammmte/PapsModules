@@ -1,7 +1,6 @@
-using Paps.GlobalProvisioning;
 using UnityEngine;
 
-namespace Paps.DevelopmentTools.Runtime
+namespace Paps.GlobalProvisioning
 {
     public class AddToLocator : MonoBehaviour
     {
@@ -10,6 +9,11 @@ namespace Paps.DevelopmentTools.Runtime
         private void Awake()
         {
             Locator.Create(_component.GetType(), _component);
+        }
+
+        private void OnDestroy()
+        {
+            Locator.Remove(_component.GetType());
         }
     }
 }
