@@ -18,7 +18,14 @@ namespace Paps.Cheats
 
         public static async UniTask<T> LoadAssetAsync<T>(string address) where T : UnityEngine.Object
         {
-            return await Addressables.LoadAssetAsync<T>(address);
+            try
+            {
+                return await Addressables.LoadAssetAsync<T>(address);
+            }
+            catch(InvalidKeyException)
+            {
+                return null;
+            }
         }
 
         public static int GetInt(this TextField textField, int defaultValue = default)
