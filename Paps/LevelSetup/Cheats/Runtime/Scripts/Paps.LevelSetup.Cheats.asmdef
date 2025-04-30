@@ -1,0 +1,25 @@
+{
+    "name": "Paps.LevelSetup.Cheats",
+    "rootNamespace": "Paps.LevelSetup.Cheats",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:a00d710b062668a46b8ebf64b9e61d6e",
+        "GUID:276fb2fc1687fe74c9c6ce7174a1073f",
+        "GUID:23eed6c2401dca1419d1ebd180e58c5a",
+        "GUID:4bb1096f5faa2b8489d34ce6d8c1e4d8",
+        "GUID:a0f35239c1c021e4abb57365ce18de72",
+        "GUID:28c07ca45521f46409202d63817718dc",
+        "GUID:1b69c9ae65d6a6e468348e472a8adfd7"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_EDITOR || CHEATS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

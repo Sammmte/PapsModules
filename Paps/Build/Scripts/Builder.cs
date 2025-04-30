@@ -24,6 +24,15 @@ namespace Paps.Build
                 var customSettings = allCustomBuildSettings.First(s => s.GetType() == buildSettingsHandler.SettingsType);
                 buildSettingsHandler.HandleSettings(buildSettings, customSettings);
             }
+            
+            var buildPreprocessors = TypeCache.GetTypesDerivedFrom<IBuildPreprocessor>()
+                .Select(t => (IBuildPreprocessor)Activator.CreateInstance(t))
+                .OrderBy(i => i.Order);
+
+            foreach (var preprocessor in buildPreprocessors)
+            {
+                preprocessor.Process(buildSettings);
+            }
 
             var buildTargetGroup = BuildPipeline.GetBuildTargetGroup(buildSettings.BuildTarget);
             var namedBuildTarget = NamedBuildTarget.FromBuildTargetGroup(buildTargetGroup);
@@ -33,6 +42,7 @@ namespace Paps.Build
             var addressableGroupsNotIncluded = buildSettings.GetNotIncludedAddressablesGroups();
             SetAddressablesGroupsAsIncluded(addressableGroupsNotIncluded, false);
             Debug.Log($"Build removes addressables groups: {JsonSerialization.ToJson(addressableGroupsNotIncluded)}");
+            Debug.Log($"Scenes included in build are {JsonSerialization.ToJson(buildSettings.GetScenePaths())}");
 
             BuildPipeline.BuildPlayer(new BuildPlayerOptions()
             {
