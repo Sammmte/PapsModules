@@ -13,7 +13,7 @@ namespace Paps.Timers
             set => _timer.Interval = value;
         }
 
-        private TCheckResult _lastResult;
+        public TCheckResult LastResult { get; private set; }
 
         public TimedCheck(Func<TCheckResult> check)
         {
@@ -25,10 +25,10 @@ namespace Paps.Timers
             if (!_timer.Active)
             {
                 _timer.Start();
-                _lastResult = _check();
+                LastResult = _check();
             }
 
-            return _lastResult;
+            return LastResult;
         }
 
         public void Stop()
