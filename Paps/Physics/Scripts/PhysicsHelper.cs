@@ -13,6 +13,16 @@ namespace Paps.Physics
         public static float EDITOR_GIZMO_DISPLAY_DURATION = 2f;
 
         private static readonly Collider[] _simpleColliderBuffer = new Collider[1];
+
+        public static int Raycast(Vector3 origin, Vector3 direction, float maxDistance, LayerMask layerMask,
+            RaycastHit[] rayHits, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        {
+            using (VisualLifetime.Create(EDITOR_GIZMO_DISPLAY_DURATION))
+            {
+                return PhysicsAPI.RaycastNonAlloc(origin, direction, rayHits, maxDistance, layerMask,
+                    queryTriggerInteraction);
+            }
+        }
         
         public static bool Raycast(Vector3 origin, Vector3 direction, float maxDistance, LayerMask layerMask,
             out RaycastHit hitInfo, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
