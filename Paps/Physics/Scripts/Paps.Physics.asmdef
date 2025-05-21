@@ -1,0 +1,21 @@
+{
+    "name": "Paps.Physics",
+    "rootNamespace": "Paps.Physics",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:a00d710b062668a46b8ebf64b9e61d6e",
+        "GUID:276fb2fc1687fe74c9c6ce7174a1073f",
+        "GUID:d1b444302b718f44cb143fec387f1e3e",
+        "GUID:9b261077c7a2ac34886513ec1345f8e0",
+        "GUID:4bb1096f5faa2b8489d34ce6d8c1e4d8"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
