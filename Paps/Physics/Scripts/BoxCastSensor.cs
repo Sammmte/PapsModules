@@ -4,7 +4,7 @@ using UnityEngine;
 using Paps.Optionals;
 using Paps.Physics;
 
-namespace Paps.Sensors
+namespace Paps.Physics
 {
     public class BoxCastSensor : CastPhysicsSensor
     {

@@ -3,7 +3,7 @@ using SaintsField;
 using System;
 using UnityEngine;
 
-namespace Paps.Sensors
+namespace Paps.Physics
 {
     public abstract class PhysicsSensor : MonoBehaviour
     {
