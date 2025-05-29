@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Debug = UnityEngine.Debug;
+using Object = UnityEngine.Object;
 
 namespace Paps.Logging
 {
@@ -41,12 +42,15 @@ namespace Paps.Logging
         }
 
         [Conditional("PAPS_LOG"), Conditional("UNITY_EDITOR")]
-        public static void Log<T>(this T caller, string message)
+        public static void Log<T>(this T caller, string message, Object contextObject = null)
         {
             if (!IsLogEnabled(typeof(T)))
                 return;
 
-            Debug.Log($"[{typeof(T).Name}] {message}");
+            if (contextObject != null)
+                Debug.Log($"[{typeof(T).Name}] {message}", contextObject);
+            else
+                Debug.Log($"[{typeof(T).Name}] {message}");
         }
 
         private static bool IsLogEnabled(Type type)
