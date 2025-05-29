@@ -10,6 +10,7 @@ namespace Paps.Timers
         public bool Loop { get; set; }
         public event Action<SyncTimer> OnTick;
         public bool Active { get; private set; }
+        public bool Paused { get; set; }
 
         private float _accumulationTime;
 
@@ -19,6 +20,7 @@ namespace Paps.Timers
                 return;
             
             Active = true;
+            Paused = false;
             _accumulationTime = 0;
             this.RegisterInManager();
         }
@@ -29,11 +31,15 @@ namespace Paps.Timers
                 return;
             
             Active = false;
+            Paused = false;
             this.UnregisterInManager();
         }
         
         public void ManagedUpdate()
         {
+            if(Paused)
+                return;
+            
             _accumulationTime += Time.deltaTime;
 
             if (_accumulationTime >= Interval)
