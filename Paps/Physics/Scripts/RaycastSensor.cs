@@ -6,39 +6,17 @@ namespace Paps.Physics
 {
     public class RaycastSensor : CastPhysicsSensor
     {
-        public struct OverrideParameters
-        {
-            public Optional<Vector3> Origin;
-            public Optional<Vector3> Direction;
-            public Optional<float> Distance;
-            public Optional<LayerMask> LayerMask;
-            public Optional<QueryTriggerInteraction> QueryTriggerInteraction;
-        }
-        
-        private OverrideParameters _overrideParameters;
-
-        public ReadOnlySpan<RaycastHit> Sense(OverrideParameters overrideParameters)
-        {
-            _overrideParameters = overrideParameters;
-
-            var result = Sense();
-
-            _overrideParameters = default;
-
-            return result;
-        }
-        
-        protected override int Execute(RaycastHit[] rayHits)
+        protected override int Execute(RaycastHit[] rayHits, CastPhysicsSensor.OverrideParameters finalParameters)
         {
             if (MaxResults == 1)
             {
                 if (PhysicsHelper.Raycast(
-                        _overrideParameters.Origin.ValueOrDefault(Origin),
-                        _overrideParameters.Direction.ValueOrDefault(Direction),
-                        _overrideParameters.Distance.ValueOrDefault(Distance),
-                        _overrideParameters.LayerMask.ValueOrDefault(LayerMask),
+                        finalParameters.Origin,
+                        finalParameters.Direction,
+                        finalParameters.Distance,
+                        finalParameters.LayerMask,
                         out RaycastHit hitInfo,
-                        _overrideParameters.QueryTriggerInteraction.ValueOrDefault(QueryTriggerInteraction)
+                        finalParameters.QueryTriggerInteraction
                     ))
                 {
                     rayHits[0] = hitInfo;
@@ -49,12 +27,12 @@ namespace Paps.Physics
             }
 
             return PhysicsHelper.Raycast(
-                _overrideParameters.Origin.ValueOrDefault(Origin),
-                _overrideParameters.Direction.ValueOrDefault(Direction),
-                _overrideParameters.Distance.ValueOrDefault(Distance),
-                _overrideParameters.LayerMask.ValueOrDefault(LayerMask),
+                finalParameters.Origin,
+                finalParameters.Direction,
+                finalParameters.Distance,
+                finalParameters.LayerMask,
                 rayHits,
-                _overrideParameters.QueryTriggerInteraction.ValueOrDefault(QueryTriggerInteraction)
+                finalParameters.QueryTriggerInteraction
             );
         }
     }

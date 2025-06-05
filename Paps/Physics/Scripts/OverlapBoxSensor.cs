@@ -40,27 +40,44 @@ namespace Paps.Physics
 
         private OverrideParameters _overrideParameters;
 
-        public ReadOnlySpan<Collider> Sense(OverrideParameters overrideParameters)
+        public new ReadOnlySpan<Collider> Sense(OverrideParameters overrideParameters = default)
         {
             _overrideParameters = overrideParameters;
 
-            var result = Sense();
+            var result = base.Sense();
 
             _overrideParameters = default;
 
             return result;
         }
         
-        protected override int Execute(Collider[] buffer)
+        protected override int Execute(Collider[] buffer, PhysicsSensor.OverrideParameters baseFinalParameters)
         {
+            var finalParameters = GetFinalParameters(baseFinalParameters, _overrideParameters);
+            
             return PhysicsHelper.OverlapBox(
-                _overrideParameters.Origin.ValueOrDefault(Origin),
-                _overrideParameters.HalfExtents.ValueOrDefault(HalfExtents),
-                _overrideParameters.LayerMask.ValueOrDefault(LayerMask),
-                _overrideParameters.Rotation.ValueOrDefault(Rotation),
+                finalParameters.Origin,
+                finalParameters.HalfExtents,
+                finalParameters.LayerMask,
+                finalParameters.Rotation,
                 buffer,
-                _overrideParameters.QueryTriggerInteraction.ValueOrDefault(QueryTriggerInteraction)
+                finalParameters.QueryTriggerInteraction
             );
+        }
+
+        private OverrideParameters GetFinalParameters(PhysicsSensor.OverrideParameters baseFinalParameters,
+            OverrideParameters overrideParameters)
+        {
+            return new OverrideParameters()
+            {
+                Origin = overrideParameters.Origin.ValueOrDefault(baseFinalParameters.Origin),
+                LayerMask = overrideParameters.LayerMask.ValueOrDefault(baseFinalParameters.LayerMask),
+                QueryTriggerInteraction =
+                    overrideParameters.QueryTriggerInteraction.ValueOrDefault(baseFinalParameters
+                        .QueryTriggerInteraction),
+                HalfExtents = overrideParameters.HalfExtents.ValueOrDefault(HalfExtents),
+                Rotation = overrideParameters.Rotation.ValueOrDefault(Rotation)
+            };
         }
     }
 }

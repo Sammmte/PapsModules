@@ -2,7 +2,6 @@
 using System;
 using UnityEngine;
 using Paps.Optionals;
-using Paps.Physics;
 
 namespace Paps.Physics
 {
@@ -43,30 +42,32 @@ namespace Paps.Physics
 
         private OverrideParameters _overrideParameters;
 
-        public ReadOnlySpan<RaycastHit> Sense(OverrideParameters overrideParameters)
+        public new ReadOnlySpan<RaycastHit> Sense(OverrideParameters overrideParameters = default)
         {
             _overrideParameters = overrideParameters;
 
-            var result = Sense();
+            var result = base.Sense();
 
             _overrideParameters = default;
 
             return result;
         }
         
-        protected override int Execute(RaycastHit[] rayHits)
+        protected override int Execute(RaycastHit[] rayHits, CastPhysicsSensor.OverrideParameters baseFinalParameters)
         {
+            var finalParameters = GetFinalParameters(baseFinalParameters, _overrideParameters);
+            
             if (MaxResults == 1)
             {
                 if (PhysicsHelper.BoxCast(
-                        _overrideParameters.Origin.ValueOrDefault(Origin),
-                        _overrideParameters.HalfExtents.ValueOrDefault(HalfExtents),
-                        _overrideParameters.Direction.ValueOrDefault(Direction),
-                        _overrideParameters.Rotation.ValueOrDefault(Rotation),
-                        _overrideParameters.Distance.ValueOrDefault(Distance),
-                        _overrideParameters.LayerMask.ValueOrDefault(LayerMask),
+                        finalParameters.Origin,
+                        finalParameters.HalfExtents,
+                        finalParameters.Direction,
+                        finalParameters.Rotation,
+                        finalParameters.Distance,
+                        finalParameters.LayerMask,
                         out RaycastHit hitInfo,
-                        _overrideParameters.QueryTriggerInteraction.ValueOrDefault(QueryTriggerInteraction)
+                        finalParameters.QueryTriggerInteraction
                     ))
                 {
                     rayHits[0] = hitInfo;
@@ -77,15 +78,32 @@ namespace Paps.Physics
             }
             
             return PhysicsHelper.BoxCast(
-                _overrideParameters.Origin.ValueOrDefault(Origin),
-                _overrideParameters.HalfExtents.ValueOrDefault(HalfExtents),
-                _overrideParameters.Direction.ValueOrDefault(Direction),
-                _overrideParameters.Rotation.ValueOrDefault(Rotation),
-                _overrideParameters.Distance.ValueOrDefault(Distance),
-                _overrideParameters.LayerMask.ValueOrDefault(LayerMask),
+                finalParameters.Origin,
+                finalParameters.HalfExtents,
+                finalParameters.Direction,
+                finalParameters.Rotation,
+                finalParameters.Distance,
+                finalParameters.LayerMask,
                 rayHits,
-                _overrideParameters.QueryTriggerInteraction.ValueOrDefault(QueryTriggerInteraction)
+                finalParameters.QueryTriggerInteraction
             );
+        }
+
+        private OverrideParameters GetFinalParameters(CastPhysicsSensor.OverrideParameters baseFinalParameters,
+            OverrideParameters overrideParameters)
+        {
+            return new OverrideParameters()
+            {
+                Origin = overrideParameters.Origin.ValueOrDefault(baseFinalParameters.Origin),
+                LayerMask = overrideParameters.LayerMask.ValueOrDefault(baseFinalParameters.LayerMask),
+                QueryTriggerInteraction =
+                    overrideParameters.QueryTriggerInteraction.ValueOrDefault(baseFinalParameters
+                        .QueryTriggerInteraction),
+                Direction = overrideParameters.Direction.ValueOrDefault(baseFinalParameters.Direction),
+                Distance = overrideParameters.Distance.ValueOrDefault(baseFinalParameters.Distance),
+                HalfExtents = overrideParameters.HalfExtents.ValueOrDefault(HalfExtents),
+                Rotation = overrideParameters.Rotation.ValueOrDefault(Rotation)
+            };
         }
     }
 }
