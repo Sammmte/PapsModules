@@ -65,26 +65,17 @@ namespace Paps.Optionals
 
         private static bool IsValidValue(T value)
         {
-            if (value is ValueType)
-                return true;
+            var type = typeof(T);
 
-            if (value is UnityEngine.Object unityObject)
+            if (type.IsClass)
             {
-                try
-                {
-                    var name = unityObject.name;
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
+                if (value is UnityEngine.Object unityObject)
+                    return unityObject != null;
+
+                return value != null;
             }
-
-            if (value != null)
-                return true;
-
-            return false;
+            
+            return true;
         }
 
         public static implicit operator T(Optional<T> optional)
