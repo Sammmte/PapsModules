@@ -13,6 +13,7 @@ namespace Paps.Physics
         public static float EDITOR_GIZMO_DISPLAY_DURATION = 2f;
 
         private static readonly Collider[] _simpleColliderBuffer = new Collider[1];
+        private static readonly RaycastHit[] _simpleRaycastHitBuffer = new RaycastHit[1];
 
         public static int Raycast(Vector3 origin, Vector3 direction, float maxDistance, LayerMask layerMask,
             RaycastHit[] rayHits, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
@@ -27,10 +28,12 @@ namespace Paps.Physics
         public static bool Raycast(Vector3 origin, Vector3 direction, float maxDistance, LayerMask layerMask,
             out RaycastHit hitInfo, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
-            using (VisualLifetime.Create(EDITOR_GIZMO_DISPLAY_DURATION))
-            {
-                return PhysicsAPI.Raycast(origin, direction, out hitInfo, maxDistance, layerMask, queryTriggerInteraction);
-            }
+            var amount = Raycast(origin, direction, maxDistance, layerMask, _simpleRaycastHitBuffer,
+                queryTriggerInteraction);
+            
+            GetRaycastHitFromBuffer(out hitInfo);
+
+            return amount > 0;
         }
 
         public static int OverlapBox(Vector3 center, Vector3 halfExtents, LayerMask layerMask, Quaternion rotation,
@@ -59,22 +62,22 @@ namespace Paps.Physics
             return collider != null;
         }
 
-        public static bool SphereCast(Vector3 origin, float radius, Vector3 direction, out RaycastHit hitInfo, 
-            float maxDistance, LayerMask layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        private static void GetRaycastHitFromBuffer(out RaycastHit raycastHit)
         {
-            using (VisualLifetime.Create(EDITOR_GIZMO_DISPLAY_DURATION))
-            {
-                return PhysicsAPI.SphereCast(origin, radius, direction, out hitInfo, maxDistance, layerMask, queryTriggerInteraction);
-            }
+            raycastHit = _simpleRaycastHitBuffer[0];
+
+            _simpleRaycastHitBuffer[0] = default;
         }
 
         public static bool BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion rotation, float maxDistance,
             LayerMask layerMask, out RaycastHit hitInfo, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
-            using (VisualLifetime.Create(EDITOR_GIZMO_DISPLAY_DURATION))
-            {
-                return PhysicsAPI.BoxCast(center, halfExtents, direction, out hitInfo, rotation, maxDistance, layerMask, queryTriggerInteraction);
-            }
+            var amount = BoxCast(center, halfExtents, direction, rotation, maxDistance, layerMask,
+                _simpleRaycastHitBuffer, queryTriggerInteraction);
+            
+            GetRaycastHitFromBuffer(out hitInfo);
+
+            return amount > 0;
         }
         
         public static int BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion rotation, float maxDistance,
