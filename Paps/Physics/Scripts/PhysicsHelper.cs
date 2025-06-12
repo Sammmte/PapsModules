@@ -13,7 +13,7 @@ namespace Paps.Physics
         public static float EDITOR_GIZMO_DISPLAY_DURATION = 2f;
 
         private static readonly Collider[] _simpleColliderBuffer = new Collider[1];
-        private static readonly RaycastHit[] _simpleRaycastHitBuffer = new RaycastHit[1];
+        private static readonly RaycastHit[] _simpleRaycastHitBuffer = new RaycastHit[50];
 
         public static int Raycast(Vector3 origin, Vector3 direction, float maxDistance, LayerMask layerMask,
             RaycastHit[] rayHits, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
@@ -31,7 +31,7 @@ namespace Paps.Physics
             var amount = Raycast(origin, direction, maxDistance, layerMask, _simpleRaycastHitBuffer,
                 queryTriggerInteraction);
             
-            GetRaycastHitFromBuffer(out hitInfo);
+            GetRaycastHitFromBuffer(amount, out hitInfo);
 
             return amount > 0;
         }
@@ -62,11 +62,21 @@ namespace Paps.Physics
             return collider != null;
         }
 
-        private static void GetRaycastHitFromBuffer(out RaycastHit raycastHit)
+        private static void GetRaycastHitFromBuffer(int amount, out RaycastHit raycastHit)
         {
-            raycastHit = _simpleRaycastHitBuffer[0];
+            var closest = _simpleRaycastHitBuffer[0];
+            
+            for (int i = 1; i < amount; i++)
+            {
+                var current = _simpleRaycastHitBuffer[i];
 
-            _simpleRaycastHitBuffer[0] = default;
+                if (current.distance < closest.distance)
+                    closest = current;
+
+                _simpleRaycastHitBuffer[i] = default;
+            }
+
+            raycastHit = closest;
         }
 
         public static bool BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion rotation, float maxDistance,
@@ -75,7 +85,7 @@ namespace Paps.Physics
             var amount = BoxCast(center, halfExtents, direction, rotation, maxDistance, layerMask,
                 _simpleRaycastHitBuffer, queryTriggerInteraction);
             
-            GetRaycastHitFromBuffer(out hitInfo);
+            GetRaycastHitFromBuffer(amount, out hitInfo);
 
             return amount > 0;
         }
