@@ -52,7 +52,7 @@ namespace Paps.DevelopmentTools.Editor
                     continue;
                 }
 
-                if (expectedNamespace != script.Namespace)
+                if (!script.Namespace.StartsWith(expectedNamespace))
                     Debug.LogWarning($"Script with path {script.Path} should be on namespace {expectedNamespace} but is on namespace {script.Namespace}");
             }
         }
