@@ -90,14 +90,6 @@ namespace Paps.LevelSetup
                 await onUnload();
         }
 
-        /*private static bool Exists(ILevelSetuppable levelSetuppable)
-        {
-            if (levelSetuppable is UnityEngine.Object obj) // needed to check if unity object was destroyed
-                return obj != null;
-
-            return levelSetuppable != null;
-        }*/
-
         public static void RegisterEverPresent(ILevelSetuppable levelSetuppable)
         {
             if(_everPresentLevelSetuppables.Contains(levelSetuppable))
@@ -162,7 +154,6 @@ namespace Paps.LevelSetup
             {
                 if (sceneGroup.Scenes.Contains(_sceneBound[i].Scene))
                 {
-                    Debug.Log("UNLOADING: " + (_sceneBound[i].LevelSetuppable as MonoBehaviour).name);
                     _tempSceneBoundBuffer.Add(_sceneBound[i]);
                 }
             }
