@@ -1,11 +1,11 @@
 using Cysharp.Threading.Tasks;
 using Paps.SceneLoading;
+using Paps.UnityExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using ZLinq;
 using Scene = Paps.SceneLoading.Scene;
 
 namespace Paps.LevelSetup
@@ -21,6 +21,7 @@ namespace Paps.LevelSetup
         private static List<GameObject> _rootGameObjectsList = new List<GameObject>(DEFAULT_OBJECTS_CAPACITY);
         private static List<SceneBoundLevelSetuppable> _sceneBound = new List<SceneBoundLevelSetuppable>(DEFAULT_OBJECTS_CAPACITY);
         private static List<SceneBoundLevelSetuppable> _tempSceneBoundBuffer = new List<SceneBoundLevelSetuppable>(DEFAULT_OBJECTS_CAPACITY);
+        private static List<ILevelSetuppable> _tempLevelSetuppableBuffer = new List<ILevelSetuppable>(DEFAULT_OBJECTS_CAPACITY);
 
         public static async UniTask LoadAndSetupInitialLevel(Level level)
         {
@@ -100,35 +101,30 @@ namespace Paps.LevelSetup
 
         private static async UniTask SetupAndKickstartFrom(SceneGroup sceneGroup, bool includeEverPresent)
         {
-            var setuppablesPerScene = sceneGroup.Scenes.AsValueEnumerable()
-                .Select(scene =>
-                {
-                    scene.GetRootGameObjects(_rootGameObjectsList);
-
-                    var levelSetuppables = _rootGameObjectsList.AsValueEnumerable()
-                        .SelectMany(g => g.DescendantsAndSelf())
-                        .Select(g => g.GetComponent<ILevelSetuppable>())
-                        .Where(l => l != null);
-
-                    return (Scene: scene, LevelSetuppables: levelSetuppables);
-                });
-            
-            _rootGameObjectsList.Clear();
-
-            foreach (var item in setuppablesPerScene)
+            for (int i = 0; i < sceneGroup.Scenes.Length; i++)
             {
-                foreach (var levelSetuppable in item.LevelSetuppables)
+                var scene = sceneGroup.Scenes[i];
+                scene.GetRootGameObjects(_rootGameObjectsList);
+
+                for (int j = 0; j < _rootGameObjectsList.Count; j++)
                 {
-                    _tempSceneBoundBuffer.Add(new SceneBoundLevelSetuppable(levelSetuppable, item.Scene));
+                    _rootGameObjectsList[j].GetComponentsInChildren(true, _tempLevelSetuppableBuffer);
+
+                    for (int k = 0; k < _tempLevelSetuppableBuffer.Count; k++)
+                    {
+                        _tempSceneBoundBuffer.Add(new SceneBoundLevelSetuppable(_tempLevelSetuppableBuffer[k], scene));
+                    }
+                    
+                    _tempLevelSetuppableBuffer.Clear();
                 }
+                
+                _rootGameObjectsList.Clear();
             }
 
             if (includeEverPresent)
-                await UniTask.WhenAll(_everPresentLevelSetuppables.AsValueEnumerable()
-                    .Select(l => l.Setup()).ToArray());
+                await UniTask.WhenAll(_everPresentLevelSetuppables.ToArray(l => l.Setup()));
 
-            await UniTask.WhenAll(_tempSceneBoundBuffer.AsValueEnumerable()
-                .Select(l => l.LevelSetuppable.Setup()).ToArray());
+            await UniTask.WhenAll(_tempSceneBoundBuffer.ToArray(l => l.LevelSetuppable.Setup()));
 
             if (includeEverPresent)
             {
@@ -137,10 +133,10 @@ namespace Paps.LevelSetup
                     levelSetuppable.Kickstart();
                 }
             }
-            
-            foreach (var item in _tempSceneBoundBuffer.AsValueEnumerable())
+
+            for (int i = 0; i < _tempSceneBoundBuffer.Count; i++)
             {
-                item.LevelSetuppable.Kickstart();
+                _tempSceneBoundBuffer[i].LevelSetuppable.Kickstart();
             }
             
             _sceneBound.AddRange(_tempSceneBoundBuffer);
@@ -158,12 +154,10 @@ namespace Paps.LevelSetup
                 }
             }
 
-            await UniTask.WhenAll(_tempSceneBoundBuffer.AsValueEnumerable()
-                .Select(l => l.LevelSetuppable.Unload()).ToArray());
+            await UniTask.WhenAll(_tempSceneBoundBuffer.ToArray(l => l.LevelSetuppable.Unload()));
             
             if (includeEverPresent)
-                await UniTask.WhenAll(_everPresentLevelSetuppables.AsValueEnumerable()
-                    .Select(l => l.Unload()).ToArray());
+                await UniTask.WhenAll(_everPresentLevelSetuppables.ToArray(l => l.Unload()));
 
             for (int i = 0; i < _tempSceneBoundBuffer.Count; i++)
                 _sceneBound.Remove(_tempSceneBoundBuffer[i]);
