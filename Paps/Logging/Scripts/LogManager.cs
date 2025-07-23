@@ -52,6 +52,30 @@ namespace Paps.Logging
             else
                 Debug.Log($"[{typeof(T).Name}] {message}");
         }
+        
+        [Conditional("PAPS_LOG"), Conditional("UNITY_EDITOR")]
+        public static void LogWarning<T>(this T caller, string message, Object contextObject = null)
+        {
+            if (!IsLogEnabled(typeof(T)))
+                return;
+
+            if (contextObject != null)
+                Debug.LogWarning($"[{typeof(T).Name}] {message}", contextObject);
+            else
+                Debug.LogWarning($"[{typeof(T).Name}] {message}");
+        }
+        
+        [Conditional("PAPS_LOG"), Conditional("UNITY_EDITOR")]
+        public static void LogError<T>(this T caller, string message, Object contextObject = null)
+        {
+            if (!IsLogEnabled(typeof(T)))
+                return;
+
+            if (contextObject != null)
+                Debug.LogError($"[{typeof(T).Name}] {message}", contextObject);
+            else
+                Debug.LogError($"[{typeof(T).Name}] {message}");
+        }
 
         private static bool IsLogEnabled(Type type)
         {
