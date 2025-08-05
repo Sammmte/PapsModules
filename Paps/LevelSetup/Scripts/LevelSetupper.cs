@@ -20,8 +20,8 @@ namespace Paps.LevelSetup
         private static List<Scene> _levelScenes = new List<Scene>(DEFAULT_SCENES_CAPACITY);
         private static List<GameObject> _rootGameObjectsList = new List<GameObject>(DEFAULT_OBJECTS_CAPACITY);
         private static List<SceneBoundLevelSetuppable> _sceneBound = new List<SceneBoundLevelSetuppable>(DEFAULT_OBJECTS_CAPACITY);
-        private static List<SceneBoundLevelSetuppable> _tempSceneBoundBuffer = new List<SceneBoundLevelSetuppable>(DEFAULT_OBJECTS_CAPACITY);
         private static List<ILevelSetuppable> _tempLevelSetuppableBuffer = new List<ILevelSetuppable>(DEFAULT_OBJECTS_CAPACITY);
+        private static List<ILevelSetuppable> _tempGetComponentLevelSetuppableBuffer = new List<ILevelSetuppable>(DEFAULT_OBJECTS_CAPACITY);
 
         public static async UniTask LoadAndSetupInitialLevel(Level level)
         {
@@ -108,40 +108,25 @@ namespace Paps.LevelSetup
 
                 for (int j = 0; j < _rootGameObjectsList.Count; j++)
                 {
-                    _rootGameObjectsList[j].GetComponentsInChildren(true, _tempLevelSetuppableBuffer);
+                    _rootGameObjectsList[j].GetComponentsInChildren(true, _tempGetComponentLevelSetuppableBuffer);
 
-                    for (int k = 0; k < _tempLevelSetuppableBuffer.Count; k++)
+                    for (int k = 0; k < _tempGetComponentLevelSetuppableBuffer.Count; k++)
                     {
-                        _tempSceneBoundBuffer.Add(new SceneBoundLevelSetuppable(_tempLevelSetuppableBuffer[k], scene));
+                        _sceneBound.Add(new SceneBoundLevelSetuppable(_tempGetComponentLevelSetuppableBuffer[k], scene));
                     }
                     
-                    _tempLevelSetuppableBuffer.Clear();
+                    _tempLevelSetuppableBuffer.AddRange(_tempGetComponentLevelSetuppableBuffer);
+                    
+                    _tempGetComponentLevelSetuppableBuffer.Clear();
                 }
                 
                 _rootGameObjectsList.Clear();
             }
-
-            if (includeEverPresent)
-                await UniTask.WhenAll(_everPresentLevelSetuppables.ToArray(l => l.Setup()));
-
-            await UniTask.WhenAll(_tempSceneBoundBuffer.ToArray(l => l.LevelSetuppable.Setup()));
-
-            if (includeEverPresent)
-            {
-                foreach (var levelSetuppable in _everPresentLevelSetuppables)
-                {
-                    levelSetuppable.Kickstart();
-                }
-            }
-
-            for (int i = 0; i < _tempSceneBoundBuffer.Count; i++)
-            {
-                _tempSceneBoundBuffer[i].LevelSetuppable.Kickstart();
-            }
             
-            _sceneBound.AddRange(_tempSceneBoundBuffer);
-            
-            _tempSceneBoundBuffer.Clear();
+            if(includeEverPresent)
+                _tempLevelSetuppableBuffer.InsertRange(0, _everPresentLevelSetuppables);
+
+            await SetupAndKickstartFromTempBuffer();
         }
 
         private static async UniTask UnloadFrom(SceneGroup sceneGroup, bool includeEverPresent)
@@ -150,19 +135,75 @@ namespace Paps.LevelSetup
             {
                 if (sceneGroup.Scenes.Contains(_sceneBound[i].Scene))
                 {
-                    _tempSceneBoundBuffer.Add(_sceneBound[i]);
+                    _tempLevelSetuppableBuffer.Add(_sceneBound[i].LevelSetuppable);
+                    
+                    _sceneBound.RemoveAt(i);
+
+                    i--;
                 }
             }
-
-            await UniTask.WhenAll(_tempSceneBoundBuffer.ToArray(l => l.LevelSetuppable.Unload()));
             
-            if (includeEverPresent)
-                await UniTask.WhenAll(_everPresentLevelSetuppables.ToArray(l => l.Unload()));
+            if(includeEverPresent)
+                _tempLevelSetuppableBuffer.AddRange(_everPresentLevelSetuppables);
 
-            for (int i = 0; i < _tempSceneBoundBuffer.Count; i++)
-                _sceneBound.Remove(_tempSceneBoundBuffer[i]);
+            await UnloadFromTempBuffer();
+        }
+
+        public static T Instantiate<T>(T original) where T : Component
+        {
+            var instance = GameObject.Instantiate(original);
+
+            instance.gameObject.GetComponentsInChildren(true, _tempLevelSetuppableBuffer);
+
+            for (int i = 0; i < _tempLevelSetuppableBuffer.Count; i++)
+            {
+                _sceneBound.Add(new SceneBoundLevelSetuppable(_tempLevelSetuppableBuffer[i], instance.gameObject.scene));
+            }
+
+            SetupAndKickstartFromTempBuffer();
+
+            return instance;
+        }
+
+        public static T AddSetuppableComponent<T>(this GameObject gameObject) where T : Component, ILevelSetuppable
+        {
+            var levelSetuppable = gameObject.AddComponent<T>();
             
-            _tempSceneBoundBuffer.Clear();
+            _sceneBound.Add(new SceneBoundLevelSetuppable(levelSetuppable, gameObject.scene));
+
+            SetupAndKickstart(levelSetuppable);
+
+            return levelSetuppable;
+        }
+
+        private static async UniTask SetupAndKickstartFromTempBuffer()
+        {
+            var array = _tempLevelSetuppableBuffer.ToArray();
+            
+            _tempLevelSetuppableBuffer.Clear();
+
+            await UniTask.WhenAll(array.ToArray(l => l.Setup()));
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i].Kickstart();
+            }
+        }
+
+        private static async UniTask UnloadFromTempBuffer()
+        {
+            var array = _tempLevelSetuppableBuffer.ToArray();
+            
+            _tempLevelSetuppableBuffer.Clear();
+
+            await UniTask.WhenAll(array.ToArray(l => l.Unload()));
+        }
+
+        private static async UniTask SetupAndKickstart(ILevelSetuppable levelSetuppable)
+        {
+            await levelSetuppable.Setup();
+            
+            levelSetuppable.Kickstart();
         }
     }
 }
