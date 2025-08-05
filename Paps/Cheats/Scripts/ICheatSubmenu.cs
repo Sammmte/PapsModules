@@ -7,6 +7,7 @@ namespace Paps.Cheats
     {
         public string DisplayName { get; }
         public int Order { get => 0; }
+        public CheatSubmenuAvailabilityInfo IsAvailable() => CheatSubmenuAvailabilityInfo.Available();
         public UniTask Load();
         public VisualElement GetVisualElement();
         public void OnShow() { }

@@ -17,8 +17,10 @@ namespace Paps.Cheats
         private ScrollView _buttonsContainer;
         private VisualElement _submenuContainerParent;
         private ScrollView _submenuContainer;
+        private VisualElement _notAvailableContainer;
 
         private Label _submenuDisplayNameLabel;
+        private Label _notAvailableReasonLabel;
 
         private Button _backButton, _closeButton;
 
@@ -35,6 +37,8 @@ namespace Paps.Cheats
             _submenuContainerParent = this.Q("SubmenuContainerParent");
             _submenuContainer = this.Q<ScrollView>("SubmenuContainer");
             _submenuDisplayNameLabel = this.Q<Label>("SubmenuDisplayNameLabel");
+            _notAvailableContainer = this.Q("NotAvailableContainer");
+            _notAvailableReasonLabel = this.Q<Label>("NotAvailableReasonLabel");
 
             _backButton = this.Q<Button>("BackButton");
             _closeButton = this.Q<Button>("CloseButton");
@@ -86,6 +90,21 @@ namespace Paps.Cheats
         public void Show()
         {
             style.display = DisplayStyle.Flex;
+
+            if (_openedSubmenu != null)
+            {
+                var availabilityInfo = _openedSubmenu.IsAvailable();
+
+                if (!availabilityInfo.IsAvailable)
+                {
+                    HideSubmenu();
+                }
+            }
+
+            if (_notAvailableContainer.style.display == DisplayStyle.Flex)
+            {
+                HideSubmenu();
+            }
             
             OnCheatsDisplayed?.Invoke();
         }
@@ -101,22 +120,44 @@ namespace Paps.Cheats
         {
             _openedSubmenu?.OnHide();
 
+            _notAvailableContainer.style.display = DisplayStyle.None;
             _buttonsContainer.style.display = DisplayStyle.None;
-            _submenuContainer.Add(submenu.GetVisualElement());
-            _submenuContainerParent.style.display = DisplayStyle.Flex;
-            _submenuDisplayNameLabel.text = submenu.DisplayName;
 
-            _openedSubmenu = submenu;
-            _openedSubmenu.OnShow();
+            var availabilityInfo = submenu.IsAvailable();
+
+            if (availabilityInfo.IsAvailable)
+            {
+                _submenuContainer.Add(submenu.GetVisualElement());
+                _submenuContainerParent.style.display = DisplayStyle.Flex;
+                _submenuDisplayNameLabel.text = submenu.DisplayName;
+
+                _openedSubmenu = submenu;
+                _openedSubmenu.OnShow();
+            }
+            else
+            {
+                _openedSubmenu = null;
+                ShowNotAvailable(availabilityInfo.NotAvailableReason);
+            }
+            
         }
+
+        private void ShowNotAvailable(string reason)
+        {
+            _notAvailableContainer.style.display = DisplayStyle.Flex;
+            _notAvailableReasonLabel.text = "Not Available\n" + GetReasonString(reason);
+        }
+
+        private string GetReasonString(string reason) => string.IsNullOrEmpty(reason) ? "Unknown" : reason;
 
         private void HideSubmenu()
         {
             _buttonsContainer.style.display = DisplayStyle.Flex;
             _submenuContainer.Clear();
             _submenuContainerParent.style.display = DisplayStyle.None;
+            _notAvailableContainer.style.display = DisplayStyle.None;
 
-            _openedSubmenu.OnHide();
+            _openedSubmenu?.OnHide();
             _openedSubmenu = null;
         }
 

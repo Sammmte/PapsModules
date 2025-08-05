@@ -11,6 +11,9 @@
                 <engine:Button text="Back" name="BackButton" style="font-size: 40px;" />
                 <engine:ScrollView name="SubmenuContainer" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" style="margin-top: 20px; margin-right: 20px; margin-bottom: 10px; margin-left: 20px; background-color: rgb(217, 217, 217);" />
             </engine:VisualElement>
+            <engine:VisualElement name="NotAvailableContainer" style="flex-grow: 1; display: none;">
+                <engine:Label text="Not Available" name="NotAvailableReasonLabel" style="color: rgb(222, 30, 30); -unity-font-style: bold; -unity-text-align: upper-center; font-size: 28px;" />
+            </engine:VisualElement>
         </engine:VisualElement>
     </Paps.Cheats.CheatsUI>
 </engine:UXML>
