@@ -6,6 +6,41 @@ namespace Paps.GameplayTags
 {
     public abstract class GameplayTags<T> : GameplayTagsBase where T : struct, Enum
     {
-        [field: SerializeField] public List<T> Tags { get; private set; }
+        [SerializeField] private List<T> _tags;
+
+        public void Add(T tag)
+        {
+            if(Contains(tag))
+                return;
+            
+            _tags.Add(tag);
+        }
+
+        public void Add(ReadOnlySpan<T> tags)
+        {
+            for(int i = 0; i < tags.Length; i++)
+                Add(tags[i]);
+        }
+        
+        public bool Contains(T tag) => _tags.Contains(tag);
+
+        public bool Contains(ReadOnlySpan<T> tags)
+        {
+            for (int i = 0; i < tags.Length; i++)
+            {
+                if (!Contains(tags[i]))
+                    return false;
+            }
+
+            return true;
+        }
+        
+        public void Remove(T tag) => _tags.Remove(tag);
+
+        public void Remove(ReadOnlySpan<T> tags)
+        {
+            for(int i = 0; i < tags.Length; i++)
+                Remove(tags[i]);
+        }
     }
 }
