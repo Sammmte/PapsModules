@@ -9,7 +9,22 @@ namespace Paps.Localization
     {
         [SerializeField] private LocalizedString _localizedString;
 
-        public string Text => _localizedString.GetLocalizedString();
+        public string TableId => _localizedString.TableReference;
+
+        public string Text
+        {
+            get
+            {
+                try
+                {
+                    return _localizedString.GetLocalizedString();
+                }
+                catch
+                {
+                    return "NO_LOCALIZED_STRING";
+                }
+            }
+        }
 
         private bool _hookedToStringChangedEvent;
         
@@ -33,7 +48,7 @@ namespace Paps.Localization
 
         internal LocalizedText(string tableId, string localizationId)
         {
-            _localizedString.SetReference(tableId, localizationId);
+            _localizedString = new LocalizedString(tableId, localizationId);
             _localizedString.StringChanged += OnStringChanged;
         }
 
