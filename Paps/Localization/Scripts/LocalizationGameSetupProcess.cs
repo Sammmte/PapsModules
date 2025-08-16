@@ -9,16 +9,13 @@ namespace Paps.Localization
     [CreateAssetMenu(menuName = "Paps/Setup/Localization")]
     public class LocalizationGameSetupProcess : GameSetupProcess
     {
-        public override UniTask Setup()
+        public override async UniTask Setup()
         {
-            return UniTask.Create(async () =>
-            {
-                await LocalizationSettings.InitializationOperation.ToUniTask();
-                await UniTask.NextFrame(); // this prevents errors from calling localized strings the same frame initialization finishes
+            await LocalizationSettings.InitializationOperation.ToUniTask();
+            await UniTask.NextFrame(); // this prevents errors from calling localized strings the same frame initialization finishes
 
-                var localizationService = new UnityLocalizationService();
-                Locator.Create<ILocalizationService>(localizationService);
-            });
+            var localizationService = new LocalizationService();
+            Locator.Create(localizationService);
         }
     }
 }

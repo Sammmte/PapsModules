@@ -4,7 +4,7 @@ using Paps.UnityExtensions;
 
 namespace Paps.Localization
 {
-    public class UnityLocalizationService : ILocalizationService
+    public class LocalizationService
     {
         public Language[] GetLanguages()
         {
@@ -13,7 +13,7 @@ namespace Paps.Localization
 
         public LocalizedText GetLocalizedText(string tableId, string localizationId)
         {
-            return new UnityLocalizationLocalizedText(new LocalizedString(tableId, localizationId));
+            return new LocalizedText(tableId, localizationId);
         }
 
         public Language GetTextLanguage()

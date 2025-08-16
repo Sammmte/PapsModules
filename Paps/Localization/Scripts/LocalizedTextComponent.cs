@@ -6,16 +6,24 @@ namespace Paps.Localization
     public class LocalizedTextComponent : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI _textUIComponent;
-        [SerializeField] private SerializableLocalizedText _localizedText;
-
-        private LocalizedText _localizedTextInstance;
-
+        [SerializeField] private LocalizedText _localizedText;
+        
         private void Awake()
         {
-            _localizedTextInstance = _localizedText.GetLocalizedText();
-            _localizedTextInstance.OnTextChanged += UpdateText;
+            SetLocalizedText(_localizedText);
+        }
+
+        public void SetLocalizedText(LocalizedText localizedText)
+        {
+            if (_localizedText != null)
+            {
+                _localizedText.OnTextChanged -= UpdateText;
+            }
             
-            UpdateText(_localizedTextInstance.Text);
+            _localizedText = localizedText;
+            _localizedText.OnTextChanged += UpdateText;
+            
+            UpdateText(_localizedText.Text);
         }
 
         private void UpdateText(string text)
