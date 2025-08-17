@@ -9,7 +9,12 @@ namespace Paps.GameplayTags
     {
         [field: SerializeField] public bool IncludeChildren { get; set; }
         [field: SerializeField] public List<GameObject> ExtraTaggedObjects { get; private set; }
-        
+
+        private void Awake()
+        {
+            GameplayTagsManager.Register(this);
+        }
+
         public async UniTask Setup()
         {
             GameplayTagsManager.Register(this);

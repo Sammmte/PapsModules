@@ -35,7 +35,7 @@ namespace Paps.GameplayTags
         public static bool HasTag<TTag>(this Component component, TTag tag) where TTag : struct, Enum =>
             HasTag(component.gameObject, tag);
         
-        public static bool HasTags<TTag>(this GameObject gameObject, ReadOnlySpan<TTag> tags) where TTag : struct, Enum
+        public static bool HasTags<TTag>(this GameObject gameObject, ref ReadOnlySpan<TTag> tags) where TTag : struct, Enum
         {
             var gameplayTags = gameObject.GetTags<TTag>();
 
@@ -45,8 +45,23 @@ namespace Paps.GameplayTags
             return false;
         }
 
-        public static bool HasTags<TTag>(this Component component, ReadOnlySpan<TTag> tags) where TTag : struct, Enum =>
-            HasTags(component.gameObject, tags);
+        public static bool HasTags<TTag>(this Component component, ref ReadOnlySpan<TTag> tags) where TTag : struct, Enum =>
+            HasTags(component.gameObject, ref tags);
+
+        public static bool HasAnyTag<TTag>(this GameObject gameObject, ref ReadOnlySpan<TTag> tags)
+            where TTag : struct, Enum
+        {
+            var gameplayTags = gameObject.GetTags<TTag>();
+
+            if (gameplayTags != null)
+                return gameplayTags.ContainsAny(tags);
+
+            return false;
+        }
+
+        public static bool HasAnyTag<TTag>(this Component component, ref ReadOnlySpan<TTag> tags)
+            where TTag : struct, Enum =>
+            HasAnyTag(component.gameObject, ref tags);
 
         public static void AddTag<TTag, TGameplayTagsComponent>(this Component component, TTag tag) 
             where TTag : struct, Enum where TGameplayTagsComponent : GameplayTags<TTag> =>
@@ -60,11 +75,11 @@ namespace Paps.GameplayTags
             gameplayTags.Add(tag);
         }
 
-        public static void AddTags<TTag, TGameplayTagsComponent>(this Component component, ReadOnlySpan<TTag> tags)
+        public static void AddTags<TTag, TGameplayTagsComponent>(this Component component, ref ReadOnlySpan<TTag> tags)
             where TTag : struct, Enum where TGameplayTagsComponent : GameplayTags<TTag> =>
-            AddTags<TTag, TGameplayTagsComponent>(component.gameObject, tags);
+            AddTags<TTag, TGameplayTagsComponent>(component.gameObject, ref tags);
         
-        public static void AddTags<TTag, TGameplayTagsComponent>(this GameObject gameObject, ReadOnlySpan<TTag> tags)
+        public static void AddTags<TTag, TGameplayTagsComponent>(this GameObject gameObject, ref ReadOnlySpan<TTag> tags)
             where TTag : struct, Enum where TGameplayTagsComponent : GameplayTags<TTag>
         {
             var gameplayTags = GetOrCreateTags<TTag, TGameplayTagsComponent>(gameObject);
@@ -83,11 +98,11 @@ namespace Paps.GameplayTags
             gameplayTags?.Remove(tag);
         }
 
-        public static void RemoveTags<TTag>(this Component component, ReadOnlySpan<TTag> tags)
+        public static void RemoveTags<TTag>(this Component component, ref ReadOnlySpan<TTag> tags)
             where TTag : struct, Enum =>
-            RemoveTags(component.gameObject, tags);
+            RemoveTags(component.gameObject, ref tags);
 
-        public static void RemoveTags<TTag>(this GameObject gameObject, ReadOnlySpan<TTag> tags)
+        public static void RemoveTags<TTag>(this GameObject gameObject, ref ReadOnlySpan<TTag> tags)
             where TTag : struct, Enum
         {
             var gameplayTags = GetTags<TTag>(gameObject);
