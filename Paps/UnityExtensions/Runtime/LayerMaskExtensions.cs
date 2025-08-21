@@ -4,20 +4,14 @@ namespace Paps.UnityExtensions
 {
     public static class LayerMaskExtensions
     {
-        public static bool Includes(this int value, params int[] layers)
+        public static bool Includes(this LayerMask mask, int layer)
         {
-            foreach(var layer in layers)
-            {
-                if ((value & 1 << layer) <= 0)
-                    return false;
-            }
-
-            return true;
+            return (mask.value & (1 << layer)) != 0;
         }
 
-        public static bool Includes(this LayerMask mask, params int[] layers)
-        {
-            return mask.value.Includes(layers);
-        }
+        public static bool Includes(this LayerMask mask, GameObject gameObject) => 
+            Includes(mask, gameObject.layer);
+        public static bool Includes(this LayerMask mask, Component component) =>
+            Includes(mask, component.gameObject.layer);
     }
 }
