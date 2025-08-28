@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: dae57c3f3523f79468c0c96a9824a6e2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _editorVTA: {fileID: 9197481963319205126, guid: 11839c0b59652e042be16cd6fdce2321, type: 3}
+  - _valueReferenceElementVTA: {fileID: 9197481963319205126, guid: aa9083b58e1d16048989b73cf15569fc, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
