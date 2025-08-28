@@ -6,8 +6,8 @@ namespace Paps.ValueReferences
     public abstract class ValueReferenceAsset : ScriptableObject
     {
         public const string BASE_CREATE_ASSET_MENU_PATH = "Paps/Value References/";
-        
-        [field: SerializeField] public bool IsConstant { get; private set; }
+
+        [field: SerializeField] public bool IsConstant { get; private set; } = true;
     }
     
     public abstract class ValueReferenceAsset<T> : ValueReferenceAsset

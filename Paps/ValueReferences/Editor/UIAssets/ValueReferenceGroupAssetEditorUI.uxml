@@ -1,7 +1,7 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <editor:PropertyField name="GroupPathField" />
     <engine:VisualElement name="ScrollerHeaderContainer">
-        <engine:DropdownField label="Dropdown" name="ReferenceTypeSelectorDropdown" />
+        <engine:DropdownField label="Select Type" name="ReferenceTypeSelectorDropdown" />
         <engine:Button text="Create" name="CreateButton" />
     </engine:VisualElement>
     <engine:ScrollView name="ReferencesScroller" style="background-color: rgb(72, 72, 72);" />
