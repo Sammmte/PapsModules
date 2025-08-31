@@ -33,7 +33,7 @@ namespace Paps.ValueReferences.Editor
         private VisualTreeAsset _valueReferenceGroupElementVTA;
 
         private Dictionary<string, Type> _valueReferenceTypes;
-        private bool _allowDelete;
+        private bool _isRoot;
         
         private List<ValueReferenceElement> _valueReferenceElements;
         private List<ValueReferenceGroupElement> _subGroupElements;
@@ -41,7 +41,7 @@ namespace Paps.ValueReferences.Editor
         public event Action<ValueReferenceGroupElement> OnDeleteRequested;
         
         public void Initialize(ValueReferenceGroupAsset groupAsset, SerializedProperty groupProperty, VisualTreeAsset valueReferenceElementVTA,
-            VisualTreeAsset valueReferenceGroupElementVTA, Dictionary<string, Type> valueReferenceTypes, bool allowDelete)
+            VisualTreeAsset valueReferenceGroupElementVTA, Dictionary<string, Type> valueReferenceTypes, bool isRoot)
         {
             _groupAsset = groupAsset;
             
@@ -54,7 +54,7 @@ namespace Paps.ValueReferences.Editor
             _valueReferenceGroupElementVTA = valueReferenceGroupElementVTA;
 
             _valueReferenceTypes = valueReferenceTypes;
-            _allowDelete = allowDelete;
+            _isRoot = isRoot;
             
             _valueReferenceElements = new List<ValueReferenceElement>();
             _subGroupElements = new List<ValueReferenceGroupElement>();
@@ -88,7 +88,7 @@ namespace Paps.ValueReferences.Editor
             _addValueReferenceButton.clicked += AddValueReferenceElement;
             _addSubGroupButton.clicked += AddSubGroupElement;
 
-            if (!_allowDelete)
+            if (_isRoot)
             {
                 _deleteButton.style.display = DisplayStyle.None;
             }
@@ -139,22 +139,34 @@ namespace Paps.ValueReferences.Editor
             _subGroupsProperty.arraySize += 1;
             var newIndex = _subGroupsProperty.arraySize - 1;
 
-            var newSubGroupProperty = _subGroupsProperty.GetArrayElementAtIndex(newIndex);
+            SetupNewSubGroupElementAtIndex(newIndex);
+        }
+
+        private void SetupNewSubGroupElementAtIndex(int index)
+        {
+            var newSubGroupProperty = SetupSubGroupElementAtIndex(index);
+
+            newSubGroupProperty.serializedObject.ApplyModifiedProperties();
+            AssetDatabase.SaveAssets();
+        }
+
+        private SerializedProperty SetupSubGroupElementAtIndex(int index)
+        {
+            var newSubGroupProperty = _subGroupsProperty.GetArrayElementAtIndex(index);
 
             var newElementParent = _valueReferenceGroupElementVTA.CloneTree();
 
             var newElement = newElementParent.Q<ValueReferenceGroupElement>();
             
             newElement.Initialize(_groupAsset, newSubGroupProperty, _valueReferenceElementVTA, 
-                _valueReferenceGroupElementVTA, _valueReferenceTypes, true);
+                _valueReferenceGroupElementVTA, _valueReferenceTypes, false);
             
             _subGroupElements.Add(newElement);
             _subGroupsContainer.Add(newElement);
 
             newElement.OnDeleteRequested += OnValueReferenceGroupRequestedDelete;
 
-            newSubGroupProperty.serializedObject.ApplyModifiedProperties();
-            AssetDatabase.SaveAssets();
+            return newSubGroupProperty;
         }
 
         private void UpdatePath(string path)
@@ -178,6 +190,7 @@ namespace Paps.ValueReferences.Editor
 
         private void ShowRenameField()
         {
+            _renameTextField.SetValueWithoutNotify(_groupPathProperty.stringValue);
             _renameTextField.style.display = DisplayStyle.Flex;
         }
 
@@ -223,18 +236,7 @@ namespace Paps.ValueReferences.Editor
         {
             for (int i = 0; i < _subGroupsProperty.arraySize; i++)
             {
-                var newElementParent = _valueReferenceGroupElementVTA.CloneTree();
-
-                var newElement = newElementParent.Q<ValueReferenceGroupElement>();
-                
-                newElement.Initialize(_groupAsset, _subGroupsProperty.GetArrayElementAtIndex(i), 
-_valueReferenceElementVTA, 
-_valueReferenceGroupElementVTA, _valueReferenceTypes, true);
-                
-                _subGroupElements.Add(newElement);
-                _subGroupsContainer.Add(newElement);
-
-                newElement.OnDeleteRequested += OnValueReferenceGroupRequestedDelete;
+                SetupSubGroupElementAtIndex(i);
             }
         }
 

@@ -33,7 +33,7 @@ namespace Paps.ValueReferences.Editor
             
             _rootGroupElement.Initialize(_groupAssetTarget, serializedObject.FindPropertyBakingField(nameof(_groupAssetTarget.Group)),
                 _valueReferenceElementVTA, _valueReferenceGroupElementVTA,
-                _valueReferenceTypes, false);
+                _valueReferenceTypes, true);
             
             rootContainer.Add(_rootGroupElement);
 
