@@ -9,7 +9,11 @@ namespace Paps.ValueReferences
     [Serializable]
     public struct ValueReference<T>
     {
-        [SerializeField] [Dropdown(nameof(GetOptions))] private ValueReferenceAsset<T> _referenceAsset;
+        [SerializeField] 
+        #if UNITY_EDITOR
+        [Dropdown(nameof(GetOptions))]
+        #endif
+        private ValueReferenceAsset<T> _referenceAsset;
 
         [ShowInInspector]
         public T Value
@@ -23,6 +27,8 @@ namespace Paps.ValueReferences
             }
             set => _referenceAsset.Value = value;
         }
+        
+        public static implicit operator T(ValueReference<T> valueReference) => valueReference.Value;
 
         #if UNITY_EDITOR
         [Button]
@@ -30,9 +36,7 @@ namespace Paps.ValueReferences
         {
             UnityEditor.EditorGUIUtility.PingObject(_referenceAsset);
         }
-
-        public static implicit operator T(ValueReference<T> valueReference) => valueReference.Value;
-
+        
         private static DropdownList<ValueReferenceAsset<T>> GetOptions()
         {
             var dropdownItems = UnityEditor.AssetDatabase.FindAssets($"t:{nameof(ValueReferenceGroupAsset)}")
