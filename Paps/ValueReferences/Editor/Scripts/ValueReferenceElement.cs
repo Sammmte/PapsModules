@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEditor;
 using UnityEngine.UIElements;
 
 namespace Paps.ValueReferences.Editor
@@ -7,16 +8,14 @@ namespace Paps.ValueReferences.Editor
     public partial class ValueReferenceElement : VisualElement
     {
         public ValueReferenceAsset ValueReferenceAsset { get; private set; }
-        public int Index { get; private set; }
 
         private UnityEditor.Editor _assetEditor;
 
         public event Action<ValueReferenceElement> OnDeleteRequested;
         
-        public void Initialize(ValueReferenceAsset valueReferenceAsset, int index)
+        public void Initialize(SerializedProperty valueReferenceAssetProperty)
         {
-            ValueReferenceAsset = valueReferenceAsset;
-            Index = index;
+            ValueReferenceAsset = valueReferenceAssetProperty.objectReferenceValue as ValueReferenceAsset;
             
             _assetEditor = UnityEditor.Editor.CreateEditor(ValueReferenceAsset);
 

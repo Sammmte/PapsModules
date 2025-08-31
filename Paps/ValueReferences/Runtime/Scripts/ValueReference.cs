@@ -1,7 +1,7 @@
 ﻿using SaintsField;
+using SaintsField.Playa;
 using System;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 namespace Paps.ValueReferences
@@ -11,24 +11,38 @@ namespace Paps.ValueReferences
     {
         [SerializeField] [Dropdown(nameof(GetOptions))] private ValueReferenceAsset<T> _referenceAsset;
 
+        [ShowInInspector]
         public T Value
         {
-            get => _referenceAsset.Value;
+            get
+            {
+                if (_referenceAsset == null)
+                    return default;
+                
+                return _referenceAsset.Value;
+            }
             set => _referenceAsset.Value = value;
+        }
+
+        #if UNITY_EDITOR
+        [Button]
+        private void PingAsset()
+        {
+            UnityEditor.EditorGUIUtility.PingObject(_referenceAsset);
         }
 
         public static implicit operator T(ValueReference<T> valueReference) => valueReference.Value;
 
         private static DropdownList<ValueReferenceAsset<T>> GetOptions()
         {
-            var dropdownItems = AssetDatabase.FindAssets($"t:{nameof(ValueReferenceGroupAsset)}")
-                .Select(guid => AssetDatabase.LoadAssetAtPath<ValueReferenceGroupAsset>(AssetDatabase.GUIDToAssetPath((string)guid)))
-                .Select(group => (Path: group.GroupPath, References: group.GetReferencesOfType<T>()))
-                .Where(pathWithReferences => pathWithReferences.References.Length != 0)
-                .SelectMany(pathWithReferences => pathWithReferences.References
-                    .Select(reference => (Path: pathWithReferences.Path + $"/{reference.name}", Reference: reference)));
+            var dropdownItems = UnityEditor.AssetDatabase.FindAssets($"t:{nameof(ValueReferenceGroupAsset)}")
+                .Select(guid => UnityEditor.AssetDatabase.LoadAssetAtPath<ValueReferenceGroupAsset>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid)))
+                .Select(group => group.GetReferencesOfType<T>())
+                .Where(references => references.Length != 0)
+                .SelectMany(references => references.Select(r => (r.Path, r.ValueReferenceAsset)));
 
             return new DropdownList<ValueReferenceAsset<T>>(dropdownItems);
         }
+        #endif
     }
 }
