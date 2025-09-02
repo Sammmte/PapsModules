@@ -12,6 +12,12 @@ namespace Paps.ValueReferences
             public string Path;
             public ValueReferenceAsset<T> ValueReferenceAsset;
         }
+
+        public struct ValueReferencePathInfo
+        {
+            public string Path;
+            public ValueReferenceAsset ValueReferenceAsset;
+        }
         
         [field: SerializeField] public ValueReferenceGroup Group { get; set; }
 
@@ -20,6 +26,15 @@ namespace Paps.ValueReferences
             var list = new List<ValueReferencePathInfo<T>>();
 
             GetReferencesOfTypeFromGroup(Group, null, list);
+
+            return list.ToArray();
+        }
+
+        public ValueReferencePathInfo[] GetAllReferences()
+        {
+            var list = new List<ValueReferencePathInfo>();
+            
+            GetReferencesFromGroup(Group, null, list);
 
             return list.ToArray();
         }
@@ -45,6 +60,30 @@ namespace Paps.ValueReferences
             foreach (var childGroup in valueReferenceGroup.SubGroups)
             {
                 GetReferencesOfTypeFromGroup(childGroup, composedPath, list);
+            }
+        }
+        
+        private void GetReferencesFromGroup(ValueReferenceGroup valueReferenceGroup, string composedPath, List<ValueReferencePathInfo> list)
+        {
+            if (composedPath == null)
+            {
+                composedPath = valueReferenceGroup.GroupPath;
+            }
+            else
+            {
+                composedPath += $"/{valueReferenceGroup.GroupPath}";
+            }
+            
+            list.AddRange(valueReferenceGroup.ValueReferences
+                .Select(v => new ValueReferencePathInfo()
+                {
+                    Path = composedPath + $"/{v.name}",
+                    ValueReferenceAsset = v
+                }));
+
+            foreach (var childGroup in valueReferenceGroup.SubGroups)
+            {
+                GetReferencesFromGroup(childGroup, composedPath, list);
             }
         }
     }
