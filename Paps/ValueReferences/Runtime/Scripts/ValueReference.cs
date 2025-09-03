@@ -25,7 +25,6 @@ namespace Paps.ValueReferences
                 
                 return _referenceAsset.Value;
             }
-            set => _referenceAsset.Value = value;
         }
         
         public static implicit operator T(ValueReference<T> valueReference) => valueReference.Value;

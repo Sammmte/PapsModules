@@ -8,6 +8,5 @@ namespace Paps.ValueReferences
         [SerializeField] private int _value;
 
         protected override int GetValue() => _value;
-        protected override void SetValue(int value) => _value = value;
     }
 }

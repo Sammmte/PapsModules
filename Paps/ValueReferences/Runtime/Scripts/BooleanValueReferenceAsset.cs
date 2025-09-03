@@ -8,6 +8,5 @@ namespace Paps.ValueReferences
         [SerializeField] private bool _value;
 
         protected override bool GetValue() => _value;
-        protected override void SetValue(bool value) => _value = value;
     }
 }
