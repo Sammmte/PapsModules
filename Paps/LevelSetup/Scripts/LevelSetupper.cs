@@ -181,6 +181,11 @@ namespace Paps.LevelSetup
             var array = _tempLevelSetuppableBuffer.ToArray();
             
             _tempLevelSetuppableBuffer.Clear();
+            
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i].Created();
+            }
 
             await UniTask.WhenAll(array.ToArray(l => l.Setup()));
 
@@ -201,6 +206,8 @@ namespace Paps.LevelSetup
 
         private static async UniTask SetupAndKickstart(ILevelSetuppable levelSetuppable)
         {
+            levelSetuppable.Created();
+            
             await levelSetuppable.Setup();
             
             levelSetuppable.Kickstart();
