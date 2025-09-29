@@ -32,7 +32,8 @@ namespace Paps.Physics
                 finalParameters.Distance,
                 finalParameters.LayerMask,
                 rayHits,
-                finalParameters.QueryTriggerInteraction
+                finalParameters.QueryTriggerInteraction,
+                finalParameters.OrderByDistance
             );
         }
     }

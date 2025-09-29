@@ -16,12 +16,34 @@ namespace Paps.Physics
         private static readonly RaycastHit[] _simpleRaycastHitBuffer = new RaycastHit[50];
 
         public static int Raycast(Vector3 origin, Vector3 direction, float maxDistance, LayerMask layerMask,
-            RaycastHit[] rayHits, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+            RaycastHit[] rayHits, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, 
+            bool orderByDistance = false)
         {
             using (VisualLifetime.Create(EDITOR_GIZMO_DISPLAY_DURATION))
             {
-                return PhysicsAPI.RaycastNonAlloc(origin, direction, rayHits, maxDistance, layerMask,
+                var count = PhysicsAPI.RaycastNonAlloc(origin, direction, rayHits, maxDistance, layerMask,
                     queryTriggerInteraction);
+
+                if (orderByDistance)
+                    OrderHitsByDistance(rayHits, count);
+                
+                return count;
+            }
+        }
+
+        private static void OrderHitsByDistance(RaycastHit[] buffer, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                for (int j = i + 1; j < count; j++)
+                {
+                    if (buffer[i].distance > buffer[j].distance)
+                    {
+                        var temp = buffer[i];
+                        buffer[i] = buffer[j];
+                        buffer[j] = temp;
+                    }
+                }
             }
         }
         

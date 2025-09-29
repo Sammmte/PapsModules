@@ -14,6 +14,7 @@ namespace Paps.Physics
             public Optional<QueryTriggerInteraction> QueryTriggerInteraction;
             public Optional<Vector3> Direction;
             public Optional<float> Distance;
+            public Optional<bool> OrderByDistance;
         }
         
         [SerializeField] private bool _useTransformForDirection;
@@ -21,6 +22,7 @@ namespace Paps.Physics
 
         [SerializeField] [HideIf(nameof(_useTransformForDirection))] private Vector3 _direction;
         [field: SerializeField] public float Distance { get; private set; }
+        [field: SerializeField] public bool OrderByDistance { get; private set; }
 
         public Vector3 Direction
         {
@@ -92,7 +94,8 @@ namespace Paps.Physics
                 QueryTriggerInteraction = overrideParameters.QueryTriggerInteraction.ValueOrDefault(
                     baseFinalParameters.QueryTriggerInteraction),
                 Direction = overrideParameters.Direction.ValueOrDefault(Direction),
-                Distance = overrideParameters.Distance.ValueOrDefault(Distance)
+                Distance = overrideParameters.Distance.ValueOrDefault(Distance),
+                OrderByDistance = overrideParameters.OrderByDistance.ValueOrDefault(OrderByDistance)
             };
         }
     }
