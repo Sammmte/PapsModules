@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SaintsField;
+using System;
 using UnityEngine;
 
 namespace Paps.GameplayTags
 {
     public abstract class GameplayTags<T> : GameplayTagsBase where T : struct, Enum
     {
-        [SerializeField] private List<T> _tags;
+        [SerializeField] [SaintsHashSet(numberOfItemsPerPage: 10)] private SaintsHashSet<T> _tags;
 
         public void Add(T tag)
         {
-            if(Contains(tag))
-                return;
-            
             _tags.Add(tag);
         }
 
