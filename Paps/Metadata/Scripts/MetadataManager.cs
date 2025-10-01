@@ -55,7 +55,7 @@ namespace Paps.Metadata
             if (_describedGameObjects.TryGetValue(go, out var keyDictionary))
             {
                 if (keyDictionary.TryGetValue(propertyKey, out var metadata) &&
-                    metadata is Metadata<TKey, TValue> specialized)
+                    metadata is IMetadata<TValue> specialized)
                 {
                     result = specialized.Value;
                     return true;

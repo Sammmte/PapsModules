@@ -29,12 +29,4 @@ namespace Paps.Metadata
             MetadataManager<TKey>.Instance.Unsubscribe(this);
         }
     }
-
-    public abstract class Metadata<TKey, TValue> : Metadata<TKey> where TKey : struct, Enum
-    {
-        public abstract TValue Value
-        {
-            get;
-        }
-    }
 }
