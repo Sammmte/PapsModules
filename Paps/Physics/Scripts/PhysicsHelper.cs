@@ -75,6 +75,23 @@ namespace Paps.Physics
             return GetColliderFromBuffer(out collider);
         }
 
+        public static int OverlapSphere(Vector3 center, float radius, Collider[] buffer, LayerMask layerMask, 
+            QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        {
+            using (VisualLifetime.Create(EDITOR_GIZMO_DISPLAY_DURATION))
+            {
+                return PhysicsAPI.OverlapSphereNonAlloc(center, radius, buffer, layerMask, queryTriggerInteraction);
+            }
+        }
+
+        public static bool OverlapBox(Vector3 center, float radius, out Collider collider, LayerMask layerMask,
+            QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        {
+            OverlapSphere(center, radius, _simpleColliderBuffer, layerMask, queryTriggerInteraction);
+
+            return GetColliderFromBuffer(out collider);
+        }
+
         private static bool GetColliderFromBuffer(out Collider collider)
         {
             collider = _simpleColliderBuffer[0];
