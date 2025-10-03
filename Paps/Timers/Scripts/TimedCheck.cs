@@ -4,7 +4,9 @@ namespace Paps.Timers
 {
     public class TimedCheck<TCheckResult>
     {
-        private readonly Func<TCheckResult> _check;
+        public delegate bool CheckPredicate(out TCheckResult result);
+        
+        private readonly CheckPredicate _check;
         private readonly SyncTimer _timer = new SyncTimer();
 
         public float Interval
@@ -13,22 +15,21 @@ namespace Paps.Timers
             set => _timer.Interval = value;
         }
 
-        public TCheckResult LastResult { get; private set; }
-
-        public TimedCheck(Func<TCheckResult> check)
+        public TimedCheck(CheckPredicate check)
         {
             _check = check;
         }
 
-        public TCheckResult Check()
+        public bool Check(out TCheckResult result)
         {
             if (!_timer.Active)
             {
                 _timer.Start();
-                LastResult = _check();
+                return _check(out result);
             }
 
-            return LastResult;
+            result = default;
+            return false;
         }
 
         public void Stop()
