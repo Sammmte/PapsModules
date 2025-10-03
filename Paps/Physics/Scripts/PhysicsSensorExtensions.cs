@@ -4,7 +4,9 @@
     {
         public static bool FindsNothing(this PhysicsSensor sensor)
         {
-            return sensor.Sense().Length == 0;
+            using var results = sensor.Sense();
+            
+            return results.Length == 0;
         }
     }
 }

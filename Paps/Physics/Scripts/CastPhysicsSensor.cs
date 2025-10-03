@@ -1,6 +1,6 @@
 ﻿using Paps.Optionals;
+using Paps.UnityExtensions;
 using SaintsField.Playa;
-using System;
 using UnityEngine;
 
 namespace Paps.Physics
@@ -48,23 +48,23 @@ namespace Paps.Physics
             }
         }
 
+        private int _rayResultCount;
         private OverrideParameters _overrideParameters;
 
-        public new ReadOnlySpan<RaycastHit> Sense(OverrideParameters overrideParameters = default)
+        public new TempReadOnlyBufferSegment<RaycastHit> Sense(OverrideParameters overrideParameters = default)
         {
             ClearBuffer();
             _overrideParameters = overrideParameters;
             
-            var span = base.Sense();
+            using var tempBuffer = base.Sense();
 
             _overrideParameters = default;
 
-            return GetLastRayHitsResults();
+            var count = _rayResultCount;
+            _rayResultCount = 0;
+
+            return new TempReadOnlyBufferSegment<RaycastHit>(_rayHitResults, count);
         }
-
-        private int _rayResultCount;
-
-        public ReadOnlySpan<RaycastHit> GetLastRayHitsResults() => new ReadOnlySpan<RaycastHit>(RayHitResults, 0, _rayResultCount);
 
         protected sealed override int Execute(Collider[] resultsBuffer, PhysicsSensor.OverrideParameters baseFinalParameters)
         {

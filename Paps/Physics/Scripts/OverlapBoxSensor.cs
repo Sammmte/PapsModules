@@ -1,4 +1,5 @@
 ﻿using Paps.Optionals;
+using Paps.UnityExtensions;
 using SaintsField.Playa;
 using System;
 using UnityEngine;
@@ -40,7 +41,7 @@ namespace Paps.Physics
 
         private OverrideParameters _overrideParameters;
 
-        public new ReadOnlySpan<Collider> Sense(OverrideParameters overrideParameters = default)
+        public new TempReadOnlyBufferSegment<Collider> Sense(OverrideParameters overrideParameters = default)
         {
             _overrideParameters = overrideParameters;
 

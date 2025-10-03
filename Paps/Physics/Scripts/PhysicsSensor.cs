@@ -1,4 +1,5 @@
 using Paps.Optionals;
+using Paps.UnityExtensions;
 using SaintsField.Playa;
 using System;
 using UnityEngine;
@@ -47,18 +48,14 @@ namespace Paps.Physics
             }
         }
 
-        private int _resultCount;
-
-        public ReadOnlySpan<Collider> Sense(OverrideParameters overrideParameters = default)
+        public TempReadOnlyBufferSegment<Collider> Sense(OverrideParameters overrideParameters = default)
         {
             ClearBuffer();
             
-            _resultCount = Execute(CollidersBuffer, GetFinalParameters(overrideParameters));
+            var count = Execute(CollidersBuffer, GetFinalParameters(overrideParameters));
 
-            return GetLastResults();
+            return new TempReadOnlyBufferSegment<Collider>(_collidersBuffer, count);
         }
-
-        public ReadOnlySpan<Collider> GetLastResults() => new ReadOnlySpan<Collider>(CollidersBuffer, 0, _resultCount);
 
         protected abstract int Execute(Collider[] resultsBuffer, OverrideParameters finalParameters);
 

@@ -2,6 +2,7 @@
 using System;
 using UnityEngine;
 using Paps.Optionals;
+using Paps.UnityExtensions;
 using SaintsField.Playa;
 
 namespace Paps.Physics
@@ -43,7 +44,7 @@ namespace Paps.Physics
 
         private OverrideParameters _overrideParameters;
 
-        public new ReadOnlySpan<RaycastHit> Sense(OverrideParameters overrideParameters = default)
+        public new TempReadOnlyBufferSegment<RaycastHit> Sense(OverrideParameters overrideParameters = default)
         {
             _overrideParameters = overrideParameters;
 
