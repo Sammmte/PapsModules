@@ -10,7 +10,17 @@ namespace Paps.DevelopmentTools.Editor
         [CreateProperty]
         public Vector3 WorldPosition
         {
-            get => _gameObject?.transform.position ?? Vector3.zero;
+            get
+            {
+                try
+                {
+                    return _gameObject?.transform.position ?? Vector3.zero;
+                }
+                catch (MissingReferenceException e)
+                {
+                    return Vector3.zero;
+                }
+            }
             set
             {
                 if(_gameObject == null)
@@ -23,7 +33,17 @@ namespace Paps.DevelopmentTools.Editor
         [CreateProperty]
         public Vector3 WorldRotationEuler
         {
-            get => _gameObject?.transform.rotation.eulerAngles ?? Vector3.zero;
+            get
+            {
+                try
+                {
+                    return _gameObject?.transform.rotation.eulerAngles ?? Vector3.zero;
+                }
+                catch (MissingReferenceException e)
+                {
+                    return Vector3.zero;
+                }
+            }
             set
             {
                 if (_gameObject == null)
@@ -36,7 +56,17 @@ namespace Paps.DevelopmentTools.Editor
         [CreateProperty]
         public Vector3 WorldScale
         {
-            get => _gameObject?.transform.lossyScale ?? Vector3.zero;
+            get
+            {
+                try
+                {
+                    return _gameObject?.transform.lossyScale ?? Vector3.zero;
+                }
+                catch (MissingReferenceException e)
+                {
+                    return Vector3.zero;
+                }
+            }
             set
             {
                 

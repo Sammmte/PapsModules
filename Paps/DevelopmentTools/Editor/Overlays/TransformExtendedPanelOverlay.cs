@@ -1,6 +1,7 @@
 using Unity.Properties;
 using UnityEditor;
 using UnityEditor.Overlays;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -56,7 +57,9 @@ namespace Paps.DevelopmentTools.Editor
 
         private void UpdatePanelBasedOnSelection()
         {
-            if (Selection.activeGameObject != null)
+            var go = Selection.activeGameObject;
+            
+            if (go != null && PrefabStageUtility.GetPrefabStage(go) == null)
             {
                 BindToObject(Selection.activeGameObject);
             }
