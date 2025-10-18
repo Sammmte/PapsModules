@@ -11,7 +11,7 @@ namespace Paps.ValueReferences
     {
         [SerializeField] 
         #if UNITY_EDITOR
-        [Dropdown(nameof(GetOptions))]
+        [AdvancedDropdown(nameof(GetOptions))]
         #endif
         private ValueReferenceAsset<T> _referenceAsset;
 
@@ -38,8 +38,10 @@ namespace Paps.ValueReferences
             UnityEditor.EditorGUIUtility.PingObject(_referenceAsset);
         }
         
-        private static DropdownList<ValueReferenceAsset<T>> GetOptions()
+        private static AdvancedDropdownList<ValueReferenceAsset<T>> GetOptions()
         {
+            var list = new AdvancedDropdownList<ValueReferenceAsset<T>>("Reference Asset");
+            
             var dropdownItems = UnityEditor.AssetDatabase.FindAssets($"t:{nameof(ValueReferenceGroupAsset)}")
                 .Select(guid => UnityEditor.AssetDatabase.LoadAssetAtPath<ValueReferenceGroupAsset>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid)))
                 .Select(group => group.GetReferencesOfType<T>())
@@ -57,7 +59,12 @@ namespace Paps.ValueReferences
             
             dropdownItems.InsertRange(0, uncategorized);
 
-            return new DropdownList<ValueReferenceAsset<T>>(dropdownItems);
+            foreach (var valueReference in dropdownItems)
+            {
+                list.Add(valueReference.Path, valueReference.ValueReferenceAsset);
+            }
+
+            return list;
         }
         #endif
     }
