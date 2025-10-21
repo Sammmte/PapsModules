@@ -6,7 +6,7 @@ namespace Paps.UnityExtensions
     public struct TempReadOnlyBufferSegment<T> : IDisposable
     {
         private T[] _array;
-        private List<T> _list;
+        private IList<T> _list;
         public int Length { get; }
 
         public T this[int index]
@@ -27,7 +27,7 @@ namespace Paps.UnityExtensions
             Length = length;
         }
 
-        public TempReadOnlyBufferSegment(List<T> list, int length)
+        public TempReadOnlyBufferSegment(IList<T> list, int length)
         {
             _list = list;
             _array = null;
