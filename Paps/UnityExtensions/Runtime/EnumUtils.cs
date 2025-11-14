@@ -20,5 +20,10 @@ namespace Paps.UnityExtensions
 
             return _enumData[type];
         }
+
+        public static T[] GetValues<T>() where T : struct, Enum
+        {
+            return (T[])Enum.GetValues(typeof(T));
+        }
     }
 }
