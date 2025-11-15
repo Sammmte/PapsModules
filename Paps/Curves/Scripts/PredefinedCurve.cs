@@ -1,0 +1,39 @@
+﻿namespace Paps.Curves
+{
+    public enum PredefinedCurve
+    {
+        Linear,        
+        EaseInQuadratic,    
+        EaseOutQuadratic,   
+        EaseInOutQuadratic,
+        EaseInCubic,        
+        EaseOutCubic,       
+        EaseInOutCubic,
+        EaseInQuartic,      
+        EaseOutQuartic,     
+        EaseInOutQuartic,
+        EaseInQuintic,      
+        EaseOutQuintic,     
+        EaseInOutQuintic,
+        EaseInSinusoidal,   
+        EaseOutSinusoidal,  
+        EaseInOutSinusoidal,
+        EaseInBounce,       
+        EaseOutBounce,      
+        EaseInOutBounce,
+        EaseInOverhead,     
+        EaseOutOverhead,    
+        EaseInOutOverhead,
+        EaseInExponential,  
+        EaseOutExponential, 
+        EaseInOutExponential,
+        EaseInElastic,      
+        EaseOutElastic,     
+        EaseInOutElastic,
+        EaseInCircular,     
+        EaseOutCircular,    
+        EaseInOutCircular,
+        AntiLinear,    
+        AlmostIdentity
+    }
+}
