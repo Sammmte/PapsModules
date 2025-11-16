@@ -24,6 +24,19 @@ namespace Paps.Timers
             _accumulationTime = 0;
             this.RegisterInManager();
         }
+        
+        public void Restart()
+        {
+            if (Active)
+            {
+                Paused = false;
+                _accumulationTime = 0;
+            }
+            else
+            {
+                Start();
+            }
+        }
 
         public void Stop()
         {
