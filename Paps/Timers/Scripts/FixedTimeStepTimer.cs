@@ -1,4 +1,5 @@
-﻿using Gilzoide.UpdateManager;
+﻿
+using Paps.UpdateManager;
 using System;
 
 namespace Paps.Timers
@@ -19,7 +20,7 @@ namespace Paps.Timers
             
             Active = true;
             _accumulationFrames = 0;
-            this.RegisterInManager();
+            this.RegisterFixedUpdate();
         }
 
         public void Stop()
@@ -28,7 +29,7 @@ namespace Paps.Timers
                 return;
             
             Active = false;
-            this.UnregisterInManager();
+            this.UnregisterFixedUpdate();
         }
         
         public void ManagedFixedUpdate()

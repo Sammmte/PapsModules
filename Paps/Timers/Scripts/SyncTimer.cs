@@ -1,4 +1,5 @@
-using Gilzoide.UpdateManager;
+
+using Paps.UpdateManager;
 using System;
 using UnityEngine;
 
@@ -22,7 +23,7 @@ namespace Paps.Timers
             Active = true;
             Paused = false;
             _accumulationTime = 0;
-            this.RegisterInManager();
+            this.RegisterUpdate();
         }
         
         public void Restart()
@@ -45,7 +46,7 @@ namespace Paps.Timers
             
             Active = false;
             Paused = false;
-            this.UnregisterInManager();
+            this.UnregisterUpdate();
         }
         
         public void ManagedUpdate()

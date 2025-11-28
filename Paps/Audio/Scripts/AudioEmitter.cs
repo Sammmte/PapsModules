@@ -1,5 +1,5 @@
-﻿using Gilzoide.UpdateManager;
-using Paps.Optionals;
+﻿using Paps.Optionals;
+using Paps.UpdateManager;
 using System;
 using UnityEngine;
 
@@ -29,12 +29,12 @@ namespace Paps.Audio
         {
             _audioSource.Play();
             
-            this.RegisterInManager();
+            this.RegisterUpdate();
         }
 
         internal void Stop()
         {
-            this.UnregisterInManager();
+            this.UnregisterUpdate();
             
             _audioSource.Stop();
             OnStopped?.Invoke(this);
@@ -53,7 +53,7 @@ namespace Paps.Audio
 
         private void OnDestroy()
         {
-            this.UnregisterInManager();
+            this.UnregisterUpdate();
             
             _audioSource.Stop();
         }
