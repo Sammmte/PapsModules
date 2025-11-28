@@ -1,0 +1,18 @@
+{
+    "name": "Paps.ManualPhysicsSimulation",
+    "rootNamespace": "Paps.ManualPhysicsSimulation",
+    "references": [
+        "GUID:276fb2fc1687fe74c9c6ce7174a1073f",
+        "GUID:9b261077c7a2ac34886513ec1345f8e0",
+        "GUID:6bf45c2ff8b8c17468782dc09ef461d2"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
