@@ -3,6 +3,7 @@ using Paps.UpdateManager;
 using SaintsField.Playa;
 using System;
 using UnityEngine;
+using UnityTime = UnityEngine.Time;
 
 namespace Paps.ManualPhysicsSimulation
 {
@@ -43,11 +44,14 @@ namespace Paps.ManualPhysicsSimulation
 
         void Update()
         {
-            if(_timeChannel.DeltaTime == 0 || _timeChannel.Paused)
-                return;
+            var deltaTime = GetDeltaTime();
+            var paused = _timeChannel?.Paused ?? false;
             
-            _accumulatedDeltaTime += _timeChannel.DeltaTime;
-            var timeStep = _fixedTimeStep * _timeChannel.TimeScale;
+            if(deltaTime == 0 || paused)
+                return;
+
+            _accumulatedDeltaTime += deltaTime;
+            var timeStep = _fixedTimeStep * GetTimeScale();
 
             while (_accumulatedDeltaTime >= timeStep)
             {
@@ -68,5 +72,8 @@ namespace Paps.ManualPhysicsSimulation
 
             enabled = HasListeners;
         }
+        
+        private float GetDeltaTime() => _timeChannel?.DeltaTime ?? UnityTime.deltaTime;
+        private float GetTimeScale() => _timeChannel?.TimeScale ?? UnityTime.timeScale;
     }
 }
