@@ -1,3 +1,4 @@
+using Paps.Time;
 using Paps.UpdateManager;
 using SaintsField.Playa;
 using System;
@@ -8,6 +9,8 @@ namespace Paps.ManualPhysicsSimulation
     public class ManualPhysicsFixedUpdateUpdater : MonoBehaviour, IUpdater<IFixedUpdatable>
     {
         [SerializeField] private int _initialCapacity;
+        [SerializeField] private float _fixedTimeStep;
+        [SerializeField] private TimeChannel _timeChannel;
         
         [ShowInInspector, ListDrawerSettings(numberOfItemsPerPage: 10)]
         private FastRemoveList<IFixedUpdatable> _listeners;
@@ -40,11 +43,15 @@ namespace Paps.ManualPhysicsSimulation
 
         void Update()
         {
-            _accumulatedDeltaTime += Time.deltaTime;
+            if(_timeChannel.DeltaTime == 0 || _timeChannel.Paused)
+                return;
+            
+            _accumulatedDeltaTime += _timeChannel.DeltaTime;
+            var timeStep = _fixedTimeStep * _timeChannel.TimeScale;
 
-            while (_accumulatedDeltaTime >= Time.fixedDeltaTime)
+            while (_accumulatedDeltaTime >= timeStep)
             {
-                _accumulatedDeltaTime -= Time.fixedDeltaTime;
+                _accumulatedDeltaTime -= timeStep;
                 foreach (IFixedUpdatable updatable in _listeners)
                 {
                     try
@@ -56,7 +63,7 @@ namespace Paps.ManualPhysicsSimulation
                         Debug.LogException(ex);
                     }
                 }
-                Physics.Simulate(Time.fixedDeltaTime);
+                Physics.Simulate(timeStep);
             }
 
             enabled = HasListeners;

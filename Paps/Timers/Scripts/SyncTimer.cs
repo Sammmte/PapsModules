@@ -1,7 +1,6 @@
-
+using Paps.Time;
 using Paps.UpdateManager;
 using System;
-using UnityEngine;
 
 namespace Paps.Timers
 {
@@ -12,6 +11,7 @@ namespace Paps.Timers
         public event Action<SyncTimer> OnTick;
         public bool Active { get; private set; }
         public bool Paused { get; set; }
+        public TimeChannel TimeChannel { get; set; }
 
         private float _accumulationTime;
 
@@ -53,8 +53,8 @@ namespace Paps.Timers
         {
             if(Paused)
                 return;
-            
-            _accumulationTime += Time.deltaTime;
+
+            _accumulationTime += GetDeltaTime();
 
             if (_accumulationTime >= Interval)
             {
@@ -64,6 +64,13 @@ namespace Paps.Timers
                 _accumulationTime = 0;
                 OnTick?.Invoke(this);
             }
+        }
+        
+        private float GetDeltaTime()
+        {
+            if (TimeChannel != null)
+                return TimeChannel.DeltaTime;
+            return TimeManager.Instance.GlobalDeltaTime;
         }
     }
 }

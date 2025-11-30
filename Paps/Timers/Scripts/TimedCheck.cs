@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Paps.Time;
+using System;
 
 namespace Paps.Timers
 {
@@ -8,6 +9,12 @@ namespace Paps.Timers
         
         private readonly CheckPredicate _check;
         private readonly SyncTimer _timer = new SyncTimer();
+
+        public TimeChannel TimeChannel
+        {
+            get => _timer.TimeChannel;
+            set => _timer.TimeChannel = value;
+        }
 
         public float Interval
         {
