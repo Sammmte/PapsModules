@@ -1,3 +1,4 @@
+using Paps.Optionals;
 using Paps.Time;
 using Paps.UpdateManager;
 using System;
@@ -12,6 +13,26 @@ namespace Paps.Timers
         public bool Active { get; private set; }
         public bool Paused { get; set; }
         public TimeChannel TimeChannel { get; set; }
+        
+        private Optional<int> _updateUpdaterId;
+
+        public Optional<int> UpdateUpdaterId
+        {
+            get => _updateUpdaterId;
+            set
+            {
+                if (Active)
+                {
+                    Unregister();
+                    _updateUpdaterId = value;
+                    Register();
+                }
+                else
+                {
+                    _updateUpdaterId = value;
+                }
+            }
+        }
 
         private float _accumulationTime;
 
@@ -23,7 +44,7 @@ namespace Paps.Timers
             Active = true;
             Paused = false;
             _accumulationTime = 0;
-            this.RegisterUpdate();
+            Register();
         }
         
         public void Restart()
@@ -46,7 +67,7 @@ namespace Paps.Timers
             
             Active = false;
             Paused = false;
-            this.UnregisterUpdate();
+            Unregister();
         }
         
         public void ManagedUpdate()
@@ -71,6 +92,30 @@ namespace Paps.Timers
             if (TimeChannel != null)
                 return TimeChannel.DeltaTime;
             return TimeManager.Instance.GlobalDeltaTime;
+        }
+
+        private void Register()
+        {
+            if (UpdateUpdaterId.HasValue)
+            {
+                this.RegisterUpdate(UpdateUpdaterId);
+            }
+            else
+            {
+                this.RegisterUpdate();
+            }
+        }
+
+        private void Unregister()
+        {
+            if (UpdateUpdaterId.HasValue)
+            {
+                this.UnregisterUpdate(UpdateUpdaterId);
+            }
+            else
+            {
+                this.UnregisterUpdate();
+            }
         }
     }
 }

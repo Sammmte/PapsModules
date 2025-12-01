@@ -1,5 +1,5 @@
-﻿using Paps.Time;
-using System;
+﻿using Paps.Optionals;
+using Paps.Time;
 
 namespace Paps.Timers
 {
@@ -20,6 +20,12 @@ namespace Paps.Timers
         {
             get => _timer.Interval;
             set => _timer.Interval = value;
+        }
+
+        public Optional<int> UpdateUpdaterId
+        {
+            get => _timer.UpdateUpdaterId;
+            set => _timer.UpdateUpdaterId = value;
         }
 
         public TimedCheck(CheckPredicate check)

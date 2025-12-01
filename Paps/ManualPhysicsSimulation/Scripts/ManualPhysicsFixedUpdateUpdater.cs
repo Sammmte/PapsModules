@@ -1,5 +1,6 @@
 using Paps.Time;
 using Paps.UpdateManager;
+using Paps.ValueReferences;
 using SaintsField.Playa;
 using System;
 using UnityEngine;
@@ -9,6 +10,7 @@ namespace Paps.ManualPhysicsSimulation
 {
     public class ManualPhysicsFixedUpdateUpdater : MonoBehaviour, IUpdater<IFixedUpdatable>
     {
+        [SerializeField] private ValueReference<int> _id;
         [SerializeField] private int _initialCapacity;
         [SerializeField] private float _fixedTimeStep;
         [SerializeField] private TimeChannel _timeChannel;
@@ -19,27 +21,45 @@ namespace Paps.ManualPhysicsSimulation
         private float _accumulatedDeltaTime;
         
         private bool HasListeners => _listeners.Count > 0;
+        public int Id => _id;
+        private bool _manualEnabled;
         
         private void Awake()
         {
             _listeners = new FastRemoveList<IFixedUpdatable>(_initialCapacity);
-            enabled = HasListeners;
+            _manualEnabled = enabled;
+            
+            UpdateEnabled();
 
             Physics.simulationMode = SimulationMode.Script;
         }
-        
+
         public void Register(IFixedUpdatable listener)
         {
             _listeners.Add(listener);
             
-            enabled = HasListeners;
+            UpdateEnabled();
         }
 
         public void Unregister(IFixedUpdatable listener)
         {
             _listeners.Remove(listener);
 
-            enabled = HasListeners;
+            UpdateEnabled();
+        }
+
+        public void Enable()
+        {
+            _manualEnabled = true;
+            
+            UpdateEnabled();
+        }
+
+        public void Disable()
+        {
+            _manualEnabled = false;
+            
+            UpdateEnabled();
         }
 
         void Update()
@@ -75,5 +95,10 @@ namespace Paps.ManualPhysicsSimulation
         
         private float GetDeltaTime() => _timeChannel?.DeltaTime ?? UnityTime.deltaTime;
         private float GetTimeScale() => _timeChannel?.TimeScale ?? UnityTime.timeScale;
+
+        private void UpdateEnabled()
+        {
+            enabled = HasListeners && _manualEnabled;
+        }
     }
 }
