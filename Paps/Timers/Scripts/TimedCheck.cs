@@ -27,6 +27,12 @@ namespace Paps.Timers
             get => _timer.UpdateUpdaterId;
             set => _timer.UpdateUpdaterId = value;
         }
+        
+        public bool UseTimeManager
+        {
+            get => _timer.UseTimeManager;
+            set => _timer.UseTimeManager = value;
+        }
 
         public TimedCheck(CheckPredicate check)
         {

@@ -2,6 +2,7 @@ using Paps.Optionals;
 using Paps.Time;
 using Paps.UpdateManager;
 using System;
+using UnityTime = UnityEngine.Time;
 
 namespace Paps.Timers
 {
@@ -13,6 +14,7 @@ namespace Paps.Timers
         public bool Active { get; private set; }
         public bool Paused { get; set; }
         public TimeChannel TimeChannel { get; set; }
+        public bool UseTimeManager { get; set; }
         
         private Optional<int> _updateUpdaterId;
 
@@ -91,7 +93,7 @@ namespace Paps.Timers
         {
             if (TimeChannel != null)
                 return TimeChannel.DeltaTime;
-            return TimeManager.Instance.GlobalDeltaTime;
+            return UseTimeManager ? TimeManager.Instance.GlobalDeltaTime : UnityTime.deltaTime;
         }
 
         private void Register()
