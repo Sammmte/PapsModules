@@ -64,6 +64,42 @@ namespace Paps.UpdateManager
         {
             return _fixedUpdateUpdaters[0].I;
         }
+        
+        public IUpdater<IUpdatable> GetUpdateUpdaterById(int id)
+        {
+            if(_updateUpdatersDictionary.TryGetValue(id, out var updater))
+            {
+                return updater;
+            }
+            else
+            {
+                throw new ArgumentException($"No Update Updater found with Id {id}");
+            }
+        }
+        
+        public IUpdater<ILateUpdatable> GetLateUpdateUpdaterById(int id)
+        {
+            if(_lateUpdateUpdatersDictionary.TryGetValue(id, out var updater))
+            {
+                return updater;
+            }
+            else
+            {
+                throw new ArgumentException($"No Late Update Updater found with Id {id}");
+            }
+        }
+        
+        public IUpdater<IFixedUpdatable> GetFixedUpdateUpdaterById(int id)
+        {
+            if(_fixedUpdateUpdatersDictionary.TryGetValue(id, out var updater))
+            {
+                return updater;
+            }
+            else
+            {
+                throw new ArgumentException($"No Fixed Update Updater found with Id {id}");
+            }
+        }
 
         public void RegisterForUpdate(IUpdatable updatable)
         {
