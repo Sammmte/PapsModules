@@ -3,12 +3,17 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityMainToolbarElementAttribute = UnityEditor.Toolbars.MainToolbarElementAttribute;
+using UnityMainToolbarElement = UnityEditor.Toolbars.MainToolbarElement;
 
 namespace Paps.DevelopmentTools.Editor
 {
-    [MainToolbarElement("PlayFromLevelButton", order: -999)]
+    [MainToolbarElement("PlayFromLevelButton")]
     public class PlayFromLevelButton : Button
     {
+        [UnityMainToolbarElementAttribute("PlayFromLevelButton")]
+        private static UnityMainToolbarElement CreateDummy() => null;
+        
         private static bool _willPlayFromEntry;
 
         [InitializeOnLoadMethod]

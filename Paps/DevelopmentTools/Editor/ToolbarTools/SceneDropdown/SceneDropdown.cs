@@ -2,12 +2,18 @@ using Paps.UnityToolbarExtenderUIToolkit;
 using UnityEditor;
 using UnityEditor.Toolbars;
 using UnityEngine;
+using MainToolbarElement = Paps.UnityToolbarExtenderUIToolkit.MainToolbarElementAttribute;
+using UnityMainToolbarElementAttribute = UnityEditor.Toolbars.MainToolbarElementAttribute;
+using UnityMainToolbarElement = UnityEditor.Toolbars.MainToolbarElement;
 
 namespace Paps.DevelopmentTools.Editor
 {
-    [MainToolbarElement("SceneDropdown", ToolbarAlign.Right, order: -1000)]
+    [MainToolbarElement("SceneDropdown")]
     public class SceneDropdown : EditorToolbarDropdown
     {
+        [UnityMainToolbarElementAttribute("SceneDropdown")]
+        private static UnityMainToolbarElement CreateDummy() => null;
+        
         public void InitializeElement()
         {
             text = "Scenes";

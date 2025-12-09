@@ -1,13 +1,17 @@
 ﻿using Paps.Persistence;
 using Paps.UnityToolbarExtenderUIToolkit;
-using UnityEngine;
 using UnityEngine.UIElements;
+using UnityMainToolbarElementAttribute = UnityEditor.Toolbars.MainToolbarElementAttribute;
+using UnityMainToolbarElement = UnityEditor.Toolbars.MainToolbarElement;
 
 namespace Paps.DevelopmentTools.Editor
 {
     [MainToolbarElement("PersistenceToggle")]
     public class PersistenceToggle : Toggle
     {
+        [UnityMainToolbarElementAttribute("PersistenceToggle")]
+        private static UnityMainToolbarElement CreateDummy() => null;
+        
         [Serialize] private bool _enabled;
 
         public void InitializeElement()

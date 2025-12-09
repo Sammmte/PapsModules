@@ -2,12 +2,17 @@
 using Paps.UnityToolbarExtenderUIToolkit;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityMainToolbarElementAttribute = UnityEditor.Toolbars.MainToolbarElementAttribute;
+using UnityMainToolbarElement = UnityEditor.Toolbars.MainToolbarElement;
 
 namespace Paps.DevelopmentTools.Editor
 {
-    [MainToolbarElement("CurrentLoadedLevelLabel", ToolbarAlign.Right, order: -999)]
+    [MainToolbarElement("CurrentLoadedLevelLabel")]
     public class CurrentLoadedLevelLabel : Label
     {
+        [UnityMainToolbarElementAttribute("CurrentLoadedLevelLabel")]
+        private static UnityMainToolbarElement CreateDummy() => null;
+        
         public void InitializeElement()
         {
             EditorLevelManager.OnLevelChanged += UpdateLabel;
