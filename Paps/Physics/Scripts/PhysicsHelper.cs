@@ -138,5 +138,30 @@ namespace Paps.Physics
                     layerMask, queryTriggerInteraction);
             }
         }
+
+        public static bool SphereCast(Vector3 center, Vector3 direction, float radius, out RaycastHit hitInfo, 
+            float maxDistance, LayerMask layerMask, 
+            QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        {
+            using (VisualLifetime.Create(EDITOR_GIZMO_DISPLAY_DURATION))
+            {
+                return PhysicsAPI.SphereCast(center, radius, direction, out hitInfo, maxDistance, layerMask, queryTriggerInteraction);
+            }
+        }
+
+        public static int SphereCast(Vector3 center, Vector3 direction, float radius, RaycastHit[] hits, 
+            float maxDistance, LayerMask layerMask, 
+            QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, bool orderByDistance = false)
+        {
+            using (VisualLifetime.Create(EDITOR_GIZMO_DISPLAY_DURATION))
+            {
+                var count = PhysicsAPI.SphereCastNonAlloc(center, radius, direction, hits, maxDistance, layerMask, queryTriggerInteraction);
+
+                if(orderByDistance)
+                    OrderHitsByDistance(hits, count);
+
+                return count;
+            }
+        }
     }
 }
