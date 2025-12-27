@@ -7,6 +7,8 @@ namespace Paps.Localization
     [Serializable]
     public class LocalizedText
     {
+        public static readonly LocalizedText NO_STRING = new LocalizedText();
+
         [SerializeField] private LocalizedString _localizedString;
 
         public string TableId => _localizedString.TableReference;
