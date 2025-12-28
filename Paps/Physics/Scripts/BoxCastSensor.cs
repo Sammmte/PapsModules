@@ -1,9 +1,11 @@
-﻿using SaintsField;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 using Paps.Optionals;
 using Paps.UnityExtensions;
 using SaintsField.Playa;
+#if UNITY_EDITOR
+using UnityEditor;
+using Cysharp.Threading.Tasks;
+#endif
 
 namespace Paps.Physics
 {
@@ -107,5 +109,57 @@ namespace Paps.Physics
                 Rotation = overrideParameters.Rotation.ValueOrDefault(Rotation)
             };
         }
+
+        #if UNITY_EDITOR
+        private bool _onPreview;
+        private Vector3 _nextPreviewPosition;
+
+        private void OnDrawGizmosSelected()
+        {
+            if(!_onPreview)
+                return;
+
+            Gizmos.DrawWireCube(_nextPreviewPosition, HalfExtents * 2);
+        }
+
+        [Button]
+        private void Preview(float totalSeconds = 1f)
+        {
+            if(totalSeconds <= 0)
+            {
+                totalSeconds = 0.001f;
+            }
+
+            ShowPreview(totalSeconds).Forget();
+        }
+
+        private async UniTaskVoid ShowPreview(float totalSeconds)
+        {
+            var origin = Origin;
+            var endPosition = origin + (Direction.normalized * Distance);
+
+            var lastRecordedTime = EditorApplication.timeSinceStartup;
+            var deltaTime = 0f;
+            var currentTime = 0f;
+
+            _onPreview = true;
+
+            while(currentTime < totalSeconds)
+            {
+                var nextPosition = Vector3.Lerp(origin, endPosition, currentTime / totalSeconds);
+
+                _nextPreviewPosition = nextPosition;
+
+                deltaTime = (float)(EditorApplication.timeSinceStartup - lastRecordedTime);
+                lastRecordedTime = EditorApplication.timeSinceStartup;
+
+                currentTime += deltaTime;
+
+                await UniTask.NextFrame();
+            }
+
+            _onPreview = false;
+        }
+        #endif
     }
 }

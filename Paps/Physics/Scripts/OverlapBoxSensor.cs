@@ -3,6 +3,10 @@ using Paps.UnityExtensions;
 using SaintsField.Playa;
 using System;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+using Cysharp.Threading.Tasks;
+#endif
 
 namespace Paps.Physics
 {
@@ -80,5 +84,49 @@ namespace Paps.Physics
                 Rotation = overrideParameters.Rotation.ValueOrDefault(Rotation)
             };
         }
+
+        #if UNITY_EDITOR
+        private bool _onPreview;
+
+        private void OnDrawGizmosSelected()
+        {
+            if(!_onPreview)
+                return;
+
+            Gizmos.DrawWireCube(Origin, HalfExtents * 2);
+        }
+
+        [Button]
+        private void Preview(float totalSeconds = 1f)
+        {
+            if(totalSeconds <= 0)
+            {
+                totalSeconds = 0.001f;
+            }
+
+            ShowPreview(totalSeconds).Forget();
+        }
+
+        private async UniTaskVoid ShowPreview(float totalSeconds)
+        {
+            var lastRecordedTime = EditorApplication.timeSinceStartup;
+            var deltaTime = 0f;
+            var currentTime = 0f;
+
+            _onPreview = true;
+
+            while(currentTime < totalSeconds)
+            {
+                deltaTime = (float)(EditorApplication.timeSinceStartup - lastRecordedTime);
+                lastRecordedTime = EditorApplication.timeSinceStartup;
+
+                currentTime += deltaTime;
+
+                await UniTask.NextFrame();
+            }
+
+            _onPreview = false;
+        }
+        #endif
     }
 }

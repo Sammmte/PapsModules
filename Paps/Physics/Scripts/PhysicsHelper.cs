@@ -13,7 +13,6 @@ namespace Paps.Physics
         public static float EDITOR_GIZMO_DISPLAY_DURATION = 2f;
 
         private static readonly Collider[] _simpleColliderBuffer = new Collider[1];
-        private static readonly RaycastHit[] _simpleRaycastHitBuffer = new RaycastHit[50];
 
         public static int Raycast(Vector3 origin, Vector3 direction, float maxDistance, LayerMask layerMask,
             RaycastHit[] rayHits, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, 
@@ -50,12 +49,10 @@ namespace Paps.Physics
         public static bool Raycast(Vector3 origin, Vector3 direction, float maxDistance, LayerMask layerMask,
             out RaycastHit hitInfo, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
-            var amount = Raycast(origin, direction, maxDistance, layerMask, _simpleRaycastHitBuffer,
-                queryTriggerInteraction);
-            
-            GetRaycastHitFromBuffer(amount, out hitInfo);
-
-            return amount > 0;
+            using (VisualLifetime.Create(EDITOR_GIZMO_DISPLAY_DURATION))
+            {
+                return PhysicsAPI.Raycast(origin, direction, out hitInfo, maxDistance, layerMask, queryTriggerInteraction);
+            }
         }
 
         public static int OverlapBox(Vector3 center, Vector3 halfExtents, LayerMask layerMask, Quaternion rotation,
@@ -101,32 +98,13 @@ namespace Paps.Physics
             return collider != null;
         }
 
-        private static void GetRaycastHitFromBuffer(int amount, out RaycastHit raycastHit)
-        {
-            var closest = _simpleRaycastHitBuffer[0];
-            
-            for (int i = 1; i < amount; i++)
-            {
-                var current = _simpleRaycastHitBuffer[i];
-
-                if (current.distance < closest.distance)
-                    closest = current;
-
-                _simpleRaycastHitBuffer[i] = default;
-            }
-
-            raycastHit = closest;
-        }
-
         public static bool BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion rotation, float maxDistance,
             LayerMask layerMask, out RaycastHit hitInfo, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
-            var amount = BoxCast(center, halfExtents, direction, rotation, maxDistance, layerMask,
-                _simpleRaycastHitBuffer, queryTriggerInteraction);
-            
-            GetRaycastHitFromBuffer(amount, out hitInfo);
-
-            return amount > 0;
+            using (VisualLifetime.Create(EDITOR_GIZMO_DISPLAY_DURATION))
+            {
+                return PhysicsAPI.BoxCast(center, halfExtents, direction, out hitInfo, rotation, maxDistance, layerMask, queryTriggerInteraction);
+            }
         }
         
         public static int BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion rotation, float maxDistance,
