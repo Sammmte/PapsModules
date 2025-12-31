@@ -8,7 +8,7 @@ namespace Paps.ValueReferences
         public const string BASE_CREATE_ASSET_MENU_PATH = "Paps/Value References/";
     }
     
-    public abstract class ValueReferenceAsset<T> : ValueReferenceAsset
+    public abstract class ValueReferenceAsset<T> : ValueReferenceAsset, IValueReferenceSource<T>
     {
         public T Value
         {

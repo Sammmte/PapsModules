@@ -10,11 +10,10 @@ namespace Paps.ValueReferences
     [Serializable]
     public struct ValueReference<T>
     {
-        [SerializeField] 
         #if UNITY_EDITOR
         [AdvancedDropdown(nameof(GetOptions))]
         #endif
-        private ValueReferenceAsset<T> _referenceAsset;
+        [SerializeField] private SaintsInterface<IValueReferenceSource<T>> _referenceSource;
 
         [SerializeField] private Optional<T> _hardcodedValue;
         [SerializeField] private bool _throwErrorWhenNoValuePresent;
@@ -24,8 +23,8 @@ namespace Paps.ValueReferences
         {
             get
             {
-                if(_referenceAsset != null)
-                    return _referenceAsset.Value;
+                if(_referenceSource.I != null)
+                    return _referenceSource.I.Value;
 
                 if (_hardcodedValue.HasValue)
                     return _hardcodedValue.Value;
@@ -37,18 +36,12 @@ namespace Paps.ValueReferences
             }
         }
 
-        public bool HasValue => _referenceAsset != null || _hardcodedValue.HasValue;
+        public bool HasValue => _referenceSource.I != null || _hardcodedValue.HasValue;
         
         public static implicit operator T(ValueReference<T> valueReference) => valueReference.Value;
 
         #if UNITY_EDITOR
         public const string UNCATEGORIZED_GROUP = "Uncategorized";
-        
-        [Button]
-        private void PingAsset()
-        {
-            UnityEditor.EditorGUIUtility.PingObject(_referenceAsset);
-        }
         
         private static AdvancedDropdownList<ValueReferenceAsset<T>> GetOptions()
         {
