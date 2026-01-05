@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -18,7 +17,6 @@ namespace Paps.ValueReferences.Editor
         private ValueReferenceGroupAsset[] _groups;
         private PathTree<ValueReferenceGroupAsset[]> _pathTree;
         private PathTree<ValueReferencePathElement> _pathElementsTree;
-        private ValueReferenceGroupAsset _orphanGroupAsset;
 
         [MenuItem("Paps/Value References/Manager Window")]
         public static void Display()
@@ -31,7 +29,7 @@ namespace Paps.ValueReferences.Editor
         private void CreateGUI()
         {
             _groups = GetGroups();
-            _pathTree = CreateAndFillPathTree(_groups);
+            _pathTree = GetPathTree();
             _pathElementsTree = _pathTree.Map(node =>
             {
                 var pathElementParent = _pathElementTreeAsset.CloneTree();
@@ -44,8 +42,8 @@ namespace Paps.ValueReferences.Editor
             {
                 var pathElement = node.Data;
 
-                pathElement.Initialize(node.Name, 
-                    ValueReferencesUtils.GetGroupsForPath(_groups, node.GetPath()), 
+                pathElement.Initialize(GetNodeName(node.Name), 
+                    ValueReferencesEditorManager.GetGroupsForPath(node.GetPath()), 
                     node.Children.Select(c => c.Data).ToArray(),
                     _groupElementTreeAsset, _valueReferenceElementTreeAsset);
             });
@@ -61,30 +59,12 @@ namespace Paps.ValueReferences.Editor
 
         private ValueReferenceGroupAsset[] GetGroups()
         {
-            IEnumerable<ValueReferenceGroupAsset> groupAssets = ValueReferencesUtils.GetGroupAssets();
-
-            _orphanGroupAsset = ScriptableObject.CreateInstance<ValueReferenceGroupAsset>();
-            _orphanGroupAsset.name = "Orphan Values";
-            _orphanGroupAsset.Path = "ORPHAN";
-            _orphanGroupAsset.ValueReferenceAssets = ValueReferencesUtils.GetOrphanValueReferenceAssets(groupAssets.ToArray());
-
-            groupAssets = groupAssets.Append(_orphanGroupAsset);
-
-            return groupAssets.ToArray();
+            return ValueReferencesEditorManager.GetGroupAssets();
         }
 
-        private PathTree<ValueReferenceGroupAsset[]> CreateAndFillPathTree(ValueReferenceGroupAsset[] groups)
+        private PathTree<ValueReferenceGroupAsset[]> GetPathTree()
         {
-            var pathTree = ValueReferencesUtils.GetGroupsPathTree(_groups);
-
-            pathTree.Traverse(node =>
-            {
-                var groupsForNode = ValueReferencesUtils.GetGroupsForPath(_groups, node.GetPath());
-
-                node.Data = groupsForNode;
-            });
-
-            return pathTree;
+            return ValueReferencesEditorManager.GetGroupsPathTree();
         }
 
         private void OnDestroy()
@@ -93,8 +73,14 @@ namespace Paps.ValueReferences.Editor
             {
                 node.Data.Dispose();
             });
+        }
 
-            ScriptableObject.DestroyImmediate(_orphanGroupAsset);
+        private string GetNodeName(string inputName)
+        {
+            if(inputName == ValueReferencesEditorManager.ORPHAN_GROUP_PATH_NAME)
+                return "ORPHAN VALUES";
+
+            return inputName;
         }
 
     }
