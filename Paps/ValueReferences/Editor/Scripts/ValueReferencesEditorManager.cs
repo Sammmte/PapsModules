@@ -64,6 +64,26 @@ namespace Paps.ValueReferences.Editor
             return _groupsPathTree;
         }
 
+        public static PathTree<ValueReferenceGroupAsset[]> GetGroupsPathTreeContainingType<T>()
+        {
+            var groups = GetGroupAssets();
+
+            var uniquePaths = groups
+                .Where(g => g.ValueReferenceAssets.Any(v => v is IValueReferenceSource<T>))
+                .Select(g => g.Path)
+                .Distinct()
+                .ToArray();
+
+            var pathTree = PathTree<ValueReferenceGroupAsset[]>.BuildFromPaths(uniquePaths);
+
+            pathTree.Traverse(node =>
+            {
+                node.Data = GetGroupsForPath(node.GetPath());
+            });
+
+            return pathTree;
+        }
+
         private static void LoadGroupsPathTree()
         {
             var groups = GetGroupAssets();

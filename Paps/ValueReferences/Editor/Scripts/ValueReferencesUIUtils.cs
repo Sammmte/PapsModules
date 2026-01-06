@@ -9,5 +9,11 @@ namespace Paps.ValueReferences.Editor
             return new ValueReferencesAdvancedDropdown(new AdvancedDropdownState(), 
                 ValueReferencesEditorManager.GetGroupsPathTree());
         }
+
+        public static ValueReferencesAdvancedDropdown CreateAdvancedDropdownForType<T>()
+        {
+            return new ValueReferencesAdvancedDropdown(new AdvancedDropdownState(), 
+                ValueReferencesEditorManager.GetGroupsPathTreeContainingType<T>());
+        }
     }
 }

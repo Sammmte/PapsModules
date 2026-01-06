@@ -19,7 +19,7 @@ namespace Paps.ValueReferences.Editor
 
         protected override AdvancedDropdownItem BuildRoot()
         {
-            var root = new AdvancedDropdownItem("Root");
+            var root = new AdvancedDropdownItem("Value References");
 
             BuildRecursively(root, _pathTree.Root);
 
@@ -30,7 +30,7 @@ namespace Paps.ValueReferences.Editor
         {
             if(node.Data != null)
             {
-                var valueReferenceAssets = node.Data.SelectMany(g => g.ValueReferenceAssets);
+                var valueReferenceAssets = node.Data.SelectMany(g => g.ValueReferenceAssets).ToArray();
 
                 foreach(var asset in valueReferenceAssets)
                 {

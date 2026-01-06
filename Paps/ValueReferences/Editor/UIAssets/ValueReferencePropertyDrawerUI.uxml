@@ -1,0 +1,37 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement name="MainContainer" style="flex-direction: column; background-color: rgb(75, 75, 75); border-left-width: 3px;">
+        <ui:VisualElement name="UpperContainer" style="flex-grow: 1; flex-direction: row; justify-content: space-between; height: 30px;">
+            <ui:VisualElement name="LeftContainer" style="justify-content: center; max-width: 30%; min-width: 30%;">
+                <ui:Label text="Label" name="PropertyNameLabel"/>
+            </ui:VisualElement>
+            <ui:VisualElement name="MiddleContainer" style="flex-direction: row; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); max-height: 15px; align-self: center;">
+                <uie:ToolbarToggle name="SourceSelectViewToggle" tooltip="Select Value Source View" style="width: 30px; height: 15px; border-bottom-width: 1px;">
+                    <Paps.UnityExtensions.Editor.IconImage icon="d_ScriptableObject Icon" scale-mode="ScaleToFit" style="align-self: center;"/>
+                </uie:ToolbarToggle>
+                <uie:ToolbarToggle name="CustomValueViewToggle" tooltip="Set Custom Value View" style="width: 30px; height: 15px; border-bottom-width: 1px;">
+                    <Paps.UnityExtensions.Editor.IconImage icon="CustomTool@2x" scale-mode="ScaleToFit" style="align-self: center;"/>
+                </uie:ToolbarToggle>
+            </ui:VisualElement>
+            <ui:VisualElement name="RightContainer" style="flex-grow: 1; max-width: 57%;">
+                <ui:VisualElement name="SourceSelectViewContainer" style="flex-grow: 1; display: none;">
+                    <ui:VisualElement name="SelectHeader" style="flex-grow: 1; flex-direction: row;">
+                        <ui:Button text="Ping" name="PingButton" style="align-self: center;"/>
+                        <ui:Button text="Select Source" name="SelectSourceButton" style="flex-grow: 1; align-self: center;"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="CustomValueViewContainer" style="flex-grow: 1; display: flex; flex-direction: row;">
+                    <ui:VisualElement name="HasCustomValueToggleContainer" style="align-items: center; padding-top: 3px; padding-bottom: 3px; flex-direction: row; padding-right: 3px; padding-left: 3px;">
+                        <ui:Label text="Use Custom Value"/>
+                        <ui:Toggle name="HasCustomValueToggle" style="padding-top: 3px;"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="LowerContainer" style="flex-grow: 1; flex-direction: column; justify-content: flex-end;">
+            <ui:VisualElement name="EditorsContainer" style="flex-grow: 1; border-bottom-width: 1px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);">
+                <ui:VisualElement name="CustomValueEditorContainer" style="flex-grow: 1;"/>
+                <ui:VisualElement name="SourceEditorContainer" style="flex-grow: 1;"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
