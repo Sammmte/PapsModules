@@ -22,7 +22,7 @@ namespace Paps.ValueReferences.Editor
         private Button _pingButton;
         private Toggle _sourceSelectToggle;
         private Toggle _customValueToggle;
-        private Button _selectSourceButton;
+        private IMGUIContainer _selectSourceButtonContainer;
         private VisualElement _sourceEditorContainer;
         private Toggle _hasCustomValueToggle;
         private VisualElement _customValueEditorContainer;
@@ -39,9 +39,8 @@ namespace Paps.ValueReferences.Editor
         private Type _valueReferenceTypeParameter;
         private EditorObject _valueSourceEditor;
         private PropertyField _customValuePropertyField;
-        private IMGUIContainer _advancedDropdownStyleInitializationContainer;
 
-        private bool _loadedAdvancedDropdownStyles;
+        private bool _selectSourceButtonClicked;
 
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
@@ -57,14 +56,11 @@ namespace Paps.ValueReferences.Editor
             _customValueViewContainer = _mainVisualElement.Q("CustomValueViewContainer");
             
             _pingButton = _mainVisualElement.Q<Button>("PingButton");
-            _selectSourceButton = _mainVisualElement.Q<Button>("SelectSourceButton");
+            _selectSourceButtonContainer = _mainVisualElement.Q<IMGUIContainer>("SelectSourceButtonContainer");
             _sourceEditorContainer = _mainVisualElement.Q("SourceEditorContainer");
 
             _hasCustomValueToggle = _mainVisualElement.Q<Toggle>("HasCustomValueToggle");
             _customValueEditorContainer = _mainVisualElement.Q("CustomValueEditorContainer");
-
-            _advancedDropdownStyleInitializationContainer = new IMGUIContainer(ShowDropdownOnGUI);
-            _mainVisualElement.Add(_advancedDropdownStyleInitializationContainer);
 
             _referenceSourceProperty = property.FindPropertyRelative("_referenceSource");
             _interfaceUnityObjectProperty = _referenceSourceProperty.FindPropertyRelativeBakingField(nameof(SaintsInterface<object>.V));
@@ -94,20 +90,14 @@ namespace Paps.ValueReferences.Editor
                     SwitchToSourceSelectView();
             });
 
-            SwitchToSourceSelectView();
+            ShowInitialView();
 
             _pingButton.clicked += () =>
             {
                 EditorGUIUtility.PingObject(_interfaceUnityObjectProperty.objectReferenceValue);
             };
 
-            UpdateSelectSourceButtonState();
-
-            _selectSourceButton.clicked += () =>
-            {
-                _mainVisualElement.Remove(_advancedDropdownStyleInitializationContainer);
-                ShowDropdown();
-            };
+            _selectSourceButtonContainer.onGUIHandler += SourceSelectButtonOnGUI;
 
             UpdateValueSourceEditor();
 
@@ -119,24 +109,50 @@ namespace Paps.ValueReferences.Editor
             return _mainVisualElement;
         }
 
-        private void ShowDropdownOnGUI()
+        private void SourceSelectButtonOnGUI()
         {
-            if(_loadedAdvancedDropdownStyles)
+            GUILayout.BeginVertical();
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button(GetSelectSourceButtonStringState()))
+            {
+                _selectSourceButtonClicked = true;
+            }
+            
+            GUILayout.EndHorizontal();
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.EndVertical();
+
+            if(_selectSourceButtonClicked && Event.current.type == EventType.Repaint)
+            {
+                ShowDropdown();
+                _selectSourceButtonClicked = false;
+            }
+        }
+
+        private void ShowInitialView()
+        {
+            if(_interfaceUnityObjectProperty.objectReferenceValue == null && _hasCustomValueProperty.boolValue)
+            {
+                SwitchToCustomValueView();
                 return;
+            }
 
-            var advancedDropdownGUIType = typeof(AdvancedDropdown).Assembly.GetType("UnityEditor.IMGUI.Controls.AdvancedDropdownGUI");
-            var loadStylesMethod = advancedDropdownGUIType.GetMethod("LoadStyles", BindingFlags.NonPublic | BindingFlags.Static);
-
-            loadStylesMethod.Invoke(null, null);
-
-            _loadedAdvancedDropdownStyles = true;
+            SwitchToSourceSelectView();
         }
 
         private void ShowDropdown()
         {
+            var rect = GUILayoutUtility.GetLastRect();
+
             var advancedDropdown = GetDropdrownForType(_valueReferenceTypeParameter);
             advancedDropdown.OnSelected += OnSourceSelected;
-            advancedDropdown.Show(_selectSourceButton.worldBound);
+            advancedDropdown.Show(rect);
         }
 
         private ValueReferencesAdvancedDropdown GetDropdrownForType(Type valueReferenceTypeParameter)
@@ -154,26 +170,25 @@ namespace Paps.ValueReferences.Editor
             _interfaceUnityObjectProperty.objectReferenceValue = asset;
 
             _interfaceUnityObjectProperty.serializedObject.ApplyModifiedProperties();
-
-            UpdateSelectSourceButtonState();
         }
 
-        private void UpdateSelectSourceButtonState()
+        private string GetSelectSourceButtonStringState()
         {
             var valueReferenceAsset = _interfaceUnityObjectProperty.objectReferenceValue as ValueReferenceAsset;
 
             if(valueReferenceAsset == null)
             {
-                _selectSourceButton.text = "No source selected";
+                return "No source selected";
             }
             else
             {
-                _selectSourceButton.text = valueReferenceAsset.GetPath();
+                return valueReferenceAsset.GetPath();
             }
         }
 
         private void UpdateValueSourceEditor()
         {
+            EditorObject.DestroyImmediate(_valueSourceEditor);
             _valueSourceEditor = EditorObject.CreateEditor(_interfaceUnityObjectProperty.objectReferenceValue);
 
             _sourceEditorContainer.Clear();
