@@ -117,6 +117,8 @@ namespace Paps.ValueReferences.Editor
                 "Accept", "Cancel"))
             {
                 RemoveItem(element);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
                 RefreshItems();
                 ValueReferencesEditorManager.RefreshAll();
             }
@@ -155,23 +157,13 @@ namespace Paps.ValueReferences.Editor
 
             var newAsset = ScriptableObject.CreateInstance(type);
 
-            serializedObject.Update();
-
-            var newIndex = _valueReferencesArrayProperty.arraySize;
-
-            _valueReferencesArrayProperty.InsertArrayElementAtIndex(newIndex);
-
-            var newProperty = _valueReferencesArrayProperty.GetArrayElementAtIndex(newIndex);
-
             var thisGroupPath = AssetDatabase.GetAssetPath(_groupAsset);
 
             var folderPath = Path.GetDirectoryName(thisGroupPath);
 
             AssetDatabase.CreateAsset(newAsset, Path.Combine(folderPath, $"New{type.Name}ValueReference.asset"));
 
-            newProperty.objectReferenceValue = newAsset;
-
-            serializedObject.ApplyModifiedProperties();
+            AddItem(newAsset as ValueReferenceAsset);
 
             RefreshItems();
 
@@ -181,6 +173,21 @@ namespace Paps.ValueReferences.Editor
             var lastElement = _elements.Last();
 
             lastElement.ShowRenameView();
+        }
+
+        private void AddItem(ValueReferenceAsset item)
+        {
+            serializedObject.Update();
+
+            var newIndex = _valueReferencesArrayProperty.arraySize;
+
+            _valueReferencesArrayProperty.InsertArrayElementAtIndex(newIndex);
+
+            var newProperty = _valueReferencesArrayProperty.GetArrayElementAtIndex(newIndex);
+
+            newProperty.objectReferenceValue = item;
+
+            serializedObject.ApplyModifiedProperties();
         }
 
         private void RefreshItems()
