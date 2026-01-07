@@ -7,8 +7,8 @@
         <ui:VisualElement name="TypeContainer" style="flex-grow: 1; width: 20%; flex-direction: row; justify-content: center;">
             <ui:Label text="Label" name="TypeNameLabel" style="-unity-text-align: middle-center; color: rgb(28, 207, 28); -unity-font-style: bold;"/>
         </ui:VisualElement>
-        <ui:VisualElement name="EditorContainer" style="width: 60%;"/>
-        <ui:VisualElement name="ExtraControlsContainer" style="flex-grow: 1; flex-direction: row; min-width: 75px; justify-content: space-evenly; margin-right: 2px; margin-left: 2px;">
+        <ui:VisualElement name="EditorContainer" style="width: 60%; padding-right: 10px;"/>
+        <ui:VisualElement name="ExtraControlsContainer" style="flex-grow: 1; flex-direction: row; justify-content: space-evenly; margin-right: 2px; margin-left: 2px;">
             <ui:Button name="RenameButton" tooltip="Rename asset" style="width: 30px; height: 20px; align-self: center;">
                 <Paps.UnityExtensions.Editor.IconImage icon="d_editicon.sml"/>
             </ui:Button>

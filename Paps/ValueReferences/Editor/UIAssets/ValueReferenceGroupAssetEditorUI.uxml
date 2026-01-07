@@ -5,9 +5,14 @@
                 <ui:Label text="Label" name="GroupNameLabel" style="color: rgb(219, 117, 117); font-size: 17.5px; -unity-text-align: middle-left; -unity-font-style: bold;"/>
                 <ui:TextField name="RenameTextField" is-delayed="true" style="display: none;"/>
             </ui:VisualElement>
-            <ui:VisualElement name="ButtonsContainer" style="flex-direction: row; justify-content: flex-end;">
-                <ui:Button text="Rename" name="RenameButton"/>
-                <ui:Button name="AddButton">
+            <ui:VisualElement name="ButtonsContainer" style="flex-direction: row; justify-content: center; align-items: center;">
+                <ui:Button name="RenameButton" tooltip="Rename group" style="justify-content: center; width: 30px; height: 25px;">
+                    <Paps.UnityExtensions.Editor.IconImage icon="d_editicon.sml"/>
+                </ui:Button>
+                <ui:Button name="PingButton" tooltip="Ping group asset" style="width: 30px; height: 25px;">
+                    <Paps.UnityExtensions.Editor.IconImage icon="d_Search Icon"/>
+                </ui:Button>
+                <ui:Button name="AddButton" tooltip="Add a new value reference asset" style="width: 30px; height: 25px;">
                     <Paps.UnityExtensions.Editor.IconImage icon="d_Toolbar Plus@2x" tint-color="rgb(4, 248, 67)"/>
                 </ui:Button>
             </ui:VisualElement>

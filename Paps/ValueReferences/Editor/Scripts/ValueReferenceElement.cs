@@ -49,6 +49,7 @@ namespace Paps.ValueReferences.Editor
             _renameTextField.RegisterCallback<ChangeEvent<string>>(ev =>
             {
                 Rename(ev.newValue);
+                HideRenameView();
             });
 
             _renameTextField.RegisterCallback<FocusOutEvent>(ev =>
@@ -102,6 +103,11 @@ namespace Paps.ValueReferences.Editor
 
         private void Rename(string newName)
         {
+            newName = newName.Trim();
+
+            if(_valueReferenceAsset.name == newName)
+                return;
+
             AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(_valueReferenceAsset), newName);
 
             RefreshName();

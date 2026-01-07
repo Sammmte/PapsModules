@@ -23,6 +23,7 @@ namespace Paps.ValueReferences.Editor
         private PropertyField _pathField;
         private Button _addButton;
         private Button _renameButton;
+        private Button _pingButton;
         private TextField _renameTextField;
         private VisualElement _itemsContainer;
 
@@ -45,6 +46,7 @@ namespace Paps.ValueReferences.Editor
             _pathField = _mainVisualElement.Q<PropertyField>("PathField");
             _addButton = _mainVisualElement.Q<Button>("AddButton");
             _renameButton = _mainVisualElement.Q<Button>("RenameButton");
+            _pingButton = _mainVisualElement.Q<Button>("PingButton");
             _renameTextField = _mainVisualElement.Q<TextField>("RenameTextField");
             _itemsContainer = _mainVisualElement.Q("ItemsContainer");
 
@@ -65,6 +67,7 @@ namespace Paps.ValueReferences.Editor
             _renameTextField.RegisterCallback<ChangeEvent<string>>(ev =>
             {
                 Rename(ev.newValue);
+                HideRenameView();
             });
 
             _renameTextField.RegisterCallback<FocusOutEvent>(ev =>
@@ -90,6 +93,11 @@ namespace Paps.ValueReferences.Editor
             RefreshItems();
 
             return _mainVisualElement;
+        }
+
+        private void PingAsset()
+        {
+            EditorGUIUtility.PingObject(_groupAsset);
         }
 
         private bool IsOrphanGroup() => _pathProperty.stringValue == ValueReferencesEditorManager.ORPHAN_GROUP_PATH_NAME;
@@ -231,6 +239,11 @@ namespace Paps.ValueReferences.Editor
 
         private void Rename(string newName)
         {
+            newName = newName.Trim();
+
+            if(_groupAsset.name == newName)
+                return;
+
             AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(_groupAsset), newName);
 
             RefreshName();
