@@ -82,7 +82,7 @@ namespace Paps.ValueReferences.Editor
                     false, OnNewValueReferenceAssetSelected, tuple.Type);
             }
 
-            if(_pathProperty.stringValue == ValueReferencesEditorManager.ORPHAN_GROUP_PATH_NAME)
+            if(IsOrphanGroup())
             {
                 ShowAsOrphanGroup();
             }
@@ -92,14 +92,56 @@ namespace Paps.ValueReferences.Editor
             return _mainVisualElement;
         }
 
+        private bool IsOrphanGroup() => _pathProperty.stringValue == ValueReferencesEditorManager.ORPHAN_GROUP_PATH_NAME;
+
         private ValueReferenceElement ToUIElement(ValueReferenceAsset asset)
         {
             var elementParent = _valueReferenceElementUI.CloneTree();
             var element = elementParent.Q<ValueReferenceElement>();
 
-            element.Initialize(asset);
+            element.Initialize(asset, new ValueReferenceElement.Options()
+            { 
+                HideDelete = IsOrphanGroup() 
+            });
+
+            element.OnDeleteRequested += OnItemDeleteRequested;
 
             return element;
+        }
+
+        private void OnItemDeleteRequested(ValueReferenceElement element)
+        {
+            if(EditorUtility.DisplayDialog(
+                "Remove asset from group", 
+                $"HEADS UP! This will NOT delete the item, only remove it from {_groupAsset.name} group.\nDo you wish to continue?",
+                "Accept", "Cancel"))
+            {
+                RemoveItem(element);
+                RefreshItems();
+                ValueReferencesEditorManager.RefreshAll();
+            }
+        }
+
+        private void RemoveItem(ValueReferenceElement element)
+        {
+            serializedObject.Update();
+
+            var index = IndexOf(element.ValueReferenceAsset);
+
+            _valueReferencesArrayProperty.DeleteArrayElementAtIndex(index);
+
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private int IndexOf(ValueReferenceAsset asset)
+        {
+            for(int i = 0; i < _groupAsset.ValueReferenceAssets.Length; i++)
+            {
+                if(_groupAsset.ValueReferenceAssets[i] == asset)
+                    return i;
+            }
+
+            return -1;
         }
 
         private void OnAddButtonClicked()
@@ -132,6 +174,13 @@ namespace Paps.ValueReferences.Editor
             serializedObject.ApplyModifiedProperties();
 
             RefreshItems();
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            var lastElement = _elements.Last();
+
+            lastElement.ShowRenameView();
         }
 
         private void RefreshItems()
@@ -142,6 +191,7 @@ namespace Paps.ValueReferences.Editor
             }
 
             _elements.Clear();
+            serializedObject.Update();
             _elements.AddRange(_groupAsset.ValueReferenceAssets.Select(ToUIElement));
 
             _itemsContainer.Clear();

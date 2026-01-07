@@ -15,6 +15,9 @@
             <ui:Button name="DeleteButton" tooltip="Remove item from group" style="width: 30px; height: 20px; align-self: center;">
                 <Paps.UnityExtensions.Editor.IconImage icon="P4_DeletedLocal@2x"/>
             </ui:Button>
+            <ui:Button name="PingButton" tooltip="Ping asset " style="width: 30px; height: 20px; align-self: center;">
+                <Paps.UnityExtensions.Editor.IconImage icon="d_Search Icon"/>
+            </ui:Button>
         </ui:VisualElement>
     </Paps.ValueReferences.Editor.ValueReferenceElement>
 </ui:UXML>

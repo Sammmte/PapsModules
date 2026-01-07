@@ -3,22 +3,34 @@ using UnityEngine.UIElements;
 using EditorObject = UnityEditor.Editor;
 using System.Reflection;
 using UnityEditor;
+using Paps.Optionals;
 
 namespace Paps.ValueReferences.Editor
 {
     [UxmlElement]
     public partial class ValueReferenceElement : VisualElement, IDisposable
     {
+        public struct Options
+        {
+            public bool HideDelete;
+        }
+
         private ValueReferenceAsset _valueReferenceAsset;
         private VisualElement _editorContainer;
         private Label _nameLabel;
         private Label _typeNameLabel;
         private Button _renameButton;
         private TextField _renameTextField;
+        private Button _deleteButton;
+        private Button _pingButton;
 
         private EditorObject _editor;
 
-        public void Initialize(ValueReferenceAsset valueReferenceAsset)
+        public event Action<ValueReferenceElement> OnDeleteRequested;
+
+        public ValueReferenceAsset ValueReferenceAsset => _valueReferenceAsset;
+
+        public void Initialize(ValueReferenceAsset valueReferenceAsset, Optional<Options> options = default)
         {
             _valueReferenceAsset = valueReferenceAsset;
             _editor = EditorObject.CreateEditor(_valueReferenceAsset);
@@ -28,6 +40,8 @@ namespace Paps.ValueReferences.Editor
             _typeNameLabel = this.Q<Label>("TypeNameLabel");
             _renameButton = this.Q<Button>("RenameButton");
             _renameTextField = this.Q<TextField>("RenameTextField");
+            _deleteButton = this.Q<Button>("DeleteButton");
+            _pingButton = this.Q<Button>("PingButton");
 
             RefreshName();
 
@@ -42,11 +56,27 @@ namespace Paps.ValueReferences.Editor
                 HideRenameView();
             });
 
+            _deleteButton.clicked += NotifyDeleteRequested;
+            _pingButton.clicked += PingAsset;
+
             var valueProperty = valueReferenceAsset.GetType().GetProperty("Value", BindingFlags.Public | BindingFlags.Instance);
 
             _typeNameLabel.text = valueProperty.PropertyType.Name;
 
             _editorContainer.Add(_editor.CreateInspectorGUI());
+
+            if(options.HasValue)
+                ApplyOptions(options);
+        }
+
+        private void PingAsset()
+        {
+            EditorGUIUtility.PingObject(_valueReferenceAsset);
+        }
+
+        private void NotifyDeleteRequested()
+        {
+            OnDeleteRequested?.Invoke(this);
         }
 
         private void OnRenameButtonClicked()
@@ -54,7 +84,7 @@ namespace Paps.ValueReferences.Editor
             ShowRenameView();
         }
 
-        private void ShowRenameView()
+        public void ShowRenameView()
         {
             _renameTextField.style.display = DisplayStyle.Flex;
             _renameTextField.SetValueWithoutNotify(_valueReferenceAsset.name);
@@ -83,6 +113,19 @@ namespace Paps.ValueReferences.Editor
             _nameLabel.tooltip = _valueReferenceAsset.name;
         }
 
+        public void ApplyOptions(Options options)
+        {
+            if(options.HideDelete)
+            {
+                _deleteButton.style.display = DisplayStyle.None;
+                _deleteButton.enabledSelf = false;
+            }
+            else
+            {
+                _deleteButton.style.display = DisplayStyle.Flex;
+                _deleteButton.enabledSelf = true;
+            }
+        }
         public void Dispose()
         {
             EditorObject.DestroyImmediate(_editor);

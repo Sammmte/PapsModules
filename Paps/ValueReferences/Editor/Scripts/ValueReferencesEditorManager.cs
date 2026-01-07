@@ -18,6 +18,8 @@ namespace Paps.ValueReferences.Editor
         private static PathTree<ValueReferenceGroupAsset[]> _groupsPathTree;
         private static (CreateAssetMenuAttribute Attribute, Type Type)[] _createAssetMenuAttributesPerType;
 
+        public static event Action OnRefresh;
+
         private static void LoadGroupAssets()
         {
             var groups = AssetDatabase.FindAssets($"t:{nameof(ValueReferenceGroupAsset)}")
@@ -177,6 +179,8 @@ namespace Paps.ValueReferences.Editor
             _pathsOfValueReferenceAssets = null;
             _groupsPathTree = null;
             _createAssetMenuAttributesPerType = null;
+
+            OnRefresh?.Invoke();
         }
 
         public static void RefreshGroups()
@@ -185,6 +189,8 @@ namespace Paps.ValueReferences.Editor
             _valueReferencesWithPaths = null;
             _pathsOfValueReferenceAssets = null;
             _groupsPathTree = null;
+
+            OnRefresh?.Invoke();
         }
 
         public static void RefreshPaths()
@@ -192,6 +198,8 @@ namespace Paps.ValueReferences.Editor
             _valueReferencesWithPaths = null;
             _pathsOfValueReferenceAssets = null;
             _groupsPathTree = null;
+
+            OnRefresh?.Invoke();
         }
     }
 }

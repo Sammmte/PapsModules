@@ -1,10 +1,7 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <ui:VisualElement name="MainContainer" style="flex-grow: 1;">
         <ui:VisualElement name="Header" style="flex-direction: row; padding-left: 5px; padding-bottom: 5px; padding-top: 5px; padding-right: 5px; min-height: 30px; background-color: rgb(46, 46, 46);">
-            <ui:Label text="Refresh:" name="RefreshLabel" style="-unity-text-align: middle-left;"/>
-            <ui:Button text="UI" name="RefreshUIButton" style="min-width: 50px;"/>
-            <ui:Button text="Data" name="RefreshDataButton" style="min-width: 50px;"/>
-            <ui:Button text="All" name="RefreshAllButton" style="min-width: 50px;"/>
+            <ui:Button text="Refresh" name="RefreshButton" style="min-width: 50px;"/>
         </ui:VisualElement>
         <ui:ScrollView name="PathElementsContainer"/>
     </ui:VisualElement>
