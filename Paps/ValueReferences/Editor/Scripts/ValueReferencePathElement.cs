@@ -1,8 +1,8 @@
 using System;
-using System.Linq;
-using UnityEditor;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using EditorObject = UnityEditor.Editor;
 
 namespace Paps.ValueReferences.Editor
 {
@@ -19,28 +19,26 @@ namespace Paps.ValueReferences.Editor
         
         private VisualElement _groupElementsContainer;
         private VisualElement _childPathElementsContainer;
-        private ValueReferenceGroupElement[] _groupElements;
 
         private Label _pathLabel;
         private Button _expandCollapseButton;
         private VisualElement _foldoutContainer;
         private Image _foldoutImage;
 
-        public void Initialize(string pathNodeName, ValueReferenceGroupAsset[] groupAssets, ValueReferencePathElement[] childPathElements,
-            VisualTreeAsset groupElementTreeAsset, VisualTreeAsset valueReferenceTreeAsset)
+        private List<EditorObject> _groupEditors;
+        private List<VisualElement> _groupEditorElements;
+
+        public ValueReferencePathElement[] ChildPathElements => _childPathElements;
+
+        public void Initialize(string pathNodeName, ValueReferenceGroupAsset[] groupAssets, 
+            ValueReferencePathElement[] childPathElements)
         {
+            _groupEditors = new List<EditorObject>();
+            _groupEditorElements = new List<VisualElement>();
+
             _pathNodeName = pathNodeName;
             _groupAssets = groupAssets;
             _childPathElements = childPathElements;
-            _groupElements = _groupAssets.Select(asset =>
-            {
-                var groupElementParent = groupElementTreeAsset.CloneTree();
-                var groupElement = groupElementParent.Q<ValueReferenceGroupElement>();
-
-                groupElement.Initialize(asset, valueReferenceTreeAsset);
-
-                return groupElement;
-            }).ToArray();
 
             _groupElementsContainer = this.Q("GroupElementsContainer");
             _childPathElementsContainer = this.Q("ChildPathElementsContainer");
@@ -50,9 +48,16 @@ namespace Paps.ValueReferences.Editor
             _foldoutContainer = this.Q("FoldoutContainer");
             _foldoutImage = this.Q<Image>("FoldoutArrow");
 
-            foreach(var groupElement in _groupElements)
+            foreach(var groupAsset in _groupAssets)
             {
-                _groupElementsContainer.Add(groupElement);
+                var editor = EditorObject.CreateEditor(groupAsset);
+
+                var editorVisualElement = editor.CreateInspectorGUI();
+
+                _groupEditors.Add(editor);
+                _groupEditorElements.Add(editorVisualElement);
+
+                _groupElementsContainer.Add(editorVisualElement);
             }
 
             foreach(var childPathElement in _childPathElements)
@@ -81,10 +86,13 @@ namespace Paps.ValueReferences.Editor
 
         public void Dispose()
         {
-            for(int i = 0; i < _groupElements.Length; i++)
+            foreach(var editor in _groupEditors)
             {
-                _groupElements[i].Dispose();
+                EditorObject.DestroyImmediate(editor);
             }
+
+            _groupEditors.Clear();
+            _groupEditorElements.Clear();
         }
     }
 }

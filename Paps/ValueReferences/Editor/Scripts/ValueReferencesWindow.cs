@@ -9,10 +9,12 @@ namespace Paps.ValueReferences.Editor
     {
         [SerializeField] private VisualTreeAsset _windowTreeAsset;
         [SerializeField] private VisualTreeAsset _pathElementTreeAsset;
-        [SerializeField] private VisualTreeAsset _groupElementTreeAsset;
-        [SerializeField] private VisualTreeAsset _valueReferenceElementTreeAsset;
 
         private VisualElement _mainContainer;
+        private VisualElement _pathElementsContainer;
+        private Button _refreshUIButton;
+        private Button _refreshDataButton;
+        private Button _refreshAllButton;
 
         private ValueReferenceGroupAsset[] _groups;
         private PathTree<ValueReferenceGroupAsset[]> _pathTree;
@@ -28,6 +30,25 @@ namespace Paps.ValueReferences.Editor
 
         private void CreateGUI()
         {
+            RefreshUI();
+        }
+
+        private void OnBecameVisible()
+        {
+            RefreshUI();
+        }
+
+        private void RefreshAll()
+        {
+            RefreshUI();
+            ValueReferencesEditorManager.RefreshAll();
+        }
+
+        private void RefreshUI()
+        {
+            CleanUp();
+            rootVisualElement.Clear();
+
             _groups = GetGroups();
             _pathTree = GetPathTree();
             _pathElementsTree = _pathTree.Map(node =>
@@ -44,15 +65,25 @@ namespace Paps.ValueReferences.Editor
 
                 pathElement.Initialize(GetNodeName(node.Name), 
                     ValueReferencesEditorManager.GetGroupsForPath(node.GetPath()), 
-                    node.Children.Select(c => c.Data).ToArray(),
-                    _groupElementTreeAsset, _valueReferenceElementTreeAsset);
+                    node.Children.Select(c => c.Data).ToArray());
             });
 
             var windowVisualElement = _windowTreeAsset.CloneTree();
 
             _mainContainer = windowVisualElement.Q("MainContainer");
+            _pathElementsContainer = _mainContainer.Q("PathElementsContainer");
+            _refreshUIButton = _mainContainer.Q<Button>("RefreshUIButton");
+            _refreshDataButton = _mainContainer.Q<Button>("RefreshDataButton");
+            _refreshAllButton = _mainContainer.Q<Button>("RefreshAllButton");
 
-            _mainContainer.Add(_pathElementsTree.Root.Data);
+            _refreshUIButton.clicked += RefreshUI;
+            _refreshDataButton.clicked += ValueReferencesEditorManager.RefreshAll;
+            _refreshAllButton.clicked += RefreshAll;
+
+            foreach(var child in _pathElementsTree.Root.Data.ChildPathElements)
+            {
+                _pathElementsContainer.Add(child);
+            }
 
             rootVisualElement.Add(windowVisualElement);
         }
@@ -69,6 +100,14 @@ namespace Paps.ValueReferences.Editor
 
         private void OnDestroy()
         {
+            CleanUp();
+        }
+        
+        private void CleanUp()
+        {
+            if(_pathElementsTree == null)
+                return;
+
             _pathElementsTree.Traverse(node =>
             {
                 node.Data.Dispose();

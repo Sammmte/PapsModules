@@ -1,11 +1,20 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <Paps.ValueReferences.Editor.ValueReferenceElement style="flex-direction: row; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); padding-top: 2px; padding-right: 2px; padding-bottom: 2px; padding-left: 2px;">
-        <ui:VisualElement name="LabelContainer" style="padding-left: 5px; width: 20%;">
+        <ui:VisualElement name="LabelContainer" style="padding-left: 5px; width: 20%; justify-content: center;">
             <ui:Label text="Name" name="NameLabel" style="-unity-text-align: middle-left; text-overflow: ellipsis; overflow: hidden;"/>
+            <ui:TextField name="RenameTextField" is-delayed="true" style="display: none;"/>
         </ui:VisualElement>
         <ui:VisualElement name="TypeContainer" style="flex-grow: 1; width: 20%; flex-direction: row; justify-content: center;">
             <ui:Label text="Label" name="TypeNameLabel" style="-unity-text-align: middle-center; color: rgb(28, 207, 28); -unity-font-style: bold;"/>
         </ui:VisualElement>
         <ui:VisualElement name="EditorContainer" style="width: 60%;"/>
+        <ui:VisualElement name="ExtraControlsContainer" style="flex-grow: 1; flex-direction: row; min-width: 75px; justify-content: space-evenly; margin-right: 2px; margin-left: 2px;">
+            <ui:Button name="RenameButton" tooltip="Rename asset" style="width: 30px; height: 20px; align-self: center;">
+                <Paps.UnityExtensions.Editor.IconImage icon="d_editicon.sml"/>
+            </ui:Button>
+            <ui:Button name="DeleteButton" tooltip="Remove item from group" style="width: 30px; height: 20px; align-self: center;">
+                <Paps.UnityExtensions.Editor.IconImage icon="P4_DeletedLocal@2x"/>
+            </ui:Button>
+        </ui:VisualElement>
     </Paps.ValueReferences.Editor.ValueReferenceElement>
 </ui:UXML>

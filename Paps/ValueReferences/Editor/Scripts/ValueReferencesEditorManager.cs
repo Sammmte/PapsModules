@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.Reflection;
 
 namespace Paps.ValueReferences.Editor
 {
@@ -15,6 +16,7 @@ namespace Paps.ValueReferences.Editor
         private static Dictionary<string, ValueReferenceAsset> _valueReferencesWithPaths;
         private static Dictionary<ValueReferenceAsset, string> _pathsOfValueReferenceAssets;
         private static PathTree<ValueReferenceGroupAsset[]> _groupsPathTree;
+        private static (CreateAssetMenuAttribute Attribute, Type Type)[] _createAssetMenuAttributesPerType;
 
         private static void LoadGroupAssets()
         {
@@ -147,6 +149,49 @@ namespace Paps.ValueReferences.Editor
             }
 
             return _pathsOfValueReferenceAssets[asset];
+        }
+
+        public static (CreateAssetMenuAttribute Attribute, Type Type)[] GetCreateAssetMenuPerType()
+        {
+            if(_createAssetMenuAttributesPerType == null)
+            {
+                LoadCreateAssetMenuPerType();
+            }
+
+            return _createAssetMenuAttributesPerType;
+        }
+
+        private static void LoadCreateAssetMenuPerType()
+        {
+            _createAssetMenuAttributesPerType = TypeCache.GetTypesDerivedFrom<ValueReferenceAsset>()
+                .Where(t => !t.IsAbstract)
+                .Select(t => (Attribute: t.GetCustomAttribute<CreateAssetMenuAttribute>(), Type: t))
+                .Where(tuple => tuple.Attribute != null)
+                .ToArray();
+        }
+
+        public static void RefreshAll()
+        {
+            _groupAssets = null;
+            _valueReferencesWithPaths = null;
+            _pathsOfValueReferenceAssets = null;
+            _groupsPathTree = null;
+            _createAssetMenuAttributesPerType = null;
+        }
+
+        public static void RefreshGroups()
+        {
+            _groupAssets = null;
+            _valueReferencesWithPaths = null;
+            _pathsOfValueReferenceAssets = null;
+            _groupsPathTree = null;
+        }
+
+        public static void RefreshPaths()
+        {
+            _valueReferencesWithPaths = null;
+            _pathsOfValueReferenceAssets = null;
+            _groupsPathTree = null;
         }
     }
 }

@@ -2,7 +2,7 @@
     <Paps.ValueReferences.Editor.ValueReferencePathElement _foldout-opened-texture="project://database/Assets/PapsModules/Paps/Shared/UIAssets/UnityDefaultRuntimeTheme.tss?fileID=4154780841294389669&amp;guid=c0cb717f418fcf44b8b334b6f305729a&amp;type=3#arrow-down" _foldout-closed-texture="project://database/Assets/PapsModules/Paps/Shared/UIAssets/UnityDefaultRuntimeTheme.tss?fileID=-4521532143779581420&amp;guid=c0cb717f418fcf44b8b334b6f305729a&amp;type=3#arrow-right">
         <ui:VisualElement name="Header" style="flex-grow: 1; flex-direction: row; min-height: 35px; padding-left: 5px;">
             <ui:Button name="FoldoutButton" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;"/>
-            <ui:Image name="FoldoutArrow" source="project://database/Assets/PapsModules/Paps/Shared/UIAssets/UnityDefaultRuntimeTheme.tss?fileID=-4521532143779581420&amp;guid=c0cb717f418fcf44b8b334b6f305729a&amp;type=3#arrow-right"/>
+            <ui:Image name="FoldoutArrow" source="project://database/Assets/PapsModules/Paps/Shared/UIAssets/UnityDefaultRuntimeTheme.tss?fileID=-4521532143779581420&amp;guid=c0cb717f418fcf44b8b334b6f305729a&amp;type=3#arrow-right" picking-mode="Ignore"/>
             <ui:Label text="Path" name="PathNodeNameLabel" picking-mode="Ignore" style="color: rgb(255, 255, 255); -unity-font-style: bold; align-self: center; font-size: 20px;"/>
         </ui:VisualElement>
         <ui:VisualElement name="FoldoutContainer" enabled="true" style="flex-grow: 1; display: none;">
