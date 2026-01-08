@@ -7,11 +7,14 @@ namespace Paps.ValueReferences.Editor
 {
     public class ValueReferencesWindow : EditorWindow
     {
+        private const string BASE_SAVE_KEY = "value-references-window";
+        private const string SCROLL_POSITION_SAVE_KEY = BASE_SAVE_KEY + "scroll-position";
+
         [SerializeField] private VisualTreeAsset _windowTreeAsset;
         [SerializeField] private VisualTreeAsset _pathElementTreeAsset;
 
         private VisualElement _mainContainer;
-        private VisualElement _pathElementsContainer;
+        private ScrollView _pathElementsContainer;
         private Button _refreshButton;
 
         private ValueReferenceGroupAsset[] _groups;
@@ -65,10 +68,15 @@ namespace Paps.ValueReferences.Editor
             var windowVisualElement = _windowTreeAsset.CloneTree();
 
             _mainContainer = windowVisualElement.Q("MainContainer");
-            _pathElementsContainer = _mainContainer.Q("PathElementsContainer");
+            _pathElementsContainer = _mainContainer.Q<ScrollView>("PathElementsContainer");
             _refreshButton = _mainContainer.Q<Button>("RefreshButton");
 
             _refreshButton.clicked += RefreshAll;
+
+            _pathElementsContainer.verticalScroller.slider.RegisterCallback<ChangeEvent<float>>(ev =>
+            {
+                SaveScrollPosition(ev.newValue);
+            });
 
             foreach(var child in _pathElementsTree.Root.Data.ChildPathElements)
             {
@@ -76,6 +84,20 @@ namespace Paps.ValueReferences.Editor
             }
 
             rootVisualElement.Add(windowVisualElement);
+
+            LoadState();
+        }
+
+        private void LoadState()
+        {
+            var scrollPosition = ValueReferencesUIUtils.VALUE_REFERENCES_EDITOR_USER_PROJECT_PREFS.Get<float>(SCROLL_POSITION_SAVE_KEY);
+
+            _pathElementsContainer.verticalScroller.slider.SetValueWithoutNotify(scrollPosition);
+        }
+
+        private void SaveScrollPosition(float scrollPosition)
+        {
+            ValueReferencesUIUtils.VALUE_REFERENCES_EDITOR_USER_PROJECT_PREFS.Set(SCROLL_POSITION_SAVE_KEY, scrollPosition);
         }
 
         private ValueReferenceGroupAsset[] GetGroups()
