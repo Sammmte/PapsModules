@@ -9,10 +9,13 @@ namespace Paps.ValueReferences.Editor
     [UxmlElement]
     public partial class ValueReferencePathElement : VisualElement, IDisposable
     {
+        private const string BASE_KEY = "value-reference-path-element";
+        private const string FOLDOUT_STATE_KEY = "foldout-state";
+
         [UxmlAttribute] private Texture2D _foldoutOpenedTexture;
         [UxmlAttribute] private Texture2D _foldoutClosedTexture;
 
-        private string _pathNodeName;
+        private TreeNode<ValueReferencePathElement> _treeNode;
 
         private ValueReferenceGroupAsset[] _groupAssets;
         private ValueReferencePathElement[] _childPathElements;
@@ -30,13 +33,13 @@ namespace Paps.ValueReferences.Editor
 
         public ValueReferencePathElement[] ChildPathElements => _childPathElements;
 
-        public void Initialize(string pathNodeName, ValueReferenceGroupAsset[] groupAssets, 
+        public void Initialize(TreeNode<ValueReferencePathElement> treeNode, ValueReferenceGroupAsset[] groupAssets, 
             ValueReferencePathElement[] childPathElements)
         {
+            _treeNode = treeNode;
             _groupEditors = new List<EditorObject>();
             _groupEditorElements = new List<VisualElement>();
 
-            _pathNodeName = pathNodeName;
             _groupAssets = groupAssets;
             _childPathElements = childPathElements;
 
@@ -65,22 +68,39 @@ namespace Paps.ValueReferences.Editor
                 _childPathElementsContainer.Add(childPathElement);
             }
 
-            _pathLabel.text = _pathNodeName;
+            _pathLabel.text = GetNodeName(_treeNode.Name);
             
-            _expandCollapseButton.clicked += ExpandOrCollapse;
+            _expandCollapseButton.clicked += OnExpandCollapseButtonClicked;
+
+            LoadState();
         }
 
-        private void ExpandOrCollapse()
+        private void OnExpandCollapseButtonClicked()
         {
-            if(_foldoutContainer.style.display == DisplayStyle.Flex)
-            {
-                _foldoutContainer.style.display = DisplayStyle.None;
-                _foldoutImage.image = _foldoutClosedTexture;
-            }
-            else
+            var newState = SwitchExpandOrCollapse();
+            ValueReferencesUIUtils.VALUE_REFERENCES_EDITOR_USER_PROJECT_PREFS.Set(CreateSaveKey(FOLDOUT_STATE_KEY), newState);
+        }
+
+        private bool SwitchExpandOrCollapse()
+        {
+            var expand = _foldoutContainer.style.display != DisplayStyle.Flex;
+
+            ExpandOrCollapse(expand);
+
+            return expand;
+        }
+
+        private void ExpandOrCollapse(bool expand)
+        {
+            if(expand)
             {
                 _foldoutContainer.style.display = DisplayStyle.Flex;
                 _foldoutImage.image = _foldoutOpenedTexture;
+            }
+            else
+            {
+                _foldoutContainer.style.display = DisplayStyle.None;
+                _foldoutImage.image = _foldoutClosedTexture;
             }
         }
 
@@ -93,6 +113,26 @@ namespace Paps.ValueReferences.Editor
 
             _groupEditors.Clear();
             _groupEditorElements.Clear();
+        }
+
+        private void LoadState()
+        {
+            var shouldExpand = ValueReferencesUIUtils.VALUE_REFERENCES_EDITOR_USER_PROJECT_PREFS.Get<bool>(CreateSaveKey(FOLDOUT_STATE_KEY));
+
+            ExpandOrCollapse(shouldExpand);
+        }
+
+        private string CreateSaveKey(string subKey)
+        {
+            return $"{BASE_KEY}:{_treeNode.GetPath()}:{subKey}";
+        }
+
+        private string GetNodeName(string inputName)
+        {
+            if(inputName == ValueReferencesEditorManager.ORPHAN_GROUP_PATH_NAME)
+                return "ORPHAN VALUES";
+
+            return inputName;
         }
     }
 }

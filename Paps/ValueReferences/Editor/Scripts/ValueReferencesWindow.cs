@@ -57,7 +57,7 @@ namespace Paps.ValueReferences.Editor
             {
                 var pathElement = node.Data;
 
-                pathElement.Initialize(GetNodeName(node.Name), 
+                pathElement.Initialize(node, 
                     ValueReferencesEditorManager.GetGroupsForPath(node.GetPath()), 
                     node.Children.Select(c => c.Data).ToArray());
             });
@@ -103,14 +103,5 @@ namespace Paps.ValueReferences.Editor
                 node.Data.Dispose();
             });
         }
-
-        private string GetNodeName(string inputName)
-        {
-            if(inputName == ValueReferencesEditorManager.ORPHAN_GROUP_PATH_NAME)
-                return "ORPHAN VALUES";
-
-            return inputName;
-        }
-
     }
 }
