@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 namespace Paps.ValueReferences.Editor
 {
-    public class ValueReferencesEditorConfig : ScriptableObject
+    internal class ValueReferencesEditorConfig : ScriptableObject
     {
         private static ValueReferencesEditorConfig _instance;
 
@@ -25,5 +25,6 @@ namespace Paps.ValueReferences.Editor
         }
 
         [field: SerializeField] public VisualTreeAsset ValueReferencePropertyDrawerVTA { get; private set; }
+        [field: SerializeField] public Vector2 MinimumAdvancedDropdownSize { get; private set; }
     }
 }

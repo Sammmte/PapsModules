@@ -219,10 +219,14 @@ namespace Paps.ValueReferences.Editor
             }
 
             _elements.Clear();
+            _itemsContainer.Clear();
             serializedObject.Update();
+
+            if(_groupAsset.ValueReferenceAssets == null || _groupAsset.ValueReferenceAssets.Length == 0)
+                return;
+
             _elements.AddRange(_groupAsset.ValueReferenceAssets.Select(ToUIElement));
 
-            _itemsContainer.Clear();
             foreach(var element in _elements)
             {
                 _itemsContainer.Add(element);

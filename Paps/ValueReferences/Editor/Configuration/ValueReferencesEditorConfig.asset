@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: ValueReferencesEditorConfig
   m_EditorClassIdentifier: Paps.ValueReferences.Editor::Paps.ValueReferences.Editor.ValueReferencesEditorConfig
   <ValueReferencePropertyDrawerVTA>k__BackingField: {fileID: 9197481963319205126, guid: ab4bc3e9e8d4ed043b71875d157a9b17, type: 3}
+  <MinimumAdvancedDropdownSize>k__BackingField: {x: 200, y: 200}

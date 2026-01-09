@@ -15,6 +15,8 @@ namespace Paps.ValueReferences.Editor
             PathTree<ValueReferenceGroupAsset[]> pathTree) : base(state)
         {
             _pathTree = pathTree;
+
+            minimumSize = ValueReferencesEditorConfig.Instance.MinimumAdvancedDropdownSize;
         }
 
         protected override AdvancedDropdownItem BuildRoot()
