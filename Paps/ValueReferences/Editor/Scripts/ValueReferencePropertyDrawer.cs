@@ -35,7 +35,6 @@ namespace Paps.ValueReferences.Editor
         private SerializedProperty _optionalCustomValueProperty;
         private SerializedProperty _hasCustomValueProperty;
         private SerializedProperty _customValueProperty;
-        private object _valueReferenceObject;
         private Type _valueReferenceTypeParameter;
         private EditorObject _valueSourceEditor;
         private PropertyField _customValuePropertyField;
@@ -69,8 +68,7 @@ namespace Paps.ValueReferences.Editor
             _hasCustomValueProperty = _optionalCustomValueProperty.FindPropertyRelative("_considerItHasValue");
             _customValueProperty = _optionalCustomValueProperty.FindPropertyRelative("_value");
 
-            _valueReferenceObject = property.GetTargetObject();
-            _valueReferenceTypeParameter = _valueReferenceObject.GetType().GetGenericArguments().First();
+            _valueReferenceTypeParameter = fieldInfo.FieldType.GetGenericArguments().First();
 
             propertyLabel.text = property.displayName + $" <color=red>({_valueReferenceTypeParameter.Name})</color>";
 
