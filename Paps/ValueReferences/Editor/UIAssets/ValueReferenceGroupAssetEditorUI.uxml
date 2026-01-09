@@ -12,14 +12,19 @@
                 <ui:Button name="PingButton" tooltip="Ping group asset" style="width: 30px; height: 25px;">
                     <Paps.UnityExtensions.Editor.IconImage icon="d_Search Icon"/>
                 </ui:Button>
-                <ui:Button name="AddButton" tooltip="Add a new value reference asset" style="width: 30px; height: 25px;">
-                    <Paps.UnityExtensions.Editor.IconImage icon="d_Toolbar Plus@2x" tint-color="rgb(4, 248, 67)"/>
-                </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="PathFieldContainer" style="padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px;">
             <uie:PropertyField name="PathField"/>
         </ui:VisualElement>
-        <ui:VisualElement name="ItemsContainer" style="flex-grow: 1; min-height: 25px; background-color: rgb(67, 67, 67);"/>
+        <ui:VisualElement name="DragAndDropArea" style="flex-grow: 1;">
+            <ui:VisualElement name="ItemsContainer" style="flex-grow: 1; min-height: 25px; background-color: rgb(67, 67, 67);"/>
+            <ui:VisualElement name="AddButtonContainer" style="height: 80px;">
+                <ui:Button name="AddButton" tooltip="Click to add a new element or drag and drop existing ones" style="flex-grow: 1; align-items: center; justify-content: center;">
+                    <Paps.UnityExtensions.Editor.IconImage icon="d_Toolbar Plus@2x" tint-color="rgb(134, 245, 10)" picking-mode="Ignore"/>
+                    <ui:Label text="Add Item" picking-mode="Ignore" name="DragAndDropLabel" style="font-size: 16px;"/>
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

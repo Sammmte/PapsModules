@@ -201,5 +201,92 @@ namespace Paps.ValueReferences.Editor
 
             OnRefresh?.Invoke();
         }
+
+        private static Dictionary<ValueReferenceGroupAsset, ValueReferenceAsset[]> GetGroupsContainingAssets(ValueReferenceAsset[] assets)
+        {
+            var groupsContainingAssets = _groupAssets.Where(g => g.ValueReferenceAssets.Any(v => assets.Contains(v)));
+
+            return groupsContainingAssets.ToDictionary(g => g, g => g.ValueReferenceAssets.Where(v => assets.Contains(v)).ToArray());
+        }
+
+        public static void MoveValueReferencesAssets(ValueReferenceAsset[] assets, ValueReferenceGroupAsset targetGroup)
+        {
+            var assetAlreadyAddedToGroup = assets.Where(a => targetGroup.ValueReferenceAssets.Contains(a)).ToArray();
+
+            if(assetAlreadyAddedToGroup.Length != 0)
+            {
+                string message = $"Target group {targetGroup.name} already contains ValueReferenceAsset assets: ";
+
+                for(int i = 0; i < assetAlreadyAddedToGroup.Length; i++)
+                {
+                    var asset = assetAlreadyAddedToGroup[i];
+
+                    message += $"{asset.name}";
+
+                    if(i != assetAlreadyAddedToGroup.Length - 1)
+                    {
+                        message += ", ";
+                    }
+                }
+
+                Debug.Log(message);
+            }
+
+            assets = assets.Where(a => !assetAlreadyAddedToGroup.Contains(a)).ToArray();
+
+            if(assets.Length == 0)
+                return;
+
+            var groupsWithAssets = GetGroupsContainingAssets(assets);
+
+            foreach(var group in groupsWithAssets)
+            {
+                var serializedObject = new SerializedObject(group.Key);
+
+                var arrayProperty = serializedObject.FindProperty(nameof(ValueReferenceGroupAsset.ValueReferenceAssets));
+
+                serializedObject.Update();
+
+                for(int i = arrayProperty.arraySize - 1; i >= 0; i--)
+                {
+                    var elementProperty = arrayProperty.GetArrayElementAtIndex(i);
+
+                    if(assets.Contains(elementProperty.objectReferenceValue))
+                    {
+                        arrayProperty.DeleteArrayElementAtIndex(i);
+                    }
+                }
+
+                serializedObject.ApplyModifiedProperties();
+
+                serializedObject.Dispose();
+            }
+
+            var targetGroupSerializedObject = new SerializedObject(targetGroup);
+
+            var targetGroupArrayProperty = targetGroupSerializedObject.FindProperty(nameof(ValueReferenceGroupAsset.ValueReferenceAssets));
+
+            targetGroupSerializedObject.Update();
+
+            for(int i = 0; i < assets.Length; i++)
+            {
+                var newIndex = targetGroupArrayProperty.arraySize;
+
+                targetGroupArrayProperty.InsertArrayElementAtIndex(newIndex);
+
+                var newProperty = targetGroupArrayProperty.GetArrayElementAtIndex(newIndex);
+
+                newProperty.objectReferenceValue = assets[i];
+            }
+
+            targetGroupSerializedObject.ApplyModifiedProperties();
+
+            targetGroupSerializedObject.Dispose();
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            RefreshAll();
+        }
     }
 }

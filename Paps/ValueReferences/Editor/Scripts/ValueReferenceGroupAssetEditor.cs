@@ -26,6 +26,7 @@ namespace Paps.ValueReferences.Editor
         private Button _pingButton;
         private TextField _renameTextField;
         private VisualElement _itemsContainer;
+        private VisualElement _dragAndDropArea;
 
         private List<ValueReferenceElement> _elements;
         private ValueReferenceGroupAsset _groupAsset;
@@ -34,6 +35,8 @@ namespace Paps.ValueReferences.Editor
 
         private SerializedProperty _valueReferencesArrayProperty;
         private SerializedProperty _pathProperty;
+
+        private Manipulator _dragAndDropManipulator;
 
         public override VisualElement CreateInspectorGUI()
         {
@@ -49,6 +52,7 @@ namespace Paps.ValueReferences.Editor
             _pingButton = _mainVisualElement.Q<Button>("PingButton");
             _renameTextField = _mainVisualElement.Q<TextField>("RenameTextField");
             _itemsContainer = _mainVisualElement.Q("ItemsContainer");
+            _dragAndDropArea = _mainVisualElement.Q("DragAndDropArea");
 
             _valueReferencesArrayProperty = serializedObject.FindProperty(nameof(ValueReferenceGroupAsset.ValueReferenceAssets));
 
@@ -63,6 +67,7 @@ namespace Paps.ValueReferences.Editor
             });
             _addButton.clicked += OnAddButtonClicked;
             _renameButton.clicked += OnRenameButtonClicked;
+            _pingButton.clicked += PingAsset;
 
             _renameTextField.RegisterCallback<ChangeEvent<string>>(ev =>
             {
@@ -85,6 +90,9 @@ namespace Paps.ValueReferences.Editor
                     false, OnNewValueReferenceAssetSelected, tuple.Type);
             }
 
+            _dragAndDropManipulator = new ValueReferenceGroupAssetDragAndDropManipulator(_dragAndDropArea, ReceiveAddedAssets);
+            _dragAndDropArea.AddManipulator(_dragAndDropManipulator);
+
             if(IsOrphanGroup())
             {
                 ShowAsOrphanGroup();
@@ -93,6 +101,11 @@ namespace Paps.ValueReferences.Editor
             RefreshItems();
 
             return _mainVisualElement;
+        }
+
+        private void ReceiveAddedAssets(ValueReferenceAsset[] addedAssets)
+        {
+            ValueReferencesEditorManager.MoveValueReferencesAssets(addedAssets, _groupAsset);
         }
 
         private void PingAsset()
@@ -258,6 +271,11 @@ namespace Paps.ValueReferences.Editor
         {
             _renameButton.style.display = DisplayStyle.None;
             _renameButton.enabledSelf = false;
+
+            _pingButton.style.display = DisplayStyle.None;
+            _pingButton.enabledSelf = false;
+
+            _dragAndDropArea.RemoveManipulator(_dragAndDropManipulator);
 
             _addButton.style.display = DisplayStyle.None;
             _addButton.enabledSelf = false;
