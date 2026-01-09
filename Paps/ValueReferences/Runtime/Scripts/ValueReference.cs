@@ -12,7 +12,6 @@ namespace Paps.ValueReferences
         [SerializeField] private SaintsInterface<IValueReferenceSource<T>> _referenceSource;
 
         [SerializeField] private Optional<T> _hardcodedValue;
-        [SerializeField] private bool _throwErrorWhenNoValuePresent;
 
         [ShowInInspector]
         public T Value
@@ -25,10 +24,7 @@ namespace Paps.ValueReferences
                 if (_hardcodedValue.HasValue)
                     return _hardcodedValue.Value;
 
-                if (_throwErrorWhenNoValuePresent)
-                    throw new InvalidOperationException("Value not present");
-
-                return default;
+                throw new InvalidOperationException("Value not present");
             }
         }
 

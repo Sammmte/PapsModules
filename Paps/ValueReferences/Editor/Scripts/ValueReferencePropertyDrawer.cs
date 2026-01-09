@@ -170,6 +170,8 @@ namespace Paps.ValueReferences.Editor
             _interfaceUnityObjectProperty.objectReferenceValue = asset;
 
             _interfaceUnityObjectProperty.serializedObject.ApplyModifiedProperties();
+
+            UpdateValueSourceEditor();
         }
 
         private string GetSelectSourceButtonStringState()
@@ -188,10 +190,10 @@ namespace Paps.ValueReferences.Editor
 
         private void UpdateValueSourceEditor()
         {
+            _sourceEditorContainer.Clear();
+
             EditorObject.DestroyImmediate(_valueSourceEditor);
             _valueSourceEditor = EditorObject.CreateEditor(_interfaceUnityObjectProperty.objectReferenceValue);
-
-            _sourceEditorContainer.Clear();
             
             if(_valueSourceEditor != null)
             {
