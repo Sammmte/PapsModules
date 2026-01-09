@@ -1,5 +1,6 @@
 using Paps.Optionals;
 using Paps.UnityExtensions;
+using Paps.ValueReferences;
 using SaintsField.Playa;
 using System;
 using UnityEngine;
@@ -16,24 +17,13 @@ namespace Paps.Physics
         }
         
         [field: SerializeField] [field: Min(1)] public int MaxResults { get; private set; }
-        [SerializeField] private bool _useNamedLayerMask;
-        [SerializeField] [ShowIf(nameof(_useNamedLayerMask))] private NamedLayerMask _namedLayerMask;
-        [SerializeField] [HideIf(nameof(_useNamedLayerMask))] private LayerMask _layerMask;
+        [SerializeField] private ValueReference<LayerMask> _filterLayerMask;
         [field: SerializeField] public QueryTriggerInteraction QueryTriggerInteraction { get; private set; }
         [SerializeField] private Transform _origin;
         
         public Vector3 Origin => _origin.position;
 
-        public LayerMask LayerMask
-        {
-            get
-            {
-                if (_useNamedLayerMask)
-                    return _namedLayerMask.LayerMask;
-
-                return _layerMask;
-            }
-        }
+        public LayerMask LayerMask => _filterLayerMask;
         
         private Collider[] _collidersBuffer;
 
