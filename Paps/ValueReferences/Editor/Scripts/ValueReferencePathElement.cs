@@ -74,6 +74,19 @@ namespace Paps.ValueReferences.Editor
             _expandCollapseButton.clicked += OnExpandCollapseButtonClicked;
 
             LoadState();
+
+            if(_treeNode.Name == ValueReferencesEditorManager.ORPHAN_GROUP_PATH_NAME)
+            {
+                ShowAsOrphan();
+            }
+        }
+
+        private void ShowAsOrphan()
+        {
+            if(_groupAssets.SelectMany(g => g.ValueReferenceAssets).Count() == 0)
+            {
+                style.display = DisplayStyle.None;
+            }
         }
 
         private void OnExpandCollapseButtonClicked()

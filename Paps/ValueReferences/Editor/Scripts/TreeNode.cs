@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -52,6 +53,21 @@ namespace Paps.ValueReferences.Editor
             }
 
             return path;
+        }
+
+        public void Traverse(Action<TreeNode<TData>> traverseAction)
+        {
+            Traverse(this, traverseAction);
+        }
+
+        private void Traverse(TreeNode<TData> node, Action<TreeNode<TData>> traverseAction)
+        {
+            traverseAction(node);
+
+            for(int i = 0; i < node.Children.Count; i++)
+            {
+                Traverse(node.Children[i], traverseAction);
+            }
         }
     }
 }
