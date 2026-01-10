@@ -24,7 +24,7 @@ namespace Paps.Metadata
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            LevelSetupper.RegisterEverPresent(this);
+            LevelSetupper.Instance.RegisterEverPresent(this);
         }
 
         public void Subscribe(Metadata<TKey> metadata)

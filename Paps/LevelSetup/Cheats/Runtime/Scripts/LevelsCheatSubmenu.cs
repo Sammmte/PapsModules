@@ -36,7 +36,7 @@ namespace Paps.LevelSetup.Cheats
         {
             var button = new Button();
             button.text = level.Name;
-            button.clicked += () => LevelSetupper.LoadAndSetupLevel(level);
+            button.clicked += () => LevelSetupper.Instance.LoadAndSetupLevel(level);
 
             return button;
         }
