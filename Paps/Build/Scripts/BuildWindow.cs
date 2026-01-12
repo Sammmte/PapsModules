@@ -15,6 +15,7 @@ namespace Paps.Build
         [SerializeField] private VisualTreeAsset _customSettingsElement;
 
         private Toggle _productionToggle;
+        private Toggle _simulacrumToggle;
         private EnumField _buildTargetEnumField;
         private EnumFlagsField _buildOptionsField;
         private Button _buildButton;
@@ -43,6 +44,7 @@ namespace Paps.Build
             _buildTargetEnumField = rootVisualElement.Q<EnumField>("BuildTargetField");
             _buildOptionsField = rootVisualElement.Q<EnumFlagsField>("BuildOptionsField");
             _buildButton = rootVisualElement.Q<Button>("BuildButton");
+            _simulacrumToggle = rootVisualElement.Q<Toggle>("SimulacrumToggle");
             _customSettingsContainer = rootVisualElement.Q("CustomSettingsContainer");
 
             var existingCustomBuildSettings = TypeCache.GetTypesDerivedFrom<IBuildWindowSettings>().ToArray();
@@ -88,7 +90,10 @@ namespace Paps.Build
                 settings.AddSettings(buildSetting.GetSettingsObject());
             }
 
-            Builder.Build(settings);
+            Builder.Build(settings, new Builder.Options()
+            {
+                Simulacrum = _simulacrumToggle.value
+            });
 
             EditorUtility.RevealInFinder(settings.OutputPath);
 

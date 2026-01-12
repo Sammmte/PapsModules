@@ -11,8 +11,20 @@ namespace Paps.Build
 {
     public static class Builder
     {
-        public static void Build(BuildSettings buildSettings)
+        public struct Options
         {
+            public bool Simulacrum;
+        }
+
+        private static readonly Options DEFAULT_OPTIONS = new Options()
+        {
+            Simulacrum = false
+        };
+
+        public static void Build(BuildSettings buildSettings, Options? options = null)
+        {
+            var finalOptions = OptionsOrDefault(options);
+
             var allCustomBuildSettings = buildSettings.GetCustomSettings();
             var buildSettingsHandlers = TypeCache.GetTypesDerivedFrom<IBuildSettingsHandler>()
                 .Select(t => (IBuildSettingsHandler)Activator.CreateInstance(t))
@@ -44,16 +56,27 @@ namespace Paps.Build
             Debug.Log($"Build removes addressables groups: {JsonSerialization.ToJson(addressableGroupsNotIncluded)}");
             Debug.Log($"Scenes included in build are {JsonSerialization.ToJson(buildSettings.GetScenePaths())}");
 
-            BuildPipeline.BuildPlayer(new BuildPlayerOptions()
+            if (!finalOptions.Simulacrum)
             {
-                locationPathName = buildSettings.OutputPath,
-                options = buildSettings.BuildOptions,
-                scenes = buildSettings.GetScenePaths(),
-                target = buildSettings.BuildTarget,
-            });
+                BuildPipeline.BuildPlayer(new BuildPlayerOptions()
+                {
+                    locationPathName = buildSettings.OutputPath,
+                    options = buildSettings.BuildOptions,
+                    scenes = buildSettings.GetScenePaths(),
+                    target = buildSettings.BuildTarget,
+                });
+            }
 
             PlayerSettings.SetScriptingDefineSymbols(namedBuildTarget, previousDefineSymbols);
             SetAddressablesGroupsAsIncluded(buildSettings.GetNotIncludedAddressablesGroups(), true);
+        }
+
+        private static Options OptionsOrDefault(Options? options)
+        {
+            if(options == null)
+                return DEFAULT_OPTIONS;
+
+            return options.Value;
         }
 
         private static void SetAddressablesGroupsAsIncluded(string[] groups, bool included)
