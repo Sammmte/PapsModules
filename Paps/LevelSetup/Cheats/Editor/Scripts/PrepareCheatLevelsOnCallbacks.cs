@@ -1,13 +1,12 @@
 using Paps.Build;
+using Paps.LevelSetup.Editor;
 using System.Linq;
 using UnityEditor;
 
 namespace Paps.LevelSetup.Cheats.Editor
 {
     public class PrepareCheatLevelsOnCallbacks : IBuildPreprocessor
-    {
-        private const string SCENES_PATH = "Assets/Game";
-        
+    {   
         [InitializeOnLoadMethod]
         public static void ListenCallbacks()
         {
@@ -28,8 +27,7 @@ namespace Paps.LevelSetup.Cheats.Editor
 
             var listAsset = AssetDatabase.LoadAssetAtPath<LevelsCheatListAsset>(AssetDatabase.GUIDToAssetPath(guid));
 
-            var levelAssets = AssetDatabase.FindAssets($"t:{nameof(ScriptableLevel)}")
-                .Select(guid => AssetDatabase.LoadAssetAtPath<ScriptableLevel>(AssetDatabase.GUIDToAssetPath(guid)));
+            var levelAssets = EditorLevelManager.GetLevels();
 
             listAsset.Levels = levelAssets.ToArray();
             
@@ -40,16 +38,6 @@ namespace Paps.LevelSetup.Cheats.Editor
         public void Process(BuildSettings currentBuildSettings)
         {
             UpdateLevelsCheatListAsset();
-
-            var currentScenes = currentBuildSettings.GetScenePaths();
-
-            var finalScenes = currentScenes.Concat(GetProjectScenes().Where(path => !currentScenes.Contains(path)));
-            
-            currentBuildSettings.SetScenePaths(finalScenes.ToArray());
         }
-        
-        private static string[] GetProjectScenes() => AssetDatabase.FindAssets("t:scene", new[] { SCENES_PATH })
-            .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-            .ToArray();
     }
 }

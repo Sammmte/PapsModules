@@ -1,0 +1,8 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Paps.LevelSetup.Editor.SceneElement name="SceneElement">
+        <engine:Button name="GoToSceneButton" style="flex-direction: row; padding-top: 3px; padding-bottom: 3px;">
+            <Paps.UnityExtensions.Editor.IconImage icon="d_SceneAsset Icon" name="Icon" style="width: 20px; height: 20px; min-width: 20px; min-height: 20px;"/>
+            <engine:Label text="Label" name="SceneNameLabel" style="margin-left: 5px; text-overflow: ellipsis; overflow: hidden;"/>
+        </engine:Button>
+    </Paps.LevelSetup.Editor.SceneElement>
+</engine:UXML>

@@ -1,8 +1,0 @@
-<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Paps.DevelopmentTools.Editor.SceneElement name="SceneElement">
-        <engine:Button name="GoToSceneButton" style="flex-direction: row; padding-top: 3px; padding-bottom: 3px;">
-            <engine:VisualElement name="Icon" style="background-image: url(&quot;project://database/Library/unity%20editor%20resources?fileID=-5280412695858446811&amp;guid=0000000000000000d000000000000000&amp;type=0#d_Scene@2x&quot;); width: 16px; height: 16px; align-self: center;" />
-            <engine:Label text="Label" name="SceneNameLabel" style="margin-left: 5px;" />
-        </engine:Button>
-    </Paps.DevelopmentTools.Editor.SceneElement>
-</engine:UXML>

@@ -3,8 +3,8 @@
     "rootNamespace": "Paps.SceneLoading",
     "references": [
         "GUID:f51ebe6a0ceec4240a699833d6309b23",
-        "GUID:caca889fed6088d40b22c2d7e2909c31",
-        "GUID:a00d710b062668a46b8ebf64b9e61d6e"
+        "GUID:a00d710b062668a46b8ebf64b9e61d6e",
+        "GUID:9b261077c7a2ac34886513ec1345f8e0"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

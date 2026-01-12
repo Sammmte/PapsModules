@@ -32,10 +32,10 @@ namespace Paps.LevelSetup.Cheats
             return _container;
         }
 
-        private Button CreateButtonForLevel(ScriptableLevel level)
+        private Button CreateButtonForLevel(Level level)
         {
             var button = new Button();
-            button.text = level.Name;
+            button.text = level.Id;
             button.clicked += () => LevelSetupper.Instance.LoadAndSetupLevel(level);
 
             return button;

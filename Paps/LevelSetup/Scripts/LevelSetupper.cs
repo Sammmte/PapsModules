@@ -45,7 +45,7 @@ namespace Paps.LevelSetup
         {
             var loadedScenes = SceneLoader.GetLoadedScenes();
 
-            await SceneLoader.LoadNewSceneAndWaitOneFrame("LevelSetup_EmptyScene", LoadSceneMode.Additive);
+            await SceneLoader.LoadNewSceneAndWaitOneFrame("LevelSetup_EmptyScene");
             await SceneLoader.UnloadAsync(loadedScenes);
             await Load(level);
         }
@@ -65,7 +65,7 @@ namespace Paps.LevelSetup
             await SceneLoader.LoadAsync(level.InitialScenesGroup, LoadSceneMode.Additive);
 
             _currentLevel = level;
-            _levelScenes.AddRange(level.InitialScenesGroup.Scenes);
+            _levelScenes.AddRange(level.InitialScenesGroup);
 
             SceneLoader.SetActiveScene(level.ActiveScene);
 
@@ -76,7 +76,7 @@ namespace Paps.LevelSetup
 
         private async UniTask Unload(Func<UniTask> onUnload = null)
         {
-            var sceneGroup = new SceneGroup(_levelScenes.ToArray());
+            var sceneGroup = _levelScenes.ToArray();
 
             await UnloadFrom(sceneGroup, true);
 
@@ -96,11 +96,11 @@ namespace Paps.LevelSetup
             _everPresentLevelSetuppables.Add(levelSetuppable);
         }
 
-        private async UniTask SetupAndKickstartFrom(SceneGroup sceneGroup, bool includeEverPresent)
+        private async UniTask SetupAndKickstartFrom(Scene[] sceneGroup, bool includeEverPresent)
         {
-            for (int i = 0; i < sceneGroup.Scenes.Length; i++)
+            for (int i = 0; i < sceneGroup.Length; i++)
             {
-                var scene = sceneGroup.Scenes[i];
+                var scene = sceneGroup[i];
                 scene.GetRootGameObjects(_rootGameObjectsList);
 
                 for (int j = 0; j < _rootGameObjectsList.Count; j++)
@@ -126,11 +126,11 @@ namespace Paps.LevelSetup
             await SetupAndKickstartFromTempBuffer();
         }
 
-        private async UniTask UnloadFrom(SceneGroup sceneGroup, bool includeEverPresent)
+        private async UniTask UnloadFrom(Scene[] sceneGroup, bool includeEverPresent)
         {
             for (int i = 0; i < _sceneBound.Count; i++)
             {
-                if (sceneGroup.Scenes.Contains(_sceneBound[i].Scene))
+                if (sceneGroup.Contains(_sceneBound[i].Scene))
                 {
                     _tempLevelSetuppableBuffer.Add(_sceneBound[i].LevelSetuppable);
                     

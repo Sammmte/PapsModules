@@ -9,7 +9,7 @@ namespace Paps.Entry
 {
     public class Entry : MonoBehaviour
     {
-        [SerializeField] private ScriptableLevel _startupLevel;
+        [SerializeField] private Level _startupLevel;
 
         private void Awake()
         {

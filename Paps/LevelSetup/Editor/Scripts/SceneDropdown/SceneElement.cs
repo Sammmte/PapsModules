@@ -2,7 +2,7 @@
 using UnityEditor.SceneManagement;
 using UnityEngine.UIElements;
 
-namespace Paps.DevelopmentTools.Editor
+namespace Paps.LevelSetup.Editor
 {
     [UxmlElement]
     public partial class SceneElement : VisualElement
@@ -22,6 +22,7 @@ namespace Paps.DevelopmentTools.Editor
             _goToSceneButton = this.Q<Button>("GoToSceneButton");
 
             _sceneNameLabel.text = Path.GetFileNameWithoutExtension(_scenePath);
+            _sceneNameLabel.tooltip = _sceneNameLabel.text;
             _goToSceneButton.clicked += GoToScene;
         }
 

@@ -19,7 +19,7 @@ namespace Paps.ScreenTransitions
         {
             CleanUp();
 
-            _scene = SceneLoader.LoadNewScene("TransitionScene", LoadSceneMode.Additive);
+            _scene = SceneLoader.LoadNewScene("TransitionScene");
 
             await UniTask.NextFrame();
 

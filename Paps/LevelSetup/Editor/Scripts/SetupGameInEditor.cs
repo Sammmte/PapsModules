@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Scene = Paps.SceneLoading.Scene;
 
-namespace Paps.DevelopmentTools.Editor
+namespace Paps.LevelSetup.Editor
 {
     public static class SetupGameInEditor
     {
@@ -81,8 +81,7 @@ namespace Paps.DevelopmentTools.Editor
 
             await setupper.Setup();
 
-            var level = new Level("EditorSetupLevel", new SceneGroup(editorSceneState.OpenedScenes.Select<SceneDTO, Scene>(s => s).ToArray()), 
-                editorSceneState.ActiveScene);
+            var level = Level.Create("EditorSetupLevel", editorSceneState.OpenedScenes.Select<SceneDTO, Scene>(s => s).ToArray());
 
             await LevelSetupper.Instance.LoadAndSetupInitialLevel(level);
         }
@@ -93,7 +92,7 @@ namespace Paps.DevelopmentTools.Editor
 
             await setupper.Setup();
 
-            var level = EditorLevelManager.GetLevelByName(editorLevelState.LevelName);
+            var level = EditorLevelManager.GetLevelById(editorLevelState.LevelId);
 
             await LevelSetupper.Instance.LoadAndSetupInitialLevel(level);
         }
@@ -140,14 +139,13 @@ namespace Paps.DevelopmentTools.Editor
 
             return new EditorSceneState()
             {
-                OpenedScenes = scenes.Select<Scene, SceneDTO>(s => s).ToArray(),
-                ActiveScene = SceneManager.GetActiveScene()
+                OpenedScenes = scenes.Select<Scene, SceneDTO>(s => s).ToArray()
             };
         }
 
         private static void SaveEditorSceneState() => EditorPrefs.SetString(EDITOR_SCENE_STATE_KEY, JsonSerialization.ToJson(GetOpenedScenesInEditor()));
         private static void SaveEditorLevelState() => EditorPrefs.SetString(LOAD_LEVEL_KEY,
-            JsonSerialization.ToJson(new EditorLevelState() { LevelName = EditorLevelManager.CurrentLoadedLevel.Value.Name }));
+            JsonSerialization.ToJson(new EditorLevelState() { LevelId = EditorLevelManager.CurrentLoadedLevel.Id }));
  
         private static EditorSceneState GetEditorSceneState() => JsonSerialization.FromJson<EditorSceneState>(EditorPrefs.GetString(EDITOR_SCENE_STATE_KEY, "{}"));
         private static EditorLevelState GetEditorLevelState() => JsonSerialization.FromJson<EditorLevelState>(EditorPrefs.GetString(LOAD_LEVEL_KEY, "{}"));

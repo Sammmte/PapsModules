@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 using UnityMainToolbarElementAttribute = UnityEditor.Toolbars.MainToolbarElementAttribute;
 using UnityMainToolbarElement = UnityEditor.Toolbars.MainToolbarElement;
 
-namespace Paps.DevelopmentTools.Editor
+namespace Paps.LevelSetup.Editor
 {
     [MainToolbarElement("CurrentLoadedLevelLabel")]
     public class CurrentLoadedLevelLabel : Label
@@ -20,7 +20,7 @@ namespace Paps.DevelopmentTools.Editor
             UpdateLabel(EditorLevelManager.CurrentLoadedLevel);
         }
 
-        private void UpdateLabel(Level? level)
+        private void UpdateLabel(Level level)
         {
             if(level == null)
             {
@@ -29,7 +29,7 @@ namespace Paps.DevelopmentTools.Editor
             }
             else
             {
-                text = "Current level: " + level.Value.Name;
+                text = "Current level: " + level.Id;
                 style.color = new StyleColor(Color.green);
             }
         }

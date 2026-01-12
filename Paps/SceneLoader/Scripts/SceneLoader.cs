@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -6,42 +7,41 @@ namespace Paps.SceneLoading
 {
     public static class SceneLoader
     {
-        public static void Load(SceneGroup sceneGroup, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
+        public static void Load(ReadOnlySpan<Scene> sceneGroup, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
         {
-            if (!IsValidSceneGroup(sceneGroup))
+            if (!IsValidSceneGroup(ref sceneGroup))
                 return;
 
-            SceneManager.LoadScene(sceneGroup.Scenes[0].Name, loadSceneMode);
+            SceneManager.LoadScene(sceneGroup[0].Name, loadSceneMode);
 
-            for(int i = 1; i < sceneGroup.Scenes.Length; i++)
+            for(int i = 1; i < sceneGroup.Length; i++)
             {
-                SceneManager.LoadScene(sceneGroup.Scenes[i].Name, LoadSceneMode.Additive);
+                SceneManager.LoadScene(sceneGroup[i].Name, LoadSceneMode.Additive);
             }
         }
 
-        public static Scene LoadNewScene(string newSceneName, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
+        public static Scene LoadNewScene(string newSceneName)
         {
             return SceneManager.CreateScene(newSceneName);
         }
 
-        public static async UniTask<Scene> LoadNewSceneAndWaitOneFrame(string newSceneName, 
-            LoadSceneMode loadSceneMode = LoadSceneMode.Single)
+        public static async UniTask<Scene> LoadNewSceneAndWaitOneFrame(string newSceneName)
         {
-            var scene = LoadNewScene(newSceneName, loadSceneMode);
+            var scene = LoadNewScene(newSceneName);
             await UniTask.NextFrame();
             return scene;
         }
 
-        public static async UniTask LoadAsync(SceneGroup sceneGroup, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
+        public static async UniTask LoadAsync(ReadOnlyMemory<Scene> sceneGroup, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
         {
-            if (!IsValidSceneGroup(sceneGroup))
+            if (!IsValidSceneGroup(ref sceneGroup))
                 return;
 
-            await SceneManager.LoadSceneAsync(sceneGroup.Scenes[0].Name, loadSceneMode).ToUniTask();
+            await SceneManager.LoadSceneAsync(sceneGroup.Span[0].Name, loadSceneMode).ToUniTask();
 
-            for (int i = 1; i < sceneGroup.Scenes.Length; i++)
+            for (int i = 1; i < sceneGroup.Length; i++)
             {
-                await SceneManager.LoadSceneAsync(sceneGroup.Scenes[i].Name, LoadSceneMode.Additive).ToUniTask();
+                await SceneManager.LoadSceneAsync(sceneGroup.Span[i].Name, LoadSceneMode.Additive).ToUniTask();
             }
         }
 
@@ -50,14 +50,19 @@ namespace Paps.SceneLoading
             await SceneManager.LoadSceneAsync(sceneName, loadSceneMode).ToUniTask();
         }
 
-        public static async UniTask UnloadAsync(SceneGroup sceneGroup)
+        public static async UniTask UnloadAsync(ReadOnlyMemory<Scene> sceneGroup)
         {
-            if (!IsValidSceneGroup(sceneGroup))
+            if (!IsValidSceneGroup(ref sceneGroup))
                 return;
 
-            await UniTask.WhenAll(
-                sceneGroup.Scenes.Select(scene => SceneManager.UnloadSceneAsync(scene.Name).ToUniTask())
-                );
+            var tasks = new UniTask[sceneGroup.Length];
+            
+            for(int i = 0; i < tasks.Length; i++)
+            {
+                tasks[i] = SceneManager.UnloadSceneAsync(sceneGroup.Span[i].Name).ToUniTask();
+            } 
+
+            await UniTask.WhenAll(tasks);
         }
 
         public static async UniTask UnloadAsync(params Scene[] scenes)
@@ -87,9 +92,14 @@ namespace Paps.SceneLoading
             return scenes;
         }
 
-        private static bool IsValidSceneGroup(SceneGroup sceneGroup)
+        private static bool IsValidSceneGroup(ref ReadOnlySpan<Scene> sceneGroup)
         {
-            return sceneGroup.Scenes != null && sceneGroup.Scenes.Length > 0;
+            return sceneGroup.Length > 0;
+        }
+
+        private static bool IsValidSceneGroup(ref ReadOnlyMemory<Scene> sceneGroup)
+        {
+            return sceneGroup.Length > 0;
         }
 
         public static void MoveGameObjectToScene(GameObject gameObject, Scene scene)

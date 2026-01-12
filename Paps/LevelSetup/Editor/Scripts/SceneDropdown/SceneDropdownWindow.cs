@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Paps.DevelopmentTools.Editor
+namespace Paps.LevelSetup.Editor
 {
     public class SceneDropdownWindow : EditorWindow
     {
@@ -21,15 +21,18 @@ namespace Paps.DevelopmentTools.Editor
             var windowContainer = rootVisualElement.Q("WindowContainer");
 
             var levels = EditorLevelManager.GetLevels()
-                .OrderBy(l => l.Name);
+                .OrderBy(l => l.Id);
             var levelScenes = levels.SelectMany(l =>
             {
-                IEnumerable<Scene> allScenes = l.Level.InitialScenesGroup.Scenes.ToArray();
+                IEnumerable<Scene> scenes = new Scene[0];
 
-                if (l.LevelEditorData != null)
-                    allScenes = allScenes.Concat(l.LevelEditorData.ExtraScenes.Scenes);
+                if(l.InitialScenesGroup != null)
+                    scenes = l.InitialScenesGroup;
 
-                return allScenes;
+                if(l.ExtraScenes != null)
+                    scenes = scenes.Concat(l.ExtraScenes);
+
+                return scenes;
             });
             var staticScenes = EditorBuildSettings.scenes
                 .Select(scene => scene.path)
@@ -47,11 +50,11 @@ namespace Paps.DevelopmentTools.Editor
                 staticScenesScrollView.Add(sceneElementTemplate);
             }
 
-            foreach (var levelWithExtraData in levels)
+            foreach (var level in levels)
             {
                 var levelElementTemplate = _levelElementVisualTree.Instantiate();
                 var sceneElement = levelElementTemplate.Q<LevelElement>();
-                sceneElement.Initialize(levelWithExtraData.Level, levelWithExtraData.LevelEditorData);
+                sceneElement.Initialize(level);
                 levelsScrollView.Add(levelElementTemplate);
             }
         }

@@ -1,24 +1,24 @@
 ﻿using Cysharp.Threading.Tasks;
-using Paps.LevelSetup;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using Scene = Paps.SceneLoading.Scene;
 
-namespace Paps.DevelopmentTools.Editor
+namespace Paps.LevelSetup.Editor
 {
     public static class EditorLevelManager
     {
-        private static Level? _lastLoadedLevel;
+        private static Level _lastLoadedLevel;
 
-        public static Level? CurrentLoadedLevel { get; private set; }
+        public static Level CurrentLoadedLevel { get; private set; }
 
-        public static event Action<Level?> OnLevelChanged;
+        public static event Action<Level> OnLevelChanged;
 
-        private static LevelWithExtraData[] _levels;
+        private static Dictionary<string, Level> _levels;
 
         private static bool _isInRefreshCooldown;
         private static float _refreshCooldown = 0.2f;
@@ -44,7 +44,7 @@ namespace Paps.DevelopmentTools.Editor
 
         private static void Update()
         {
-            if(!CurrentLoadedLevel.Equals(_lastLoadedLevel))
+            if(CurrentLoadedLevel != _lastLoadedLevel)
                 OnLevelChanged?.Invoke(CurrentLoadedLevel);
 
             _lastLoadedLevel = CurrentLoadedLevel;
@@ -56,14 +56,14 @@ namespace Paps.DevelopmentTools.Editor
                 RefreshCurrentLoadedLevel();
         }
 
-        public static LevelWithExtraData[] GetLevels()
+        public static Level[] GetLevels()
         {
-            return _levels;
+            return _levels.Values.ToArray();
         }
 
-        public static Level GetLevelByName(string name)
+        public static Level GetLevelById(string id)
         {
-            return _levels.First(l => l.Name == name).Level;
+            return _levels.Values.First(l => l.Id == id);
         }
 
         private static void RefreshCurrentLoadedLevel()
@@ -85,51 +85,47 @@ namespace Paps.DevelopmentTools.Editor
             RefreshCurrentLoadedLevel();
         }
 
-        public static void LoadLevel(ScriptableLevel level, LevelEditorData levelEditorData)
+        public static void LoadLevel(Level level, bool allScenes = false)
         {
-            var scenes = level.InitialScenesGroup.Scenes;
+            var scenes = level.InitialScenesGroup;
 
-            if (levelEditorData != null)
-                scenes = scenes.Concat(levelEditorData.ExtraScenes.Scenes).ToArray();
+            if(allScenes)
+            {
+                scenes = scenes.Concat(level.ExtraScenes).ToArray();
+            }
 
-            EditorSceneManager.OpenScene(scenes[0].Path, OpenSceneMode.Single);
+            EditorSceneManager.OpenScene(scenes[0].GetSceneAssetPath(), OpenSceneMode.Single);
 
             for (int i = 1; i < scenes.Length; i++)
-                EditorSceneManager.OpenScene(scenes[i].Path, OpenSceneMode.Additive);
+                EditorSceneManager.OpenScene(scenes[i].GetSceneAssetPath(), OpenSceneMode.Additive);
 
             CurrentLoadedLevel = level;
         }
 
-        private static LevelWithExtraData[] LoadLevels()
+        private static bool IsValidLevel(Level level)
         {
-            var scriptableLevels = AssetDatabase.FindAssets($"t:{nameof(ScriptableLevel)}")
-                .Select(AssetDatabase.GUIDToAssetPath)
-                .Select(AssetDatabase.LoadAssetAtPath<ScriptableLevel>)
-                .Where(l => l.InitialScenesGroup.Scenes.Length > 0);
-
-            var levelEditorData = AssetDatabase.FindAssets($"t:{nameof(LevelEditorData)}")
-                .Select(AssetDatabase.GUIDToAssetPath)
-                .Select(AssetDatabase.LoadAssetAtPath<LevelEditorData>);
-
-            return scriptableLevels.Select(l => new LevelWithExtraData()
-            {
-                Name = l.Name,
-                Level = l,
-                LevelEditorData = levelEditorData.FirstOrDefault(data => data.Level == l)
-            }
-            ).ToArray();
+            return !string.IsNullOrEmpty(level.Id) && level.InitialScenesGroup.Length > 0;
         }
 
-        private static Level? GetLoadedLevel()
+        private static Dictionary<string, Level> LoadLevels()
+        {
+            var levels = AssetDatabase.FindAssets($"t:{nameof(Level)}")
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Select(AssetDatabase.LoadAssetAtPath<Level>)
+                .Where(IsValidLevel)
+                .ToDictionary(l => l.Id, l => l);
+
+            return levels;
+        }
+
+        private static Level GetLoadedLevel()
         {
             var loadedScenes = GetLoadedScenes();
 
-            foreach(var levelWithExtraData in _levels)
+            foreach(var level in _levels.Values)
             {
-                var currentLevel = levelWithExtraData.Level;
-
-                if(currentLevel.InitialScenesGroup.Scenes.All(s => loadedScenes.Contains(s)))
-                    return currentLevel;
+                if(InitialLevelScenesAreLoaded(level, loadedScenes))
+                    return level;
             }
 
             return null;
@@ -145,6 +141,28 @@ namespace Paps.DevelopmentTools.Editor
             }
 
             return loadedScenes.ToArray();
+        }
+
+        private static bool InitialLevelScenesAreLoaded(Level level, Scene[] loadedScenes)
+        {
+            for(int i = 0; i < level.InitialScenesGroup.Length; i++)
+            {
+                if(!SceneIsLoaded(level.InitialScenesGroup[i], loadedScenes))
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static bool SceneIsLoaded(Scene scene, Scene[] loadedScenes)
+        {
+            for(int i = 0; i < loadedScenes.Length; i++)
+            {
+                if(loadedScenes[i].Equals(scene))
+                    return true;
+            }
+
+            return false;
         }
     }
 }

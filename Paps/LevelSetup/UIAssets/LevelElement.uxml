@@ -1,0 +1,12 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Paps.LevelSetup.Editor.LevelElement name="LevelElement" style="flex-direction: row;">
+        <engine:VisualElement name="LeftContainer" style="flex-grow: 1; flex-direction: row; max-width: 50%;">
+            <Paps.UnityExtensions.Editor.IconImage icon="d_ScriptableObject Icon" name="Icon" style="width: 20px; height: 20px; min-width: 20px; min-height: 20px;"/>
+            <engine:Label text="Label" name="LevelNameLabel" style="margin-left: 5px; -unity-text-align: middle-left; text-overflow: ellipsis; overflow: hidden;"/>
+        </engine:VisualElement>
+        <engine:VisualElement name="RightContainer" style="flex-grow: 1; flex-direction: row; max-width: 50%;">
+            <engine:Button text="Initial" name="OpenInitialScenesButton" style="flex-grow: 1;"/>
+            <engine:Button text="All" name="OpenAllScenesButton" style="flex-grow: 1;"/>
+        </engine:VisualElement>
+    </Paps.LevelSetup.Editor.LevelElement>
+</engine:UXML>
