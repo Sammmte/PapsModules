@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Paps.Optionals;
 using Paps.SceneLoading;
 using Paps.UnityExtensions;
 using System;
@@ -13,6 +14,13 @@ namespace Paps.LevelSetup
     [DefaultExecutionOrder(-10000)]
     public class LevelSetupper : MonoBehaviour
     {
+        [Serializable]
+        public struct LoadLevelOptions
+        {
+            [SerializeField] public bool DoGCCollect;
+            [SerializeField] public bool UnloadUnusedAssets;
+        }
+
         public static LevelSetupper Instance { get; private set; }
 
         [SerializeField] private int _everPresentObjectsCapacity = 50;
@@ -41,21 +49,28 @@ namespace Paps.LevelSetup
             _tempGetComponentLevelSetuppableBuffer = new List<ILevelSetuppable>(_sceneBoundObjectsCapacity);
         }
 
-        public async UniTask LoadAndSetupInitialLevel(Level level)
+        public async UniTask LoadAndSetupInitialLevel(Level level, Optional<LoadLevelOptions> loadLevelOptions = default)
         {
             var loadedScenes = SceneLoader.GetLoadedScenes();
 
             await SceneLoader.LoadNewSceneAndWaitOneFrame("LevelSetup_EmptyScene");
             await SceneLoader.UnloadAsync(loadedScenes);
+
+            if(loadLevelOptions.HasValue)
+                await ApplyGCCollectOrAssetUnload(loadLevelOptions.Value);
+                
             await Load(level);
         }
 
-        public async UniTask LoadAndSetupLevel(Level level, Func<UniTask> onUnload = null)
+        public async UniTask LoadAndSetupLevel(Level level, Func<UniTask> onUnload = null, Optional<LoadLevelOptions> loadLevelOptions = default)
         {
             await Unload();
 
             if (onUnload != null)
                 await onUnload();
+
+            if(loadLevelOptions.HasValue)
+                await ApplyGCCollectOrAssetUnload(loadLevelOptions);
 
             await Load(level);
         }
@@ -192,6 +207,19 @@ namespace Paps.LevelSetup
             await levelSetuppable.Setup();
             
             levelSetuppable.Kickstart();
+        }
+
+        private async UniTask ApplyGCCollectOrAssetUnload(LoadLevelOptions loadLevelOptions)
+        {
+            if(loadLevelOptions.UnloadUnusedAssets)
+            {
+                await Resources.UnloadUnusedAssets();
+            }
+
+            if(loadLevelOptions.DoGCCollect)
+            {
+                GC.Collect();
+            }
         }
     }
 }

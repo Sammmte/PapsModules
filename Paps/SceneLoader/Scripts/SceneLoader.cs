@@ -70,6 +70,8 @@ namespace Paps.SceneLoading
             await UniTask.WhenAll(
                 scenes.Select(scene => SceneManager.UnloadSceneAsync(scene.Name).ToUniTask())
                 );
+            
+            await UniTask.NextFrame();
         }
 
         public static async UniTask UnloadAsync(Scene scene)
