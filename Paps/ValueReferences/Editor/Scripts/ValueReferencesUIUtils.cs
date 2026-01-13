@@ -18,7 +18,7 @@ namespace Paps.ValueReferences.Editor
         public static ValueReferencesAdvancedDropdown CreateAdvancedDropdownForType<T>()
         {
             return new ValueReferencesAdvancedDropdown(new AdvancedDropdownState(), 
-                ValueReferencesEditorManager.GetGroupsPathTreeContainingType<T>());
+                ValueReferencesEditorManager.GetGroupsPathTreeContainingType<T>(), typeof(T));
         }
     }
 }

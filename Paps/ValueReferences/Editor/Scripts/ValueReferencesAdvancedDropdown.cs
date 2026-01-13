@@ -8,13 +8,15 @@ namespace Paps.ValueReferences.Editor
     public class ValueReferencesAdvancedDropdown : AdvancedDropdown
     {
         private PathTree<ValueReferenceGroupAsset[]> _pathTree;
+        private Type _filterType;
 
         public event Action<ValueReferenceAsset> OnSelected;
 
         public ValueReferencesAdvancedDropdown(AdvancedDropdownState state, 
-            PathTree<ValueReferenceGroupAsset[]> pathTree) : base(state)
+            PathTree<ValueReferenceGroupAsset[]> pathTree, Type filterType = null) : base(state)
         {
             _pathTree = pathTree;
+            _filterType = filterType;
 
             minimumSize = ValueReferencesEditorConfig.Instance.MinimumAdvancedDropdownSize;
         }
@@ -36,6 +38,9 @@ namespace Paps.ValueReferences.Editor
 
                 foreach(var asset in valueReferenceAssets)
                 {
+                    if(!IsAllowedType(asset))
+                        continue;
+
                     currentItem.AddChild(new ValueReferenceAdvancedDropdownItem(asset.name, asset));
                 }
             }
@@ -63,6 +68,26 @@ namespace Paps.ValueReferences.Editor
                 return "ORPHAN VALUES";
 
             return inputName;
+        }
+
+        private bool IsAllowedType(ValueReferenceAsset asset)
+        {
+            if(_filterType == null)
+                return true;
+
+            var interfaces = asset.GetType().GetInterfaces();
+
+            foreach(var i in interfaces)
+            {
+                if(i.IsGenericType && 
+                    i.GetGenericTypeDefinition() == typeof(IValueReferenceSource<>) && 
+                    i.GetGenericArguments().First() == _filterType)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
