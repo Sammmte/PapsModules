@@ -11,6 +11,7 @@ namespace Paps.ScreenTransitions
     public class BlackScreenTransition : ScriptableObject, IScreenTransition
     {
         [SerializeField] private UIDocument _uiDocumentPrefab;
+        [SerializeField] private bool _useUnscaledTime;
 
         private Scene _scene;
         private VisualElement _blackScreen;
@@ -28,7 +29,9 @@ namespace Paps.ScreenTransitions
 
             _blackScreen = prefabInstance.rootVisualElement.Q("BlackScreen");
 
-            await Tween.VisualElementBackgroundColor(_blackScreen, endValue: Color.black, duration: 1);
+            var tween = Tween.VisualElementBackgroundColor(_blackScreen, endValue: Color.black, duration: 1, useUnscaledTime: _useUnscaledTime);
+
+            await tween;
         }
 
         public async UniTask PlayOut()
@@ -36,7 +39,7 @@ namespace Paps.ScreenTransitions
             var color = Color.black;
             color.a = 0;
 
-            await Tween.VisualElementBackgroundColor(_blackScreen, endValue: color, duration: 1);
+            await Tween.VisualElementBackgroundColor(_blackScreen, endValue: color, duration: 1, useUnscaledTime: _useUnscaledTime);
 
             await SceneLoader.UnloadAsync(_scene);
 
