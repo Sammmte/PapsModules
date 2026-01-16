@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using System.Reflection;
+using Paps.UnityExtensions;
 
 namespace Paps.ValueReferences.Editor
 {
@@ -15,7 +16,7 @@ namespace Paps.ValueReferences.Editor
         private static ValueReferenceGroupAsset[] _groupAssets;
         private static Dictionary<string, ValueReferenceAsset> _valueReferencesWithPaths;
         private static Dictionary<ValueReferenceAsset, string> _pathsOfValueReferenceAssets;
-        private static PathTree<ValueReferenceGroupAsset[]> _groupsPathTree;
+        private static Tree<ValueReferenceGroupAsset[]> _groupsPathTree;
         private static (CreateAssetMenuAttribute Attribute, Type Type)[] _createAssetMenuAttributesPerType;
 
         public static event Action OnRefresh;
@@ -58,7 +59,7 @@ namespace Paps.ValueReferences.Editor
             return _groupAssets;
         }
 
-        public static PathTree<ValueReferenceGroupAsset[]> GetGroupsPathTree()
+        public static Tree<ValueReferenceGroupAsset[]> GetGroupsPathTree()
         {
             if(_groupsPathTree == null)
             {
@@ -68,7 +69,7 @@ namespace Paps.ValueReferences.Editor
             return _groupsPathTree;
         }
 
-        public static PathTree<ValueReferenceGroupAsset[]> GetGroupsPathTreeContainingType<T>()
+        public static Tree<ValueReferenceGroupAsset[]> GetGroupsPathTreeContainingType<T>()
         {
             var groups = GetGroupAssets();
 
@@ -78,7 +79,7 @@ namespace Paps.ValueReferences.Editor
                 .Distinct()
                 .ToArray();
 
-            var pathTree = PathTree<ValueReferenceGroupAsset[]>.BuildFromPaths(uniquePaths);
+            var pathTree = Tree<ValueReferenceGroupAsset[]>.BuildFromPaths(uniquePaths);
 
             pathTree.Traverse(node =>
             {
@@ -96,7 +97,7 @@ namespace Paps.ValueReferences.Editor
                 .Distinct()
                 .ToArray();
 
-            _groupsPathTree = PathTree<ValueReferenceGroupAsset[]>.BuildFromPaths(uniquePaths);
+            _groupsPathTree = Tree<ValueReferenceGroupAsset[]>.BuildFromPaths(uniquePaths);
 
             _groupsPathTree.Traverse(node =>
             {

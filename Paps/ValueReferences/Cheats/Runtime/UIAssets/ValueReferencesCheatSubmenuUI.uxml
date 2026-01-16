@@ -1,0 +1,16 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="MainContainer" style="flex-grow: 1;">
+        <ui:VisualElement name="NoElementsContainer" style="align-items: center; display: none;">
+            <ui:Label text="No Value References found!" name="NoElementsLabel"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="ElementsContainer">
+            <ui:MultiColumnTreeView columns="" sort-column-descriptions="" virtualization-method="DynamicHeight" fixed-item-height="40">
+                <ui:Columns>
+                    <ui:Column name="Name" title="Name" min-width="33%"/>
+                    <ui:Column name="Type" title="Type" min-width="20%"/>
+                    <ui:Column name="Value" title="Value" min-width="45%"/>
+                </ui:Columns>
+            </ui:MultiColumnTreeView>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

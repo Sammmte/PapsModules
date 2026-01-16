@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using EditorObject = UnityEditor.Editor;
+using Paps.UnityExtensions;
 
 namespace Paps.ValueReferences.Editor
 {

@@ -2,6 +2,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Paps.UnityExtensions;
 
 namespace Paps.ValueReferences.Editor
 {
@@ -18,8 +19,8 @@ namespace Paps.ValueReferences.Editor
         private Button _refreshButton;
 
         private ValueReferenceGroupAsset[] _groups;
-        private PathTree<ValueReferenceGroupAsset[]> _pathTree;
-        private PathTree<ValueReferencePathElement> _pathElementsTree;
+        private Tree<ValueReferenceGroupAsset[]> _pathTree;
+        private Tree<ValueReferencePathElement> _pathElementsTree;
 
         [MenuItem("Paps/Value References/Manager Window")]
         public static void Display()
@@ -105,7 +106,7 @@ namespace Paps.ValueReferences.Editor
             return ValueReferencesEditorManager.GetGroupAssets();
         }
 
-        private PathTree<ValueReferenceGroupAsset[]> GetPathTree()
+        private Tree<ValueReferenceGroupAsset[]> GetPathTree()
         {
             return ValueReferencesEditorManager.GetGroupsPathTree();
         }

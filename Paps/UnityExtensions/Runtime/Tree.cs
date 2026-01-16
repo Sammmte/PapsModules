@@ -2,20 +2,18 @@ using UnityEngine;
 using System;
 using System.Text;
 
-namespace Paps.ValueReferences.Editor
+namespace Paps.UnityExtensions
 {
-    public class PathTree : PathTree<object> { }
-
-    public class PathTree<TData>
+    public class Tree<TData>
     {
         public TreeNode<TData> Root { get; private set; }
 
-        internal PathTree()
+        internal Tree()
         {
             Root = new TreeNode<TData>("Root");
         }
 
-        internal PathTree(TreeNode<TData> root)
+        internal Tree(TreeNode<TData> root)
         {
             Root = root;
         }
@@ -54,9 +52,9 @@ namespace Paps.ValueReferences.Editor
             }
         }
 
-        public static PathTree<TData> BuildFromPaths(string[] paths, char separator = '/')
+        public static Tree<TData> BuildFromPaths(string[] paths, char separator = '/')
         {
-            var pathTree = new PathTree<TData>();
+            var pathTree = new Tree<TData>();
 
             foreach (var path in paths)
             {

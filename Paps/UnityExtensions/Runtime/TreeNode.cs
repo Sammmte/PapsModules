@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Paps.ValueReferences.Editor
+namespace Paps.UnityExtensions
 {
     public class TreeNode<TData>
     {

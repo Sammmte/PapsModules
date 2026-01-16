@@ -1,19 +1,19 @@
 using System;
 using System.Linq;
 using UnityEditor.IMGUI.Controls;
-using UnityEngine;
+using Paps.UnityExtensions;
 
 namespace Paps.ValueReferences.Editor
 {
     public class ValueReferencesAdvancedDropdown : AdvancedDropdown
     {
-        private PathTree<ValueReferenceGroupAsset[]> _pathTree;
+        private Tree<ValueReferenceGroupAsset[]> _pathTree;
         private Type _filterType;
 
         public event Action<ValueReferenceAsset> OnSelected;
 
         public ValueReferencesAdvancedDropdown(AdvancedDropdownState state, 
-            PathTree<ValueReferenceGroupAsset[]> pathTree, Type filterType = null) : base(state)
+            Tree<ValueReferenceGroupAsset[]> pathTree, Type filterType = null) : base(state)
         {
             _pathTree = pathTree;
             _filterType = filterType;
