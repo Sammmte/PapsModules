@@ -8,7 +8,6 @@ namespace Paps.ValueReferences.Cheats
     public class ValueReferencesCheatList : ScriptableObject
     {
         public const string ORPHAN_GROUP_NAME = "Orphan";
-        public const string ORPHAN_GROUP_PATH_NAME = "VALUE_REFERENCES_ORPHAN_GROUP_PATH";
 
         [SerializeField] public ValueReferenceGroupAsset[] RawGroupAssets;
         [SerializeField] public ValueReferenceAsset[] RawOrphanAssets;
@@ -79,7 +78,7 @@ namespace Paps.ValueReferences.Cheats
             var orphanGroup = ScriptableObject.CreateInstance<ValueReferenceGroupAsset>();
 
             orphanGroup.name = ORPHAN_GROUP_NAME;
-            orphanGroup.Path = ORPHAN_GROUP_PATH_NAME;
+            orphanGroup.Path = ORPHAN_GROUP_NAME;
             orphanGroup.ValueReferenceAssets = RawOrphanAssets.ToArray();
 
             return orphanGroup;

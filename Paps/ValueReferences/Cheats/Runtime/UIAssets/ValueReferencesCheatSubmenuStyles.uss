@@ -1,0 +1,40 @@
+.value-reference-cheat-submenu {
+    flex-grow: 1;
+}
+
+.value-reference-cheat-submenu #SearchFieldContainer {
+    margin-top: 3px;
+    margin-right: 3px;
+    margin-bottom: 3px;
+    margin-left: 3px;
+    flex-direction: row;
+}
+
+.value-reference-cheat-submenu #SearchFieldContainer TextField {
+    flex-grow: 1;
+}
+
+.value-reference-cheat-submenu__item__group-name-element {
+    -unity-text-align: middle-left;
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(128, 28, 28);
+}
+
+.value-reference-cheat-submenu__item__value-name-element {
+    font-size: 18px;
+    -unity-font-style: bold-and-italic;
+    -unity-text-align: middle-left;
+    color: rgb(82, 82, 82);
+}
+
+.value-reference-cheat-submenu__item__type-name-element {
+    font-size: 14px;
+    -unity-font-style: bold;
+}
+
+.value-reference-cheat-submenu__item__value-button-container {
+}
+
+.value-reference-cheat-submenu__item__value-button-container Button {
+}
