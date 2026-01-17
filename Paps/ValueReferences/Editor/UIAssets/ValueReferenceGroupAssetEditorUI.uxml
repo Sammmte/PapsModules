@@ -1,29 +1,35 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <ui:VisualElement name="MainContainer">
-        <ui:VisualElement name="Header" style="flex-grow: 1; height: 30px; background-color: rgb(46, 46, 46); flex-direction: row; padding-left: 5px; justify-content: space-between;">
-            <ui:VisualElement name="LabelContainer" style="flex-grow: 1; justify-content: center;">
-                <ui:Label text="Label" name="GroupNameLabel" style="color: rgb(219, 117, 117); font-size: 17.5px; -unity-text-align: middle-left; -unity-font-style: bold;"/>
-                <ui:TextField name="RenameTextField" is-delayed="true" style="display: none;"/>
+    <ui:Template name="ValueReferenceGroupAddButton" src="project://database/Assets/PapsModules/Paps/ValueReferences/Editor/UIAssets/ValueReferenceGroupAddButton.uxml?fileID=9197481963319205126&amp;guid=85ab4c2c80b125340891396254fbbfda&amp;type=3#ValueReferenceGroupAddButton"/>
+    <Style src="project://database/Assets/PapsModules/Paps/ValueReferences/Editor/UIAssets/ValueReferenceStyleSheet.uss?fileID=7433441132597879392&amp;guid=1581a976f65928847be6eaac38da114d&amp;type=3#ValueReferenceStyleSheet"/>
+    <ui:VisualElement name="MainContainer" class="valueReferenceGroupAssetEditor__normal">
+        <ui:VisualElement name="Header">
+            <ui:VisualElement name="LabelContainer">
+                <ui:Label text="Label" name="GroupNameLabel"/>
+                <ui:TextField name="RenameTextField" is-delayed="true"/>
             </ui:VisualElement>
-            <ui:VisualElement name="ButtonsContainer" style="flex-direction: row; justify-content: center; align-items: center;">
-                <ui:Button name="RenameButton" tooltip="Rename group" style="justify-content: center; width: 30px; height: 25px;">
+            <ui:VisualElement name="ButtonsContainer">
+                <ui:Button name="RenameButton" tooltip="Rename group">
                     <Paps.UnityExtensions.Editor.IconImage icon="d_editicon.sml"/>
                 </ui:Button>
-                <ui:Button name="PingButton" tooltip="Ping group asset" style="width: 30px; height: 25px;">
+                <ui:Button name="PingButton" tooltip="Ping group asset">
                     <Paps.UnityExtensions.Editor.IconImage icon="d_Search Icon"/>
                 </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="PathFieldContainer" style="padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px;">
+        <ui:VisualElement name="PathFieldContainer">
             <uie:PropertyField name="PathField"/>
         </ui:VisualElement>
-        <ui:VisualElement name="DragAndDropArea" style="flex-grow: 1;">
-            <ui:VisualElement name="ItemsContainer" style="flex-grow: 1; min-height: 25px; background-color: rgb(67, 67, 67);"/>
-            <ui:VisualElement name="AddButtonContainer" style="height: 80px;">
-                <ui:Button name="AddButton" tooltip="Click to add a new element or drag and drop existing ones" style="flex-grow: 1; align-items: center; justify-content: center;">
-                    <Paps.UnityExtensions.Editor.IconImage icon="d_Toolbar Plus@2x" tint-color="rgb(134, 245, 10)" picking-mode="Ignore"/>
-                    <ui:Label text="Add Item" picking-mode="Ignore" name="DragAndDropLabel" style="font-size: 16px;"/>
-                </ui:Button>
+        <ui:VisualElement name="Body">
+            <ui:MultiColumnListView columns="" sort-column-descriptions="" name="ItemsContainer" virtualization-method="DynamicHeight" fixed-item-height="40">
+                <ui:Columns>
+                    <ui:Column name="Name" title="Name" width="25%"/>
+                    <ui:Column name="Type" title="Type" width="100px"/>
+                    <ui:Column name="Value" title="Value" width="400px"/>
+                    <ui:Column name="ExtraControls" max-width="70px" width="70px" min-width="70px"/>
+                </ui:Columns>
+            </ui:MultiColumnListView>
+            <ui:VisualElement name="AddButtonContainer">
+                <ui:Instance template="ValueReferenceGroupAddButton" name="ValueReferenceGroupAddButton"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

@@ -1,0 +1,112 @@
+ValueReferenceNameElement {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-left: 5px;
+}
+
+ValueReferenceNameElement > #NameLabel {
+    -unity-text-align: middle-left;
+    -unity-font-style: bold;
+    font-size: 16px;
+    overflow: hidden;
+    max-width: 90%;
+}
+
+ValueReferenceNameElement > #RenameField {
+    min-width: 100px;
+    display: none;
+}
+
+ValueReferenceNameElement > #RenameButton {
+    position: absolute;
+    right: 0;
+}
+
+ValueReferenceTypeElement {
+    align-items: center;
+}
+
+ValueReferenceTypeElement > #TypeLabel {
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+}
+
+ValueReferenceExtraControlsElement {
+    flex-direction: row;
+}
+
+ValueReferenceExtraControlsElement > Button {
+    width: 30px;
+    height: 20px;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+}
+
+.unity-multi-column-view__cell {
+    justify-content: center;
+}
+
+ValueReferenceGroupAddButton #DragAndDropLabel {
+    font-size: 16px;
+}
+
+.valueReferenceGroupAssetEditor__normal #Header {
+    flex-grow: 1;
+    height: 30px;
+    background-color: rgb(46, 46, 46);
+    flex-direction: row;
+    padding-left: 5px;
+    justify-content: space-between;
+}
+
+.valueReferenceGroupAssetEditor__normal #Header #LabelContainer {
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.valueReferenceGroupAssetEditor__normal #GroupNameLabel {
+    color: rgb(219, 117, 117);
+    font-size: 17.5px;
+    -unity-text-align: middle-left;
+    -unity-font-style: bold;
+}
+
+.valueReferenceGroupAssetEditor__normal #Header #RenameTextField {
+    display: none;
+}
+
+.valueReferenceGroupAssetEditor__normal #Header #ButtonsContainer {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.valueReferenceGroupAssetEditor__normal #Header #ButtonsContainer Button {
+    justify-content: center;
+    width: 30px;
+    height: 25px;
+}
+
+.valueReferenceGroupAssetEditor__normal #PathFieldContainer {
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+.valueReferenceGroupAssetEditor__normal {
+}
+
+.valueReferenceGroupAssetEditor__normal #AddButtonContainer {
+    height: 80px;
+}
+
+.unity-multi-column-view__row-container {
+    border-bottom-width: 1px;
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+}

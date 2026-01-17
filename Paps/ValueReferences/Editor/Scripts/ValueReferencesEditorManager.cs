@@ -179,7 +179,6 @@ namespace Paps.ValueReferences.Editor
             _valueReferencesWithPaths = null;
             _pathsOfValueReferenceAssets = null;
             _groupsPathTree = null;
-            _createAssetMenuAttributesPerType = null;
 
             OnRefresh?.Invoke();
         }
@@ -205,7 +204,7 @@ namespace Paps.ValueReferences.Editor
 
         private static Dictionary<ValueReferenceGroupAsset, ValueReferenceAsset[]> GetGroupsContainingAssets(ValueReferenceAsset[] assets)
         {
-            var groupsContainingAssets = _groupAssets.Where(g => g.ValueReferenceAssets.Any(v => assets.Contains(v)));
+            var groupsContainingAssets = GetGroupAssets().Where(g => g.ValueReferenceAssets.Any(v => assets.Contains(v)));
 
             return groupsContainingAssets.ToDictionary(g => g, g => g.ValueReferenceAssets.Where(v => assets.Contains(v)).ToArray());
         }
@@ -287,7 +286,7 @@ namespace Paps.ValueReferences.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            RefreshAll();
+            RefreshPaths();
         }
     }
 }

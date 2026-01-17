@@ -4,10 +4,7 @@ using EditorObject = UnityEditor.Editor;
 using UnityEngine;
 using UnityEditor.UIElements;
 using System.Collections.Generic;
-using System.Linq;
 using Paps.UnityExtensions.Editor;
-using System;
-using System.IO;
 
 namespace Paps.ValueReferences.Editor
 {
@@ -15,48 +12,39 @@ namespace Paps.ValueReferences.Editor
     public class ValueReferenceGroupAssetEditor : EditorObject
     {
         [SerializeField] private VisualTreeAsset _editorUI;
-
-        [SerializeField] private VisualTreeAsset _valueReferenceElementUI;
+        [SerializeField] private VisualTreeAsset _valueReferenceNameElementUI;
+        [SerializeField] private VisualTreeAsset _valueReferenceTypeElementUI;
+        [SerializeField] private VisualTreeAsset _valueReferenceValueElementUI;
+        [SerializeField] private VisualTreeAsset _valueReferenceExtraControlsElementUI;
 
         private VisualElement _mainVisualElement;
         private Label _groupNameLabel;
         private PropertyField _pathField;
-        private Button _addButton;
+        private ValueReferenceGroupAddButton _addButton;
         private Button _renameButton;
         private Button _pingButton;
         private TextField _renameTextField;
-        private VisualElement _itemsContainer;
-        private VisualElement _dragAndDropArea;
-
-        private List<ValueReferenceElement> _elements;
+        private MultiColumnListView _itemsContainer;
         private ValueReferenceGroupAsset _groupAsset;
-
-        private GenericMenu _addValueReferenceAssetMenu;
-
-        private SerializedProperty _valueReferencesArrayProperty;
+        private List<ValueReferenceAsset> _itemsSource;
         private SerializedProperty _pathProperty;
-
-        private Manipulator _dragAndDropManipulator;
 
         public override VisualElement CreateInspectorGUI()
         {
             _groupAsset = target as ValueReferenceGroupAsset;
-            _elements = new List<ValueReferenceElement>();
+            _itemsSource = new List<ValueReferenceAsset>();
 
             _mainVisualElement = _editorUI.CloneTree();
 
             _groupNameLabel = _mainVisualElement.Q<Label>("GroupNameLabel");
             _pathField = _mainVisualElement.Q<PropertyField>("PathField");
-            _addButton = _mainVisualElement.Q<Button>("AddButton");
+            _addButton = _mainVisualElement.Q<ValueReferenceGroupAddButton>();
             _renameButton = _mainVisualElement.Q<Button>("RenameButton");
             _pingButton = _mainVisualElement.Q<Button>("PingButton");
             _renameTextField = _mainVisualElement.Q<TextField>("RenameTextField");
-            _itemsContainer = _mainVisualElement.Q("ItemsContainer");
-            _dragAndDropArea = _mainVisualElement.Q("DragAndDropArea");
+            _itemsContainer = _mainVisualElement.Q<MultiColumnListView>("ItemsContainer");
 
-            _valueReferencesArrayProperty = serializedObject.FindProperty(nameof(ValueReferenceGroupAsset.ValueReferenceAssets));
-
-            RefreshName(); 
+            RefreshName();
 
             _pathProperty = serializedObject.FindPropertyBakingField(nameof(ValueReferenceGroupAsset.Path));
 
@@ -65,7 +53,16 @@ namespace Paps.ValueReferences.Editor
             {
                 ValueReferencesEditorManager.RefreshPaths();
             });
-            _addButton.clicked += OnAddButtonClicked;
+
+            _itemsSource.AddRange(_groupAsset.ValueReferenceAssets);
+            _itemsContainer.itemsSource = _itemsSource;
+
+            _itemsContainer.dragAndDropUpdate += OnDragAndDropUpdate;
+            _itemsContainer.handleDrop += OnHandleDrop;
+
+            SetupColumns();
+
+            _addButton.Initialize(_groupAsset, OnNewItemAdded);
             _renameButton.clicked += OnRenameButtonClicked;
             _pingButton.clicked += PingAsset;
 
@@ -80,32 +77,232 @@ namespace Paps.ValueReferences.Editor
                 HideRenameView();
             });
 
-            _addValueReferenceAssetMenu = new GenericMenu();
-            
-            var createAssetMenuAttributesPerType = ValueReferencesEditorManager.GetCreateAssetMenuPerType();
-
-            foreach(var tuple in createAssetMenuAttributesPerType)
-            {
-                _addValueReferenceAssetMenu.AddItem(new GUIContent(tuple.Attribute.menuName), 
-                    false, OnNewValueReferenceAssetSelected, tuple.Type);
-            }
-
-            _dragAndDropManipulator = new ValueReferenceGroupAssetDragAndDropManipulator(_dragAndDropArea, ReceiveAddedAssets);
-            _dragAndDropArea.AddManipulator(_dragAndDropManipulator);
-
-            if(IsOrphanGroup())
+            if (IsOrphanGroup())
             {
                 ShowAsOrphanGroup();
             }
 
-            RefreshItems();
+            _itemsContainer.Rebuild();
 
             return _mainVisualElement;
+        }
+
+        private DragVisualMode OnDragAndDropUpdate(HandleDragAndDropArgs dragArgs)
+        {
+            if(dragArgs.dragAndDropData.paths != null && 
+                dragArgs.dragAndDropData.paths.Length > 0 &&
+                TryGetValueReferenceAssets(dragArgs.dragAndDropData.paths, out var assets))
+            {
+                return DragVisualMode.Move;
+            }
+
+            return DragVisualMode.Rejected;
+        }
+
+        private DragVisualMode OnHandleDrop(HandleDragAndDropArgs dragArgs)
+        {
+            if(dragArgs.dragAndDropData.paths != null && 
+                dragArgs.dragAndDropData.paths.Length > 0 &&
+                TryGetValueReferenceAssets(dragArgs.dragAndDropData.paths, out var assets))
+            {
+                ReceiveAddedAssets(assets);
+                return DragVisualMode.Move;
+            }
+
+            return DragVisualMode.Rejected;
+        }
+
+        private bool TryGetValueReferenceAssets(string[] paths, out ValueReferenceAsset[] assets)
+        {
+            assets = new ValueReferenceAsset[paths.Length];
+
+            for(int i = 0; i < paths.Length; i++)
+            {
+                var asset = AssetDatabase.LoadAssetAtPath<ValueReferenceAsset>(paths[i]);
+
+                if(asset == null)
+                    return false;
+
+                assets[i] = asset;
+            }
+
+            return true;
+        }
+
+        private void SetupColumns()
+        {
+            var nameColumn = _itemsContainer.columns["Name"];
+            var typeColumn = _itemsContainer.columns["Type"];
+            var valueColumn = _itemsContainer.columns["Value"];
+            var extraControlsColumn = _itemsContainer.columns["ExtraControls"];
+
+            nameColumn.makeCell += CreateNameElement;
+            nameColumn.bindCell += BindNameElement;
+            nameColumn.unbindCell += UnbindNameElement;
+
+            typeColumn.makeCell += CreateTypeElement;
+            typeColumn.bindCell += BindTypeElement;
+            typeColumn.unbindCell += UnbindTypeElement;
+
+            valueColumn.makeCell += CreateValueElement;
+            valueColumn.bindCell += BindValueElement;
+            valueColumn.unbindCell += UnbindValueElement;
+
+            extraControlsColumn.makeCell += CreateExtraControlsElement;
+            extraControlsColumn.bindCell += BindExtraControlsElement;
+            extraControlsColumn.unbindCell += UnbindExtraControlsElement;
+        }
+
+        private void OnNewItemAdded(ValueReferenceAsset asset)
+        {
+            _itemsSource.Add(asset);
+
+            _itemsContainer.RefreshItems();
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            ValueReferencesEditorManager.RefreshPaths();
+
+            var lastItem = _itemsContainer.GetRootElementForIndex(_itemsSource.Count - 1);
+
+            var lastNameElement = lastItem.Q<ValueReferenceNameElement>();
+
+            lastNameElement.ShowRenameView();
+        }
+
+        private void OnElementRemoved(ValueReferenceAsset asset)
+        {
+            _itemsSource.Remove(asset);
+
+            _itemsContainer.RefreshItems();
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            ValueReferencesEditorManager.RefreshPaths();
         }
 
         private void ReceiveAddedAssets(ValueReferenceAsset[] addedAssets)
         {
             ValueReferencesEditorManager.MoveValueReferencesAssets(addedAssets, _groupAsset);
+            Refresh();
+        }
+
+        private VisualElement CreateNameElement()
+        {
+            var parent = _valueReferenceNameElementUI.CloneTree();
+
+            var element = parent.Q<ValueReferenceNameElement>();
+
+            element.Initialize();
+
+            parent.Remove(element);
+
+            return element;
+        }
+
+        private void BindNameElement(VisualElement element, int index)
+        {
+            var nameElement = element as ValueReferenceNameElement;
+
+            var data = _itemsSource[index];
+
+            nameElement.SetData(data);
+        }
+
+        private void UnbindNameElement(VisualElement element, int index)
+        {
+            var nameElement = element as ValueReferenceNameElement;
+
+            nameElement.CleanUp();
+        }
+
+        private VisualElement CreateTypeElement()
+        {
+            var parent = _valueReferenceTypeElementUI.CloneTree();
+
+            var element = parent.Q<ValueReferenceTypeElement>();
+
+            element.Initialize();
+
+            parent.Remove(element);
+
+            return element;
+        }
+
+        private void BindTypeElement(VisualElement element, int index)
+        {
+            var typeElement = element as ValueReferenceTypeElement;
+
+            var data = _itemsSource[index];
+
+            typeElement.SetData(data);
+        }
+
+        private void UnbindTypeElement(VisualElement element, int index)
+        {
+            var typeElement = element as ValueReferenceTypeElement;
+
+            typeElement.CleanUp();
+        }
+
+        private VisualElement CreateValueElement()
+        {
+            var parent = _valueReferenceValueElementUI.CloneTree();
+
+            var element = parent.Q<ValueReferenceValueElement>();
+
+            element.Initialize();
+
+            parent.Remove(element);
+
+            return element;
+        }
+
+        private void BindValueElement(VisualElement element, int index)
+        {
+            var valueElement = element as ValueReferenceValueElement;
+
+            var data = _itemsSource[index];
+
+            valueElement.SetData(data);
+        }
+
+        private void UnbindValueElement(VisualElement element, int index)
+        {
+            var valueElement = element as ValueReferenceValueElement;
+
+            valueElement.CleanUp();
+        }
+
+        private VisualElement CreateExtraControlsElement()
+        {
+            var parent = _valueReferenceExtraControlsElementUI.CloneTree();
+
+            var element = parent.Q<ValueReferenceExtraControlsElement>();
+
+            element.Initialize(OnElementRemoved);
+
+            parent.Remove(element);
+
+            return element;
+        }
+
+        private void BindExtraControlsElement(VisualElement element, int index)
+        {
+            var extraControlsElement = element as ValueReferenceExtraControlsElement;
+
+            var data = _itemsSource[index];
+
+            extraControlsElement.SetData(data, _groupAsset);
+        }
+
+        private void UnbindExtraControlsElement(VisualElement element, int index)
+        {
+            var extraControlsElement = element as ValueReferenceExtraControlsElement;
+
+            extraControlsElement.CleanUp();
         }
 
         private void PingAsset()
@@ -114,124 +311,6 @@ namespace Paps.ValueReferences.Editor
         }
 
         private bool IsOrphanGroup() => _pathProperty.stringValue == ValueReferencesEditorManager.ORPHAN_GROUP_PATH_NAME;
-
-        private ValueReferenceElement ToUIElement(ValueReferenceAsset asset)
-        {
-            var elementParent = _valueReferenceElementUI.CloneTree();
-            var element = elementParent.Q<ValueReferenceElement>();
-
-            element.Initialize(asset, new ValueReferenceElement.Options()
-            { 
-                HideDelete = IsOrphanGroup() 
-            });
-
-            element.OnDeleteRequested += OnItemDeleteRequested;
-
-            return element;
-        }
-
-        private void OnItemDeleteRequested(ValueReferenceElement element)
-        {
-            if(EditorUtility.DisplayDialog(
-                "Remove asset from group", 
-                $"HEADS UP! This will NOT delete the item, only remove it from {_groupAsset.name} group.\nDo you wish to continue?",
-                "Accept", "Cancel"))
-            {
-                RemoveItem(element);
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-                RefreshItems();
-                ValueReferencesEditorManager.RefreshAll();
-            }
-        }
-
-        private void RemoveItem(ValueReferenceElement element)
-        {
-            serializedObject.Update();
-
-            var index = IndexOf(element.ValueReferenceAsset);
-
-            _valueReferencesArrayProperty.DeleteArrayElementAtIndex(index);
-
-            serializedObject.ApplyModifiedProperties();
-        }
-
-        private int IndexOf(ValueReferenceAsset asset)
-        {
-            for(int i = 0; i < _groupAsset.ValueReferenceAssets.Length; i++)
-            {
-                if(_groupAsset.ValueReferenceAssets[i] == asset)
-                    return i;
-            }
-
-            return -1;
-        }
-
-        private void OnAddButtonClicked()
-        {
-            _addValueReferenceAssetMenu.ShowAsContext();
-        }
-
-        private void OnNewValueReferenceAssetSelected(object typeData)
-        {
-            var type = typeData as Type;
-
-            var newAsset = ScriptableObject.CreateInstance(type);
-
-            var thisGroupPath = AssetDatabase.GetAssetPath(_groupAsset);
-
-            var folderPath = Path.GetDirectoryName(thisGroupPath);
-
-            AssetDatabase.CreateAsset(newAsset, Path.Combine(folderPath, $"New{type.Name}ValueReference.asset"));
-
-            AddItem(newAsset as ValueReferenceAsset);
-
-            RefreshItems();
-
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-
-            var lastElement = _elements.Last();
-
-            lastElement.ShowRenameView();
-        }
-
-        private void AddItem(ValueReferenceAsset item)
-        {
-            serializedObject.Update();
-
-            var newIndex = _valueReferencesArrayProperty.arraySize;
-
-            _valueReferencesArrayProperty.InsertArrayElementAtIndex(newIndex);
-
-            var newProperty = _valueReferencesArrayProperty.GetArrayElementAtIndex(newIndex);
-
-            newProperty.objectReferenceValue = item;
-
-            serializedObject.ApplyModifiedProperties();
-        }
-
-        private void RefreshItems()
-        {
-            foreach(var element in _elements)
-            {
-                element.Dispose();
-            }
-
-            _elements.Clear();
-            _itemsContainer.Clear();
-            serializedObject.Update();
-
-            if(_groupAsset.ValueReferenceAssets == null || _groupAsset.ValueReferenceAssets.Length == 0)
-                return;
-
-            _elements.AddRange(_groupAsset.ValueReferenceAssets.Select(ToUIElement));
-
-            foreach(var element in _elements)
-            {
-                _itemsContainer.Add(element);
-            }
-        }
 
         private void OnRenameButtonClicked()
         {
@@ -279,13 +358,23 @@ namespace Paps.ValueReferences.Editor
             _pingButton.style.display = DisplayStyle.None;
             _pingButton.enabledSelf = false;
 
-            _dragAndDropArea.RemoveManipulator(_dragAndDropManipulator);
-
             _addButton.style.display = DisplayStyle.None;
             _addButton.enabledSelf = false;
 
             _pathField.style.display = DisplayStyle.None;
             _pathField.enabledSelf = false;
+
+            _itemsContainer.dragAndDropUpdate -= OnDragAndDropUpdate;
+            _itemsContainer.handleDrop -= OnHandleDrop;
+        }
+
+        private void Refresh()
+        {
+            _itemsSource.Clear();
+            serializedObject.Update();
+
+            _itemsSource.AddRange(_groupAsset.ValueReferenceAssets);
+            _itemsContainer.RefreshItems();
         }
     }
 }

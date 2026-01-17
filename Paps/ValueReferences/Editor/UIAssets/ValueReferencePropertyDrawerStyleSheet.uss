@@ -1,0 +1,105 @@
+.value-reference-property-drawer {
+    flex-direction: column;
+    background-color: rgb(75, 75, 75);
+}
+
+.value-reference-property-drawer #UpperContainer {
+    flex-grow: 1;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 30px;
+}
+
+.value-reference-property-drawer #UpperContainer #LeftContainer {
+    justify-content: center;
+    max-width: 30%;
+    min-width: 30%;
+    padding-left: 4px;
+}
+
+.value-reference-property-drawer #UpperContainer #MiddleContainer {
+    flex-direction: row;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+    align-self: center;
+}
+
+.value-reference-property-drawer #UpperContainer #RightContainer {
+    flex-grow: 1;
+    max-width: 57%;
+}
+
+.value-reference-property-drawer #LowerContainer {
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    background-color: rgb(53, 52, 52);
+}
+
+.value-reference-property-drawer #EditorsContainer {
+    flex-grow: 1;
+    border-bottom-width: 1px;
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-left-width: 1px;
+    padding-top: 2px;
+    padding-right: 6px;
+    padding-bottom: 2px;
+    padding-left: 3px;
+}
+
+.value-reference-property-drawer #CustomValueEditorContainer {
+    flex-grow: 1;
+}
+
+.value-reference-property-drawer #SourceEditorContainer {
+    flex-grow: 1;
+}
+
+.value-reference-property-drawer #MiddleContainer ToolbarToggle {
+    width: 30px;
+    height: 20px;
+}
+
+.value-reference-property-drawer #RightContainer #SourceSelectViewContainer {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+}
+
+.value-reference-property-drawer #PingButton {
+    align-self: center;
+    width: 30px;
+    height: 20px;
+}
+
+.value-reference-property-drawer #RightContainer #SelectSourceButtonContainer {
+    flex-grow: 1;
+}
+
+.value-reference-property-drawer #CustomValueViewContainer #HasCustomValueToggleContainer {
+    align-items: center;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    flex-direction: row;
+    padding-right: 3px;
+    padding-left: 3px;
+}
+
+.value-reference-property-drawer #HasCustomValueToggle {
+    padding-top: 3px;
+}
+
+.value-reference-property-drawer #CustomValueViewContainer {
+    flex-grow: 1;
+    display: none;
+    flex-direction: row;
+}

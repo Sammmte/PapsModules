@@ -5,7 +5,10 @@ MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - _editorUI: {fileID: 9197481963319205126, guid: 8c5b595811dac614eb1b19648cc6cf06, type: 3}
-  - _valueReferenceElementUI: {fileID: 9197481963319205126, guid: aabfd9b929d986044a0e542d1160e7a3, type: 3}
+  - _valueReferenceNameElementUI: {fileID: 9197481963319205126, guid: 75f031af2e890d341a4fcd2e26afabf9, type: 3}
+  - _valueReferenceTypeElementUI: {fileID: 9197481963319205126, guid: 6604895a41179584398818c040729b20, type: 3}
+  - _valueReferenceValueElementUI: {fileID: 9197481963319205126, guid: 43c4efa98110e9042a7fc295669d64b9, type: 3}
+  - _valueReferenceExtraControlsElementUI: {fileID: 9197481963319205126, guid: 57790302d423c6d42937a8fdb47d3335, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

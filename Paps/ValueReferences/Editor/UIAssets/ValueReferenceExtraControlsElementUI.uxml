@@ -1,0 +1,11 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/PapsModules/Paps/ValueReferences/Editor/UIAssets/ValueReferenceStyleSheet.uss?fileID=7433441132597879392&amp;guid=1581a976f65928847be6eaac38da114d&amp;type=3#ValueReferenceStyleSheet"/>
+    <Paps.ValueReferences.Editor.ValueReferenceExtraControlsElement>
+        <ui:Button name="DeleteButton" tooltip="Remove this element from this group">
+            <Paps.UnityExtensions.Editor.IconImage icon="P4_DeletedLocal@2x"/>
+        </ui:Button>
+        <ui:Button name="PingButton" tooltip="Ping this item corresponding asset">
+            <Paps.UnityExtensions.Editor.IconImage icon="d_Search Icon"/>
+        </ui:Button>
+    </Paps.ValueReferences.Editor.ValueReferenceExtraControlsElement>
+</ui:UXML>
