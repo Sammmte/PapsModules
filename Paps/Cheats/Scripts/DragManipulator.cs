@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -7,6 +8,8 @@ namespace Paps.Cheats
     {
         private bool _dragging;
         private Vector2 _startDragOffset;
+
+        public event Action<Vector2> OnPositionChanged;
 
         public DragManipulator()
         {
@@ -56,10 +59,16 @@ namespace Paps.Cheats
             {
                 _dragging = false;
                 target.ReleasePointer(evt.pointerId);
+
+                Vector2 newPosition = ((Vector2)evt.position) - _startDragOffset;
+
+                newPosition = ClampToScreen(newPosition);
+
+                OnPositionChanged?.Invoke(newPosition);
             }
         }
 
-        Vector2 ClampToScreen(Vector2 position)
+        private Vector2 ClampToScreen(Vector2 position)
         {
             float maxX = target.panel.visualTree.layout.width - target.layout.size.x;
             float maxY = target.panel.visualTree.layout.height - target.layout.size.y;
@@ -68,6 +77,14 @@ namespace Paps.Cheats
             position.y = Mathf.Clamp(position.y, 0, maxY);
 
             return position;
+        }
+
+        public void SetPosition(Vector2 position)
+        {
+            var finalPosition = ClampToScreen(position);
+
+            target.style.left = finalPosition.x;
+            target.style.top = finalPosition.y;
         }
     }
 }

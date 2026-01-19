@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UIElements;
 
@@ -13,6 +15,8 @@ namespace Paps.Cheats
         private ObjectPool<CheatOverlayElementContainer> _elementContainerPool;
 
         private Dictionary<ICheatOverlay, CheatOverlayElementContainer> _overlayContainers;
+
+        public event Action<ICheatOverlay, Vector2> OnOverlayPositionChanged;
 
         public void Initialize(VisualTreeAsset elementContainerVTA)
         {
@@ -45,7 +49,8 @@ namespace Paps.Cheats
         {
             var container = _elementContainerPool.Get();
 
-            container.SetOverlayElement(overlay.GetVisualElement());
+            container.OnPositionChanged += OnElementPositionChanged;
+            container.SetOverlayElement(overlay, overlay.GetVisualElement());
 
             _overlayContainers[overlay] = container;
 
@@ -56,8 +61,21 @@ namespace Paps.Cheats
         {
             if(_overlayContainers.TryGetValue(overlay, out var container))
             {
+                container.OnPositionChanged -= OnElementPositionChanged;
                 _elementContainerPool.Release(container);
             }
+        }
+
+        private void OnElementPositionChanged(ICheatOverlay overlay, Vector2 newPosition)
+        {
+            OnOverlayPositionChanged?.Invoke(overlay, newPosition);
+        }
+
+        public void SetOverlayPosition(ICheatOverlay overlay, Vector2 position)
+        {
+            var container = _overlayContainers[overlay];
+
+            container.SetPosition(position);
         }
     }
 }

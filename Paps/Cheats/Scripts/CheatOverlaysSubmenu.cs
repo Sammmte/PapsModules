@@ -13,8 +13,8 @@ namespace Paps.Cheats
         private const string OVERLAY_NAME_ELEMENT_CLASS = "cheat-overlays-submenu__item__name-label";
 
         private List<ICheatOverlay> _overlays;
-
-        private List<ICheatOverlay> _visibleOverlays = new List<ICheatOverlay>();
+        private Dictionary<string, CheatOverlayState> _overlaysState;
+        private CheatOverlayStateRepository _stateRepository = new CheatOverlayStateRepository();
 
         private VisualTreeAsset _submenuVTA;
         private VisualElement _mainElement;
@@ -34,6 +34,8 @@ namespace Paps.Cheats
             _overlays = await LoadOverlays();
             _submenuVTA = await this.LoadAssetAsync<VisualTreeAsset>("CheatOverlaysSubmenuUI");
             var screenUIDocumentPrefab = await this.LoadAssetAsync<GameObject>("CheatOverlaysUIDocument");
+
+            _overlaysState = LoadOverlaysState();
 
             _mainElement = _submenuVTA.CloneTree();
 
@@ -61,6 +63,11 @@ namespace Paps.Cheats
             var uiDocument = uiDocumentGameObject.GetComponent<CheatOverlayUIDocument>();
 
             _screenElement = uiDocument.Initialize();
+
+            ApplyOverlaysState();
+
+            _screenElement.OnOverlayPositionChanged += OnOverlayPositionChanged;
+            Application.quitting += SaveOnQuit;
         }
 
         private void InitializeColumns()
@@ -161,22 +168,111 @@ namespace Paps.Cheats
 
         private void OnOverlayVisibilityChanged(ICheatOverlay overlay, bool visible)
         {
+            SetVisibleState(overlay.Id, visible);
+
+            ApplyVisibilityState(overlay);
+        }
+
+        private void OnOverlayPositionChanged(ICheatOverlay overlay, Vector2 position)
+        {
+            SetPositionState(overlay.Id, position);
+        }
+
+        private void ApplyVisibilityState(ICheatOverlay overlay)
+        {
+            var visible = _overlaysState[overlay.Id].Visible;
+
             if(visible)
             {
-                _visibleOverlays.Add(overlay);
-
                 _screenElement.AddOverlay(overlay);
 
                 overlay.OnShow();
             }
             else
             {
-                _visibleOverlays.Remove(overlay);
-
                 _screenElement.RemoveOverlay(overlay);
 
                 overlay.OnHide();
             }
+        }
+
+        private void ApplyPositionState(ICheatOverlay overlay)
+        {
+            var position = _overlaysState[overlay.Id].Position;
+
+            _screenElement.SetOverlayPosition(overlay, position);
+        }
+
+        private Dictionary<string, CheatOverlayState> LoadOverlaysState()
+        {
+            var dictionary = new Dictionary<string, CheatOverlayState>(_overlays.Count);
+
+            var loadedData = _stateRepository.Get();
+
+            foreach(var data in loadedData)
+            {
+                dictionary[data.Key] = data.Value;
+            }
+
+            return dictionary;
+        }
+
+        private void SetVisibleState(string overlayId, bool visibleState)
+        {
+            var state = GetStateOf(overlayId);
+
+            state.Visible = visibleState;
+
+            _overlaysState[overlayId] = state;
+        }
+
+        private void SetPositionState(string overlayId, Vector2 position)
+        {
+            var state = GetStateOf(overlayId);
+
+            state.Position = position;
+
+            _overlaysState[overlayId] = state;
+        }
+
+        private CheatOverlayState GetStateOf(string overlayId)
+        {
+            if(_overlaysState.TryGetValue(overlayId, out var state))
+                return state;
+
+            CheatOverlayState newState = default;
+
+            _overlaysState[overlayId] = newState;
+
+            return newState;
+        }
+
+        private void SaveOnQuit()
+        {
+            Debug.Log("SAVING ON QUIT!");
+            _stateRepository.Save(_overlaysState);
+        }
+
+        private void ApplyOverlaysState()
+        {
+            foreach(var keyValue in _overlaysState)
+            {
+                var overlay = GetOverlayById(keyValue.Key);
+
+                ApplyVisibilityState(overlay);
+                ApplyPositionState(overlay);
+            }
+        }
+
+        private ICheatOverlay GetOverlayById(string id)
+        {
+            for(int i = 0; i < _overlays.Count; i++)
+            {
+                if(_overlays[i].Id == id)
+                    return _overlays[i];
+            }
+
+            return null;
         }
     }
 }
