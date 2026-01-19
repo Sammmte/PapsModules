@@ -1,0 +1,50 @@
+.cheat-overlays-submenu {
+}
+
+.cheat-overlays-submenu__item__name-label {
+    font-size: 20px;
+    -unity-font-style: bold;
+    padding-left: 3px;
+}
+
+.cheat-overlays-submenu__item__visibility-toggle {
+    align-self: center;
+}
+
+.cheat-overlays-submenu__no-elements-container {
+    align-items: center;
+}
+
+.cheat-overlays-submenu__no-elements-label {
+    font-size: 20px;
+    color: rgb(255, 0, 0);
+    -unity-font-style: bold;
+}
+
+.cheat-overlay-element-container {
+    padding-top: 3px;
+    padding-right: 3px;
+    padding-bottom: 3px;
+    padding-left: 3px;
+    border-left-color: rgba(0, 0, 0, 0.99);
+    border-right-color: rgba(0, 0, 0, 0.99);
+    border-top-color: rgba(0, 0, 0, 0.99);
+    border-bottom-color: rgba(0, 0, 0, 0.99);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    position: absolute;
+    align-self: flex-start;
+}
+
+.cheat-overlay-element-container #OverlayContainer .unity-text-element {
+    -unity-font-style: bold;
+    font-size: 150%;
+    color: rgb(255, 255, 255);
+    text-shadow: 2px 2px 0 rgb(0, 0, 0);
+}
+
+.unity-multi-column-view__cell {
+    justify-content: center;
+}
