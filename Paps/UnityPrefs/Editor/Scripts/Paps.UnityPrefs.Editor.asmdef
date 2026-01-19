@@ -1,0 +1,19 @@
+{
+    "name": "Paps.UnityPrefs.Editor",
+    "rootNamespace": "Paps.UnityPrefs.Editor",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:5f58541540927e048a4575a8db0a85cf"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

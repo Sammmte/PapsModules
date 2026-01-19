@@ -1,13 +1,10 @@
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 
 namespace Paps.UnityPrefs
 {
     internal class FileUnityPrefStorage : IUnityPrefStorage
     {
-        
-
         private string _basePath;
         private string _scope;
         private ISerializer _serializer;
@@ -89,10 +86,5 @@ namespace Paps.UnityPrefs
         {
             return Path.Combine(_basePath, $"{_scope}.prefs");
         }
-    }
-
-    internal struct SerializedValue
-    {
-        public string SerializedString;
     }
 }
