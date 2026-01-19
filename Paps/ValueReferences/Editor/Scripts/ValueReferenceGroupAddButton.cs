@@ -3,6 +3,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Reflection;
 
 namespace Paps.ValueReferences.Editor
 {
@@ -50,7 +51,9 @@ namespace Paps.ValueReferences.Editor
 
             var folderPath = Path.GetDirectoryName(thisGroupPath);
 
-            AssetDatabase.CreateAsset(newAsset, Path.Combine(folderPath, $"New{type.Name}ValueReference.asset"));
+            var genericType = type.GetProperty("Value", BindingFlags.Public | BindingFlags.Instance).PropertyType;
+
+            AssetDatabase.CreateAsset(newAsset, Path.Combine(folderPath, $"New{genericType.Name}ValueReference.asset"));
 
             AddItem(newAsset);
 
