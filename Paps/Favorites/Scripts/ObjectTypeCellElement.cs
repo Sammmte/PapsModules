@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine.UIElements;
 
 namespace Paps.Favorites
@@ -32,21 +31,7 @@ namespace Paps.Favorites
             }
             else
             {
-                _typeLabel.text = GetTypeString();
-            }
-        }
-
-        private string GetTypeString()
-        {
-            var assetPath = AssetDatabase.GetAssetPath(Favorite.Object);
-
-            if(AssetDatabase.IsValidFolder(assetPath))
-            {
-                return "Folder";
-            }
-            else
-            {
-                return Favorite.Object.GetType().Name;
+                _typeLabel.text = FavoriteTypeDisplayHelper.GetTypeDisplayName(Favorite.Object);
             }
         }
 
