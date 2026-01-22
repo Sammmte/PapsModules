@@ -249,7 +249,6 @@ namespace Paps.Cheats
 
         private void SaveOnQuit()
         {
-            Debug.Log("SAVING ON QUIT!");
             _stateRepository.Save(_overlaysState);
         }
 
