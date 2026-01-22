@@ -66,6 +66,14 @@ namespace Paps.UnityPrefs
                 return;
             }
 
+            var serializedString = File.ReadAllText(_filePath);
+
+            if(string.IsNullOrEmpty(serializedString))
+            {
+                _serializedValues = new Dictionary<string, SerializedValue>();
+                return;
+            }
+
             _serializedValues = _serializer.Deserialize<Dictionary<string, SerializedValue>>(File.ReadAllText(_filePath));
         }
 

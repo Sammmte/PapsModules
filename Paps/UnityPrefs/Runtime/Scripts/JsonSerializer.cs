@@ -16,7 +16,8 @@ namespace Paps.UnityPrefs
         {
             return JsonSerialization.ToJson<T>(obj, new JsonSerializationParameters()
             {
-                SerializedType = typeof(T)
+                SerializedType = typeof(T),
+                Minified = true
             });
         }
     }
