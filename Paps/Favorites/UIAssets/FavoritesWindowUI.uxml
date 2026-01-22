@@ -1,0 +1,22 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/PapsModules/Paps/Favorites/UIAssets/FavoritesStyles.uss?fileID=7433441132597879392&amp;guid=0679abe081b2ba54db4cc43cb1cdbb70&amp;type=3#FavoritesStyles"/>
+    <ui:VisualElement name="MainContainer" style="flex-grow: 1;">
+        <ui:VisualElement name="GroupsContainer" style="flex-direction: row;">
+            <ui:DropdownField name="GroupsDropdown" tooltip="Select a group to show" label="Current Group" class="favorites-window__group-dropdown"/>
+            <ui:TextField name="NewGroupField" is-delayed="true" label="New group" class="favorites-window__new-group-field"/>
+            <ui:Button name="AddGroupButton" tooltip="Add a new group">
+                <Paps.UnityExtensions.Editor.IconImage icon="d_Toolbar Plus"/>
+            </ui:Button>
+            <ui:Button name="DeleteGroupButton" tooltip="Delete the current active group">
+                <Paps.UnityExtensions.Editor.IconImage icon="P4_DeletedLocal"/>
+            </ui:Button>
+        </ui:VisualElement>
+        <ui:MultiColumnListView columns="" sort-column-descriptions="" reorderable="true" show-border="true" selection-type="Multiple" style="flex-grow: 1; min-height: 200px;">
+            <ui:Columns>
+                <ui:Column name="Object" title="Object" min-width="200px"/>
+                <ui:Column name="Type" title="Type" min-width="100px"/>
+                <ui:Column name="Scene" visible="true" title="Scene" min-width="100px"/>
+            </ui:Columns>
+        </ui:MultiColumnListView>
+    </ui:VisualElement>
+</ui:UXML>

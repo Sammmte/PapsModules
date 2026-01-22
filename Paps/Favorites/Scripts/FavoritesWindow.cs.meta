@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 2ca1693fb4e415646aa26cdbe958dccf
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - m_ViewDataDictionary: {instanceID: 0}
+  - _windowVTA: {fileID: 9197481963319205126, guid: e6f82c6a6525918469f39d50960c18a1, type: 3}
+  - _assetCellElementVTA: {fileID: 9197481963319205126, guid: 26a85aa689c110846a14f72f0408b3e6, type: 3}
+  - _typeCellElementVTA: {fileID: 9197481963319205126, guid: 80ea88f11c84c974ea7fc23b7ec76d6a, type: 3}
+  - _sceneCellElementVTA: {fileID: 9197481963319205126, guid: f3b5e2a1bb18569428c9915c036f2e8f, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,6 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/PapsModules/Paps/Favorites/UIAssets/FavoritesStyles.uss?fileID=7433441132597879392&amp;guid=0679abe081b2ba54db4cc43cb1cdbb70&amp;type=3#FavoritesStyles"/>
+    <Paps.Favorites.ObjectSceneCellElement class="favorites-window__item__object-scene-element">
+        <ui:Label text="Label" name="SceneLabel" class="favorites-window__item__object-type-element__type-label"/>
+    </Paps.Favorites.ObjectSceneCellElement>
+</ui:UXML>
