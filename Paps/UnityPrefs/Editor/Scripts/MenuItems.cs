@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEditor;
 
@@ -13,7 +14,7 @@ namespace Paps.UnityPrefs
             if(!Directory.Exists(UnityPrefs.PROJECT_PREFS_BASE_FILE_PATH))
                 return;
 
-            Directory.Delete(UnityPrefs.PROJECT_PREFS_BASE_FILE_PATH, true);
+            ShowClearDialog(() => Directory.Delete(UnityPrefs.PROJECT_PREFS_BASE_FILE_PATH, true));
         }
 
         [MenuItem(BASE_PATH + "ProjectPrefs/Open Folder")]
@@ -30,7 +31,7 @@ namespace Paps.UnityPrefs
             if(!Directory.Exists(UnityPrefs.USER_PROJECT_PREFS_BASE_FILE_PATH))
                 return;
 
-            Directory.Delete(UnityPrefs.USER_PROJECT_PREFS_BASE_FILE_PATH, true);
+            ShowClearDialog(() => Directory.Delete(UnityPrefs.USER_PROJECT_PREFS_BASE_FILE_PATH, true));
         }
 
         [MenuItem(BASE_PATH + "UserProjectPrefs/Open Folder")]
@@ -47,7 +48,7 @@ namespace Paps.UnityPrefs
             if(!Directory.Exists(UnityPrefs.PLAYER_PREFS_FILE_BASED_BASE_FILE_PATH))
                 return;
 
-            Directory.Delete(UnityPrefs.PLAYER_PREFS_FILE_BASED_BASE_FILE_PATH, true);
+            ShowClearDialog(() => Directory.Delete(UnityPrefs.PLAYER_PREFS_FILE_BASED_BASE_FILE_PATH, true));
         }
 
         [MenuItem(BASE_PATH + "PlayerPrefsFileBased/Open Folder")]
@@ -63,6 +64,16 @@ namespace Paps.UnityPrefs
             if(!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
+            }
+        }
+
+        private static void ShowClearDialog(Action action)
+        {
+            if(EditorUtility.DisplayDialog("Clear prefs folder", 
+                "Are you sure you want delete the directory and all its files? This can't be undone", 
+                "Accept", "Cancel"))
+            {
+                action();
             }
         }
     }
