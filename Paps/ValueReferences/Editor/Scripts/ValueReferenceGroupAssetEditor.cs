@@ -54,7 +54,11 @@ namespace Paps.ValueReferences.Editor
                 ValueReferencesEditorManager.RefreshPaths();
             });
 
-            _itemsSource.AddRange(_groupAsset.ValueReferenceAssets);
+            if(_groupAsset.ValueReferenceAssets != null)
+            {
+                _itemsSource.AddRange(_groupAsset.ValueReferenceAssets);
+            }
+            
             _itemsContainer.itemsSource = _itemsSource;
 
             _itemsContainer.dragAndDropUpdate += OnDragAndDropUpdate;
