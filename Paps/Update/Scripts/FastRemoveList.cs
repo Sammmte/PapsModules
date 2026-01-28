@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
 
-namespace Paps.UpdateManager
+namespace Paps.Update
 {
     /// <summary>Generic list with O(1) insertion and removal.</summary>
     /// <remarks>

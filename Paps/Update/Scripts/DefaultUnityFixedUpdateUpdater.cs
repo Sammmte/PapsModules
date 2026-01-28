@@ -4,7 +4,7 @@ using SaintsField.Playa;
 using System;
 using UnityEngine;
 
-namespace Paps.UpdateManager
+namespace Paps.Update
 {
     public class DefaultUnityFixedUpdateUpdater : MonoBehaviour, IUpdater<IFixedUpdatable>
     {

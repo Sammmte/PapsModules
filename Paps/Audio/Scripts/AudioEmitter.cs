@@ -1,5 +1,5 @@
 ﻿using Paps.Optionals;
-using Paps.UpdateManager;
+using Paps.Update;
 using System;
 using UnityEngine;
 

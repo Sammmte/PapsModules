@@ -1,5 +1,5 @@
 using Paps.Time;
-using Paps.UpdateManager;
+using Paps.Update;
 using Paps.ValueReferences;
 using SaintsField.Playa;
 using System;

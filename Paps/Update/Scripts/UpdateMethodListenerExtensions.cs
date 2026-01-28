@@ -1,4 +1,4 @@
-﻿namespace Paps.UpdateManager
+﻿namespace Paps.Update
 {
     public static class UpdateMethodListenerExtensions
     {

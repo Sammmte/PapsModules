@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Paps.UpdateManager
+namespace Paps.Update
 {
     public class UpdateManager : MonoBehaviour
     {

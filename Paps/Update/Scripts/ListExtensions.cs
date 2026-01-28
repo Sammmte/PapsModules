@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Paps.UpdateManager
+namespace Paps.Update
 {
     internal static class ListExtensions
     {

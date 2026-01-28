@@ -1,6 +1,6 @@
 using Paps.Optionals;
 using Paps.Time;
-using Paps.UpdateManager;
+using Paps.Update;
 using System;
 using UnityTime = UnityEngine.Time;
 

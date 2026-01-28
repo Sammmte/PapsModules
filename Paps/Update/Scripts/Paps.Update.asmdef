@@ -1,6 +1,6 @@
 {
-    "name": "Paps.UpdateManager",
-    "rootNamespace": "Paps.UpdateManager",
+    "name": "Paps.Update",
+    "rootNamespace": "Paps.Update",
     "references": [
         "GUID:9b261077c7a2ac34886513ec1345f8e0",
         "GUID:ecddbdb12aa1cc74d806fdd86a4c965a"

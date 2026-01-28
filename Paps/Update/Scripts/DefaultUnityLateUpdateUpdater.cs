@@ -4,9 +4,9 @@ using SaintsField.Playa;
 using System;
 using UnityEngine;
 
-namespace Paps.UpdateManager
+namespace Paps.Update
 {
-    public class DefaultUnityUpdateUpdater : MonoBehaviour, IUpdater<IUpdatable>
+    public class DefaultUnityLateUpdateUpdater : MonoBehaviour, IUpdater<ILateUpdatable>
     {
         [AboveButton(nameof(Enable), "Enable")]
         [AboveButton(nameof(Disable), "Disable")]
@@ -14,7 +14,7 @@ namespace Paps.UpdateManager
         [SerializeField] private ValueReference<int> _id;
         
         [ShowInInspector, ListDrawerSettings(numberOfItemsPerPage: 10)]
-        private FastRemoveList<IUpdatable> _listeners;
+        private FastRemoveList<ILateUpdatable> _listeners;
         
         private bool HasListeners => _listeners.Count > 0;
         public int Id => _id;
@@ -22,19 +22,19 @@ namespace Paps.UpdateManager
 
         private void Awake()
         {
-            _listeners = new FastRemoveList<IUpdatable>(_initialCapacity);
+            _listeners = new FastRemoveList<ILateUpdatable>(_initialCapacity);
             _manualEnabled = enabled;
             UpdateEnabled();
         }
 
-        public void Register(IUpdatable listener)
+        public void Register(ILateUpdatable listener)
         {
             _listeners.Add(listener);
             
             UpdateEnabled();
         }
 
-        public void Unregister(IUpdatable listener)
+        public void Unregister(ILateUpdatable listener)
         {
             _listeners.Remove(listener);
 
@@ -55,13 +55,13 @@ namespace Paps.UpdateManager
             UpdateEnabled();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
-            foreach (IUpdatable updatable in _listeners)
+            foreach (ILateUpdatable updatable in _listeners)
             {
                 try
                 {
-                    updatable.ManagedUpdate();
+                    updatable.ManagedLateUpdate();
                 }
                 catch (Exception ex)
                 {
