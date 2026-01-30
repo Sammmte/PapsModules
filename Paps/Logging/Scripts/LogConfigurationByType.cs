@@ -1,4 +1,4 @@
-﻿using CareBoo.Serially;
+﻿using SaintsField;
 using System;
 using UnityEngine;
 
@@ -7,7 +7,8 @@ namespace Paps.Logging
     [Serializable]
     public struct LogConfigurationByType
     {
-        [field: SerializeField] public SerializableType Type { get; private set; }
+        [field: SerializeField, TypeReference(EType.AllAssembly)]
+        public TypeReference Type { get; private set; }
         [field: SerializeField] public bool Enabled { get; set; }
     }
 }
