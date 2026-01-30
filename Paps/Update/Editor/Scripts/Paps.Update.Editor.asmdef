@@ -1,0 +1,22 @@
+{
+    "name": "Paps.Update.Editor",
+    "rootNamespace": "Paps.Update.Editor",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:a00d710b062668a46b8ebf64b9e61d6e",
+        "GUID:276fb2fc1687fe74c9c6ce7174a1073f",
+        "GUID:4bb1096f5faa2b8489d34ce6d8c1e4d8",
+        "GUID:6bf45c2ff8b8c17468782dc09ef461d2"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

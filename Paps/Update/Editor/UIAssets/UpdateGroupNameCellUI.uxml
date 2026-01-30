@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/PapsModules/Paps/Update/Editor/UIAssets/UpdateSchemaStyles.uss?fileID=7433441132597879392&amp;guid=e0d52782882a81241883f2a56e9c9169&amp;type=3#UpdateSchemaStyles"/>
+    <Paps.Update.Editor.UpdateGroupNameCellElement class="update-schema__group-item__name-cell">
+        <ui:Label text="Label" name="NameLabel" class="update-schema__group-item__name-cell__name-label"/>
+        <ui:TextField name="RenameField" is-delayed="true" class="update-schema__group-item__name-cell__rename-text-field"/>
+        <ui:Button name="RenameButton" class="update-schema__group-item__name-cell__rename-button">
+            <Paps.UnityExtensions.Editor.IconImage icon="d_editicon.sml"/>
+        </ui:Button>
+    </Paps.Update.Editor.UpdateGroupNameCellElement>
+</ui:UXML>

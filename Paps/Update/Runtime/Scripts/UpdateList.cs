@@ -17,23 +17,23 @@ namespace Paps.Update
     ///   </item>
     /// </list>
     /// </remarks>
-    public class FastRemoveList<T> : IReadOnlyList<T>
+    public class UpdateList<T> : IReadOnlyList<T>
     {
         private readonly List<T> _list;
         private readonly Dictionary<T, int> _indexMap;
         private int _loopIndex;
 
-        /// <returns>Get the number of items contained in the <see cref="FastRemoveList{T}"/>.</returns>
+        /// <returns>Get the number of items contained in the <see cref="UpdateList{T}"/>.</returns>
         public int Count => _list.Count;
 
         /// <returns>Item registered at <paramref name="index"/> if index is valid, <see langword="default"/> otherwise.</returns>
         public T this[int index] => index >= 0 && index < Count ? _list[index] : default;
 
-        public FastRemoveList() : this(1)
+        public UpdateList() : this(1)
         {
         }
         
-        public FastRemoveList(int capacity)
+        public UpdateList(int capacity)
         {
             _list = new List<T>(capacity);
             _indexMap = new Dictionary<T, int>(capacity);
@@ -98,14 +98,14 @@ namespace Paps.Update
             return true;
         }
 
-        /// <summary>Removes all values from the <see cref="FastRemoveList{T}"/>.</summary>
+        /// <summary>Removes all values from the <see cref="UpdateList{T}"/>.</summary>
         public void Clear()
         {
             _list.Clear();
             _indexMap.Clear();
         }
 
-        /// <summary>Returns an enumerator that iterates through the <see cref="FastRemoveList{T}"/>.</summary>
+        /// <summary>Returns an enumerator that iterates through the <see cref="UpdateList{T}"/>.</summary>
         public Enumerator GetEnumerator()
         {
             return new Enumerator(this);
@@ -116,9 +116,9 @@ namespace Paps.Update
 
         public struct Enumerator : IEnumerator<T>
         {
-            private FastRemoveList<T> _list;
+            private UpdateList<T> _list;
 
-            public Enumerator(FastRemoveList<T> list)
+            public Enumerator(UpdateList<T> list)
             {
                 _list = list;
                 Reset();

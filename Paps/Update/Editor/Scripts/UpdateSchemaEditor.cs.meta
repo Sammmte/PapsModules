@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: bab4fc9b6e6de444381c5066e632c633
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _editorVTA: {fileID: 9197481963319205126, guid: f4c03c7eed9b5d5469b218612b4a2ce7, type: 3}
+  - _updateGroupNameCellVTA: {fileID: 9197481963319205126, guid: 2f2be26591d9025469d68b4aec6281bb, type: 3}
+  - _updateGroupIdCellVTA: {fileID: 9197481963319205126, guid: 8570ed9402754434993f1918f1e6e79c, type: 3}
+  - _frameSequenceFrameCellVTA: {fileID: 9197481963319205126, guid: 127648c1bf561f04b8cfcfcc272988aa, type: 3}
+  - _frameGroupsSequenceCellVTA: {fileID: 9197481963319205126, guid: dd846d5c0408f5c419a19802003a23f2, type: 3}
+  - _frameGroupsSequenceGroupItemVTA: {fileID: 9197481963319205126, guid: 9298b8fd4341d7544860726be3585636, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

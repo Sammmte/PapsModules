@@ -1,0 +1,37 @@
+.update-schema__group-item__name-cell {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.update-schema__group-item__name-cell__name-label {
+    -unity-text-align: middle-left;
+    padding-left: 5px;
+}
+
+.update-schema__group-item__name-cell__rename-text-field {
+    display: none;
+}
+
+.update-schema__group-item__id-cell__id-label {
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+}
+
+.unity-multi-column-view__cell {
+    justify-content: center;
+}
+
+.update-schema__group-item__name-cell__rename-button {
+    min-height: 20px;
+}
+
+.update-schema__frame-groups-sequence-item__frame-label {
+    flex-grow: 1;
+    -unity-text-align: middle-center;
+    font-size: 12px;
+    -unity-font-style: bold;
+}
+
+.update-schema__frame-groups-sequence-item__group-item {
+    align-items: flex-start;
+}

@@ -1,5 +1,4 @@
-﻿using Paps.ValueReferences;
-using SaintsField;
+﻿using SaintsField;
 using SaintsField.Playa;
 using System;
 using UnityEngine;
@@ -10,33 +9,43 @@ namespace Paps.Update
     {
         [AboveButton(nameof(Enable), "Enable")]
         [AboveButton(nameof(Disable), "Disable")]
-        [SerializeField] private int _initialCapacity;
-        [SerializeField] private ValueReference<int> _id;
+        [SerializeField] private UpdateSchema<IUpdatable> _updateSchema;
         
-        [ShowInInspector, ListDrawerSettings(numberOfItemsPerPage: 10)]
-        private FastRemoveList<IUpdatable> _listeners;
-        
-        private bool HasListeners => _listeners.Count > 0;
-        public int Id => _id;
+        private bool HasListeners => _updateSchema.HasListeners();
         [NonSerialized, ShowInInspector, ReadOnly] private bool _manualEnabled;
 
         private void Awake()
         {
-            _listeners = new FastRemoveList<IUpdatable>(_initialCapacity);
+            _updateSchema.Initialize();
+
             _manualEnabled = enabled;
             UpdateEnabled();
         }
 
         public void Register(IUpdatable listener)
         {
-            _listeners.Add(listener);
+            _updateSchema.Register(listener);
+            
+            UpdateEnabled();
+        }
+
+        public void Register(IUpdatable listener, int updateSchemaGroupId)
+        {
+            _updateSchema.Register(listener, updateSchemaGroupId);
             
             UpdateEnabled();
         }
 
         public void Unregister(IUpdatable listener)
         {
-            _listeners.Remove(listener);
+            _updateSchema.Unregister(listener);
+
+            UpdateEnabled();
+        }
+
+        public void Unregister(IUpdatable listener, int updateSchemaGroupId)
+        {
+            _updateSchema.Unregister(listener, updateSchemaGroupId);
 
             UpdateEnabled();
         }
@@ -57,22 +66,17 @@ namespace Paps.Update
 
         private void Update()
         {
-            foreach (IUpdatable updatable in _listeners)
-            {
-                try
-                {
-                    updatable.ManagedUpdate();
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogException(ex);
-                }
-            }
+            _updateSchema.Update();
         }
 
         private void UpdateEnabled()
         {
             enabled = HasListeners && _manualEnabled;
+        }
+
+        public void Dispose()
+        {
+            _updateSchema.Dispose();
         }
     }
 }

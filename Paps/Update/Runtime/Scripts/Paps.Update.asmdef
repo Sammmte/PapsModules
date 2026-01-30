@@ -3,7 +3,9 @@
     "rootNamespace": "Paps.Update",
     "references": [
         "GUID:9b261077c7a2ac34886513ec1345f8e0",
-        "GUID:ecddbdb12aa1cc74d806fdd86a4c965a"
+        "GUID:ecddbdb12aa1cc74d806fdd86a4c965a",
+        "GUID:4bb1096f5faa2b8489d34ce6d8c1e4d8",
+        "GUID:276fb2fc1687fe74c9c6ce7174a1073f"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
