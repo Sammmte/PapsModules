@@ -61,7 +61,7 @@ namespace Paps.Update
             for(int i = 0; i < _groups.Count; i++)
             {
                 if(_groups[i].Name == groupName)
-                    return i;
+                    return i + 1;
             }
 
             return -1;
@@ -132,7 +132,7 @@ namespace Paps.Update
                 ExecuteUpdatesFor(frameUpdateGroupIds, _updatableGroups);
             }
 
-            if(_currentFrameIndex == _frameSequence.Length - 1)
+            if(_currentFrameIndex == _cookedFrameSequence.Length - 1)
                 _currentFrameIndex = 0;
             else
                 _currentFrameIndex++;
