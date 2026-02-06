@@ -4,13 +4,10 @@ using UnityEngine;
 namespace Paps.Optionals
 {
     [Serializable]
-    public struct Optional<T>
+    public struct Optional<T> : ISerializationCallbackReceiver
     {
-        [SerializeField] private bool _serializedByUnityFlag;
         [SerializeField] private bool _considerItHasValue;
         [SerializeField] private T _value;
-
-        private bool _hasValue;
 
         public T Value
         {
@@ -23,44 +20,26 @@ namespace Paps.Optionals
             }
         }
 
-        public bool HasValue
-        {
-            get
-            {
-                if (_serializedByUnityFlag && !_considerItHasValue)
-                {
-                    _hasValue = false;
-                    _serializedByUnityFlag = false;
-                }
-                else if (_serializedByUnityFlag && _considerItHasValue)
-                {
-                    _hasValue = IsValidValue(_value);
-                    _serializedByUnityFlag = false;
-                }
-
-                return _hasValue;
-            }
-        }
+        public bool HasValue { get; private set; }
 
         public Optional(T value)
         {
             _value = value;
-            _considerItHasValue = false;
-            _serializedByUnityFlag = false;
-
-            _hasValue = IsValidValue(value);
+            
+            HasValue = IsValidValue(value);
+            _considerItHasValue = HasValue;
         }
 
         public Optional(T value, bool hasValue)
         {
             _value = value;
-            _serializedByUnityFlag = false;
-            _considerItHasValue = false;
             
             if (hasValue)
-                _hasValue = IsValidValue(_value);
+                HasValue = IsValidValue(_value);
             else
-                _hasValue = false;
+                HasValue = false;
+
+            _considerItHasValue = HasValue;
         }
 
         private static bool IsValidValue(T value)
@@ -89,5 +68,22 @@ namespace Paps.Optionals
         }
         
         public static Optional<T> None() => new Optional<T>();
+
+        public void OnBeforeSerialize()
+        {
+            
+        }
+
+        public void OnAfterDeserialize()
+        {
+            if(_considerItHasValue)
+            {
+                HasValue = IsValidValue(_value);
+            }
+            else
+            {
+                HasValue = false;
+            }
+        }
     }
 }
