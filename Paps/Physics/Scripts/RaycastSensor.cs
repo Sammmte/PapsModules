@@ -51,7 +51,7 @@ namespace Paps.Physics
                 return;
 
             Gizmos.color = Color.green;
-            Gizmos.DrawLine(Origin, Direction * Distance);
+            Gizmos.DrawRay(Origin, Direction * Distance);
         }
 
         [Button]
