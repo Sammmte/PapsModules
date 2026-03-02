@@ -4,9 +4,9 @@ namespace Paps.Levels
 {
     public static class LevelSetupExtensions
     {
-        public static T AddSetuppableComponent<T>(this GameObject gameObject) where T : Component, ILevelSetuppable
+        public static T AddSetuppableComponent<T>(this GameObject gameObject) where T : Component, ILevelBound
         {
-            return LevelSetupper.Instance.AddSetuppableComponent<T>(gameObject);
+            return LevelManager.Instance.AddSetuppableComponent<T>(gameObject);
         }
     }
 }

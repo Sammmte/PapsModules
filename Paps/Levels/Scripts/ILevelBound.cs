@@ -2,7 +2,7 @@
 
 namespace Paps.Levels
 {
-    public interface ILevelSetuppable
+    public interface ILevelBound
     {
         public void Created()
         {

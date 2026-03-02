@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Paps.Metadata
 {
-    public abstract class MetadataManager<TKey> : MonoBehaviour, ILevelSetuppable where TKey : struct, Enum
+    public abstract class MetadataManager<TKey> : MonoBehaviour, ILevelBound where TKey : struct, Enum
     {
         public static MetadataManager<TKey> Instance { get; private set; }
 
@@ -24,7 +24,7 @@ namespace Paps.Metadata
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            LevelSetupper.Instance.RegisterEverPresent(this);
+            LevelManager.Instance.RegisterEverPresent(this);
         }
 
         public void Subscribe(Metadata<TKey> metadata)

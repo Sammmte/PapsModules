@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Paps.Metadata
 {
-    public abstract class Metadata<TKey> : MonoBehaviour, ILevelSetuppable where TKey : struct, Enum
+    public abstract class Metadata<TKey> : MonoBehaviour, ILevelBound where TKey : struct, Enum
     {
         [field: SerializeField] public TKey Key { get; private set; }
         

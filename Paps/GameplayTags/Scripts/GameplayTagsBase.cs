@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Paps.GameplayTags
 {
     [DisallowMultipleComponent]
-    public abstract class GameplayTagsBase : MonoBehaviour, ILevelSetuppable
+    public abstract class GameplayTagsBase : MonoBehaviour, ILevelBound
     {
         private void Awake()
         {

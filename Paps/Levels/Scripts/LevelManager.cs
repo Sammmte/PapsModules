@@ -12,7 +12,7 @@ using Scene = Paps.SceneLoading.Scene;
 namespace Paps.Levels
 {
     [DefaultExecutionOrder(-10000)]
-    public class LevelSetupper : MonoBehaviour
+    public class LevelManager : MonoBehaviour
     {
         [Serializable]
         public struct LoadLevelOptions
@@ -21,7 +21,7 @@ namespace Paps.Levels
             [SerializeField] public bool UnloadUnusedAssets;
         }
 
-        public static LevelSetupper Instance { get; private set; }
+        public static LevelManager Instance { get; private set; }
 
         [SerializeField] private int _everPresentObjectsCapacity = 50;
         [SerializeField] private int _levelScenesCapacity = 10;
@@ -29,24 +29,24 @@ namespace Paps.Levels
         [SerializeField] private int _sceneBoundObjectsCapacity = 1000;
         
         private Level _currentLevel;
-        private List<ILevelSetuppable> _everPresentLevelSetuppables;
+        private List<ILevelBound> _everPresentLevelSetuppables;
         private List<Scene> _levelScenes;
         private List<GameObject> _rootGameObjectsList;
         private List<SceneBoundLevelSetuppable> _sceneBound;
-        private List<ILevelSetuppable> _tempLevelSetuppableBuffer;
-        private List<ILevelSetuppable> _tempGetComponentLevelSetuppableBuffer;
+        private List<ILevelBound> _tempLevelSetuppableBuffer;
+        private List<ILevelBound> _tempGetComponentLevelSetuppableBuffer;
 
         private void Awake()
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            _everPresentLevelSetuppables = new List<ILevelSetuppable>(_everPresentObjectsCapacity);
+            _everPresentLevelSetuppables = new List<ILevelBound>(_everPresentObjectsCapacity);
             _levelScenes = new List<Scene>(_levelScenesCapacity);
             _rootGameObjectsList = new List<GameObject>(_rootGameObjectsCapacity);
             _sceneBound = new List<SceneBoundLevelSetuppable>(_sceneBoundObjectsCapacity);
-            _tempLevelSetuppableBuffer = new List<ILevelSetuppable>(_sceneBoundObjectsCapacity);
-            _tempGetComponentLevelSetuppableBuffer = new List<ILevelSetuppable>(_sceneBoundObjectsCapacity);
+            _tempLevelSetuppableBuffer = new List<ILevelBound>(_sceneBoundObjectsCapacity);
+            _tempGetComponentLevelSetuppableBuffer = new List<ILevelBound>(_sceneBoundObjectsCapacity);
         }
 
         public async UniTask LoadAndSetupInitialLevel(Level level, Optional<LoadLevelOptions> loadLevelOptions = default)
@@ -103,7 +103,7 @@ namespace Paps.Levels
                 await onUnload();
         }
 
-        public void RegisterEverPresent(ILevelSetuppable levelSetuppable)
+        public void RegisterEverPresent(ILevelBound levelSetuppable)
         {
             if(_everPresentLevelSetuppables.Contains(levelSetuppable))
                 return;
@@ -189,7 +189,7 @@ namespace Paps.Levels
             await UniTask.WhenAll(array.ToArray(l => l.Unload()));
         }
 
-        public T AddSetuppableComponent<T>(GameObject gameObject) where T : Component, ILevelSetuppable
+        public T AddSetuppableComponent<T>(GameObject gameObject) where T : Component, ILevelBound
         {
             var levelSetuppable = gameObject.AddComponent<T>();
             
@@ -200,7 +200,7 @@ namespace Paps.Levels
             return levelSetuppable;
         }
 
-        private async UniTask SetupAndKickstart(ILevelSetuppable levelSetuppable)
+        private async UniTask SetupAndKickstart(ILevelBound levelSetuppable)
         {
             levelSetuppable.Created();
             

@@ -4,10 +4,10 @@ namespace Paps.Levels
 {
     public readonly struct SceneBoundLevelSetuppable
     {
-        public ILevelSetuppable LevelSetuppable { get; }
+        public ILevelBound LevelSetuppable { get; }
         public Scene Scene { get; }
 
-        public SceneBoundLevelSetuppable(ILevelSetuppable levelSetuppable, Scene scene)
+        public SceneBoundLevelSetuppable(ILevelBound levelSetuppable, Scene scene)
         {
             LevelSetuppable = levelSetuppable;
             Scene = scene;

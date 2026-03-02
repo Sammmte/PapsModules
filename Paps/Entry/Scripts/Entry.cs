@@ -10,7 +10,7 @@ namespace Paps.Entry
     public class Entry : MonoBehaviour
     {
         [SerializeField] private Level _startupLevel;
-        [SerializeField] private LevelSetupper.LoadLevelOptions _loadLevelOptions;
+        [SerializeField] private LevelManager.LoadLevelOptions _loadLevelOptions;
 
         private void Awake()
         {
@@ -21,7 +21,7 @@ namespace Paps.Entry
         {
             await SceneLoader.LoadAsync("Setup", LoadSceneMode.Additive);
             await WaitForSetupProcess();
-            await LevelSetupper.Instance.LoadAndSetupInitialLevel(_startupLevel, _loadLevelOptions);
+            await LevelManager.Instance.LoadAndSetupInitialLevel(_startupLevel, _loadLevelOptions);
         }
 
         private UniTask WaitForSetupProcess()

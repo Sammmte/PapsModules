@@ -83,7 +83,7 @@ namespace Paps.Levels.Editor
 
             var level = Level.Create("EditorSetupLevel", editorSceneState.OpenedScenes.Select<SceneDTO, Scene>(s => s).ToArray());
 
-            await LevelSetupper.Instance.LoadAndSetupInitialLevel(level);
+            await LevelManager.Instance.LoadAndSetupInitialLevel(level);
         }
 
         private static async UniTaskVoid AwaitSetupAndOpenLevel(EditorLevelState editorLevelState)
@@ -94,7 +94,7 @@ namespace Paps.Levels.Editor
 
             var level = EditorLevelManager.GetLevelById(editorLevelState.LevelId);
 
-            await LevelSetupper.Instance.LoadAndSetupInitialLevel(level);
+            await LevelManager.Instance.LoadAndSetupInitialLevel(level);
         }
 
         private static bool ShouldSetupGame(PlayModeStateChange state)
