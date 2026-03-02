@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Paps.LevelSetup.Editor
+namespace Paps.Levels.Editor
 {
     public class SceneDropdownWindow : EditorWindow
     {

@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using Paps.LevelSetup;
+using Paps.Levels;
 using Paps.SceneLoading;
 using Paps.StartupSetup;
 using UnityEngine;

@@ -1,7 +1,7 @@
 ﻿using UnityScene = UnityEngine.SceneManagement.Scene;
 using Scene = Paps.SceneLoading.Scene;
 
-namespace Paps.LevelSetup.Editor
+namespace Paps.Levels.Editor
 {
     public struct SceneDTO
     {

@@ -1,6 +1,6 @@
 {
-    "name": "Paps.LevelSetup",
-    "rootNamespace": "Paps.LevelSetup",
+    "name": "Paps.Levels",
+    "rootNamespace": "Paps.Levels",
     "references": [
         "GUID:f51ebe6a0ceec4240a699833d6309b23",
         "GUID:534b73861e2d950419fb4074f4b1262a",

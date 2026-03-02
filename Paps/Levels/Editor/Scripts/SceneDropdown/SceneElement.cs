@@ -2,7 +2,7 @@
 using UnityEditor.SceneManagement;
 using UnityEngine.UIElements;
 
-namespace Paps.LevelSetup.Editor
+namespace Paps.Levels.Editor
 {
     [UxmlElement]
     public partial class SceneElement : VisualElement

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Paps.LevelSetup
+namespace Paps.Levels
 {
     [CreateAssetMenu(menuName = "Paps/Levels/Level", fileName = "Level Asset")]
     public class Level : ScriptableObject

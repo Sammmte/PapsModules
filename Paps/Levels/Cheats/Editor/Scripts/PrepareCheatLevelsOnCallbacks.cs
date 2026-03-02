@@ -1,9 +1,9 @@
 using Paps.Build;
-using Paps.LevelSetup.Editor;
+using Paps.Levels.Editor;
 using System.Linq;
 using UnityEditor;
 
-namespace Paps.LevelSetup.Cheats.Editor
+namespace Paps.Levels.Cheats.Editor
 {
     public class PrepareCheatLevelsOnCallbacks : IBuildPreprocessor
     {   

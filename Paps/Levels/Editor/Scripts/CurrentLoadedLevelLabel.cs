@@ -1,11 +1,11 @@
-﻿using Paps.LevelSetup;
+﻿using Paps.Levels;
 using Paps.UnityToolbarExtenderUIToolkit;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityMainToolbarElementAttribute = UnityEditor.Toolbars.MainToolbarElementAttribute;
 using UnityMainToolbarElement = UnityEditor.Toolbars.MainToolbarElement;
 
-namespace Paps.LevelSetup.Editor
+namespace Paps.Levels.Editor
 {
     [MainToolbarElement("CurrentLoadedLevelLabel")]
     public class CurrentLoadedLevelLabel : Label

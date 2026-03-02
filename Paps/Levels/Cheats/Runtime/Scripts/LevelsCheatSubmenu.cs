@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using Paps.Cheats;
 using UnityEngine.UIElements;
 
-namespace Paps.LevelSetup.Cheats
+namespace Paps.Levels.Cheats
 {
     public class LevelsCheatSubmenu : ICheatSubmenu
     {

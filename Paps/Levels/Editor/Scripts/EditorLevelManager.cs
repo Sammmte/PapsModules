@@ -8,7 +8,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using Scene = Paps.SceneLoading.Scene;
 
-namespace Paps.LevelSetup.Editor
+namespace Paps.Levels.Editor
 {
     public static class EditorLevelManager
     {

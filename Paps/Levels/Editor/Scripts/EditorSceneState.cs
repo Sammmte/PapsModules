@@ -1,4 +1,4 @@
-﻿namespace Paps.LevelSetup.Editor
+﻿namespace Paps.Levels.Editor
 {
     public struct EditorSceneState
     {

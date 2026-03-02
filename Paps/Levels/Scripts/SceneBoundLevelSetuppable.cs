@@ -1,6 +1,6 @@
 ﻿using Paps.SceneLoading;
 
-namespace Paps.LevelSetup
+namespace Paps.Levels
 {
     public readonly struct SceneBoundLevelSetuppable
     {

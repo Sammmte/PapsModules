@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using Paps.LevelSetup;
+using Paps.Levels;
 using Paps.SceneLoading;
 using Paps.StartupSetup;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Scene = Paps.SceneLoading.Scene;
 
-namespace Paps.LevelSetup.Editor
+namespace Paps.Levels.Editor
 {
     public static class SetupGameInEditor
     {

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0838ca45c24b4d13950f223bb40de80d, type: 3}
+  m_Name: LevelsCheatList
+  m_EditorClassIdentifier: Paps.LevelSetup.Cheats::Paps.LevelSetup.Cheats.LevelsCheatListAsset
+  Levels:
+  - {fileID: 11400000, guid: 57a3ed45ddbbf6d4b89cf7b880739da3, type: 2}
+  - {fileID: 11400000, guid: 874d6df138683124497c25b749df27b0, type: 2}
+  - {fileID: 11400000, guid: 4721a712f7ca5e844b5cc6a44def5824, type: 2}
+  - {fileID: 11400000, guid: 2ee7477730a915449807eb19fff21b33, type: 2}
+  - {fileID: 11400000, guid: a12493a891dfe36408c5db10f7a0f0d9, type: 2}
+  - {fileID: 11400000, guid: b727e65255384ac4c9007e4192e6f82f, type: 2}
+  - {fileID: 11400000, guid: 66f519f8469af7442be2cee1ec07cea5, type: 2}
+  - {fileID: 11400000, guid: 8e28b78046d7d52469d3b22717269a55, type: 2}
+  - {fileID: 11400000, guid: b602909b2379e5640bbfd996351f72ed, type: 2}
+  - {fileID: 11400000, guid: 333b6248d45dc824eb3fd97ee265a0d1, type: 2}
+  - {fileID: 11400000, guid: 106800a2b3c4be2489f12236a76a4b6d, type: 2}
+  - {fileID: 11400000, guid: 02a5c8aac7657f748afdf6013f641c44, type: 2}
+  - {fileID: 11400000, guid: 35af3b82b2753774a8f2e4e015c54f66, type: 2}
+  - {fileID: 11400000, guid: 608131c41d495d2418ba86170c402ff0, type: 2}
+  - {fileID: 11400000, guid: e76815cf057987948b4a821663971a4c, type: 2}

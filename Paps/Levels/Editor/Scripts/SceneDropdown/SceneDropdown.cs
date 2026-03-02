@@ -6,7 +6,7 @@ using MainToolbarElement = Paps.UnityToolbarExtenderUIToolkit.MainToolbarElement
 using UnityMainToolbarElementAttribute = UnityEditor.Toolbars.MainToolbarElementAttribute;
 using UnityMainToolbarElement = UnityEditor.Toolbars.MainToolbarElement;
 
-namespace Paps.LevelSetup.Editor
+namespace Paps.Levels.Editor
 {
     [MainToolbarElement("SceneDropdown")]
     public class SceneDropdown : EditorToolbarDropdown

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Paps.LevelSetup
+namespace Paps.Levels
 {
     public static class LevelSetupExtensions
     {

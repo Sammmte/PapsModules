@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 
-namespace Paps.LevelSetup
+namespace Paps.Levels
 {
     public interface ILevelSetuppable
     {

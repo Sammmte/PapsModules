@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Scene = Paps.SceneLoading.Scene;
 
-namespace Paps.LevelSetup
+namespace Paps.Levels
 {
     [DefaultExecutionOrder(-10000)]
     public class LevelSetupper : MonoBehaviour
