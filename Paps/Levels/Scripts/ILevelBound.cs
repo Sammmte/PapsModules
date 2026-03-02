@@ -4,13 +4,9 @@ namespace Paps.Levels
 {
     public interface ILevelBound
     {
-        public void Created()
+        public void Loaded()
         {
             
-        }
-        public UniTask Setup()
-        {
-            return UniTask.CompletedTask;
         }
 
         public void Kickstart()
@@ -18,9 +14,9 @@ namespace Paps.Levels
 
         }
 
-        public UniTask Unload()
+        public void Unload()
         {
-            return UniTask.CompletedTask;
+            
         }
     }
 }

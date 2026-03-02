@@ -1,6 +1,4 @@
-using Cysharp.Threading.Tasks;
 using Paps.Levels;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Paps.GameplayTags
@@ -8,19 +6,9 @@ namespace Paps.GameplayTags
     [DisallowMultipleComponent]
     public abstract class GameplayTagsBase : MonoBehaviour, ILevelBound
     {
-        private void Awake()
+        public void Loaded()
         {
             GameplayTagsManager.Instance.Register(this);
-        }
-
-        public async UniTask Setup()
-        {
-            GameplayTagsManager.Instance.Register(this);
-        }
-
-        public async UniTask Unload()
-        {
-            GameplayTagsManager.Instance.Unregister(this);
         }
 
         private void OnDestroy()

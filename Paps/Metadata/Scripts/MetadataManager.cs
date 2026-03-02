@@ -66,7 +66,7 @@ namespace Paps.Metadata
             return false;
         }
 
-        public async UniTask Unload()
+        public void Unload()
         {
             _describedGameObjects.Clear();
         }

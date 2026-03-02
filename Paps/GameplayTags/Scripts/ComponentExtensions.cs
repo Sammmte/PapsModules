@@ -106,8 +106,7 @@ namespace Paps.GameplayTags
 
             if (tags == null)
             {
-                var newTags = gameObject.AddSetuppableComponent<TGameplayTagsComponent>();
-                GameplayTagsManager.Instance.Register(newTags);
+                var newTags = gameObject.AddLevelBoundComponent<TGameplayTagsComponent>();
             }
 
             return tags;

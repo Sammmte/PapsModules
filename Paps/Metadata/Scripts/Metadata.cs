@@ -9,19 +9,9 @@ namespace Paps.Metadata
     {
         [field: SerializeField] public TKey Key { get; private set; }
         
-        private void Awake()
+        public void Loaded()
         {
             MetadataManager<TKey>.Instance.Subscribe(this);
-        }
-
-        public async UniTask Setup()
-        {
-            MetadataManager<TKey>.Instance.Subscribe(this);
-        }
-
-        public async UniTask Unload()
-        {
-            MetadataManager<TKey>.Instance.Unsubscribe(this);
         }
 
         private void OnDestroy()
