@@ -10,9 +10,41 @@ namespace Paps.Favorites
 {
     public class FavoritesWindow : EditorWindow
     {
-        private class ItemSelectManipulator : MouseManipulator
+        private class ItemPingSelectManipulator : MouseManipulator
         {
-            public ItemSelectManipulator()
+            public ItemPingSelectManipulator()
+            {
+                activators.Add(new ManipulatorActivationFilter() { button = MouseButton.LeftMouse, clickCount = 1 });
+            }
+
+            protected override void RegisterCallbacksOnTarget()
+            {
+                target.RegisterCallback<MouseDownEvent>(OnMouseDown);
+            }
+
+            protected override void UnregisterCallbacksFromTarget()
+            {
+                target.UnregisterCallback<MouseDownEvent>(OnMouseDown);
+            }
+
+            private void OnMouseDown(MouseDownEvent ev)
+            {
+                if(!CanStartManipulation(ev))
+                    return;
+
+                var favoriteProvider = target as IFavoriteProvider;
+
+                if(favoriteProvider.Favorite.Object == null)
+                    return;
+
+                EditorGUIUtility.PingObject(favoriteProvider.Favorite.Object);
+                Selection.activeObject = favoriteProvider.Favorite.Object;
+            }
+        }
+
+        private class ItemOpenManipulator : MouseManipulator
+        {
+            public ItemOpenManipulator()
             {
                 activators.Add(new ManipulatorActivationFilter() { button = MouseButton.LeftMouse, clickCount = 2 });
             }
@@ -37,7 +69,7 @@ namespace Paps.Favorites
                 if(favoriteProvider.Favorite.Object == null)
                     return;
 
-                EditorGUIUtility.PingObject(favoriteProvider.Favorite.Object);
+                AssetDatabase.OpenAsset(favoriteProvider.Favorite.Object);
             }
         }
 
@@ -254,7 +286,8 @@ namespace Paps.Favorites
             cell.Initialize();
 
             cell.AddManipulator(new ContextualMenuManipulator(OnItemOptions));
-            cell.AddManipulator(new ItemSelectManipulator());
+            cell.AddManipulator(new ItemPingSelectManipulator());
+            cell.AddManipulator(new ItemOpenManipulator());
 
             return cell;
         }
@@ -284,7 +317,8 @@ namespace Paps.Favorites
             cell.Initialize();
 
             cell.AddManipulator(new ContextualMenuManipulator(OnItemOptions));
-            cell.AddManipulator(new ItemSelectManipulator());
+            cell.AddManipulator(new ItemPingSelectManipulator());
+            cell.AddManipulator(new ItemOpenManipulator());
 
             return cell;
         }
@@ -316,7 +350,8 @@ namespace Paps.Favorites
             cell.Initialize();
 
             cell.AddManipulator(new ContextualMenuManipulator(OnItemOptions));
-            cell.AddManipulator(new ItemSelectManipulator());
+            cell.AddManipulator(new ItemPingSelectManipulator());
+            cell.AddManipulator(new ItemOpenManipulator());
 
             return cell;
         }
