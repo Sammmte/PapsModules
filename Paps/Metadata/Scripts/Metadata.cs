@@ -1,22 +1,39 @@
-using Cysharp.Threading.Tasks;
-using Paps.Levels;
-using System;
-using UnityEngine;
+using UnityEngine.Pool;
 
 namespace Paps.Metadata
 {
-    public abstract class Metadata<TKey> : MonoBehaviour, ILevelBound where TKey : struct, Enum
+
+    internal abstract class Metadata
     {
-        [field: SerializeField] public TKey Key { get; private set; }
-        
-        public void Loaded()
+        public abstract void Release();
+    }
+
+    internal sealed class Metadata<T> : Metadata
+    {
+        private static ObjectPool<Metadata<T>> _pool;
+
+        public static Metadata<T> GetPooled(T data, int keysAmount)
         {
-            MetadataManager<TKey>.Instance.Subscribe(this);
+            if(_pool == null)
+            {
+                _pool = new ObjectPool<Metadata<T>>(static () => new Metadata<T>(), defaultCapacity: keysAmount);
+            }
+
+            var metadata = _pool.Get();
+
+            metadata.Value = data;
+
+            return metadata;
         }
 
-        private void OnDestroy()
+        public T Value { get; internal set; }
+
+        private Metadata() { }
+
+        public override void Release()
         {
-            MetadataManager<TKey>.Instance.Unsubscribe(this);
+            Value = default;
+            _pool.Release(this);
         }
     }
 }
