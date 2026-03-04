@@ -240,6 +240,7 @@ namespace Paps.Levels
             _loadedDoneList.Clear();
             _kickstartPendingList.Clear();
             _kickstartDoneList.Clear();
+            _activeNonEverPresentBounds.Clear();
         }
 
         private async UniTask ApplyGCCollectOrAssetUnload(LoadLevelOptions loadLevelOptions)
