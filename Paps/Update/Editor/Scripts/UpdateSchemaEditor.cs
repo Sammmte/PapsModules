@@ -108,7 +108,7 @@ namespace Paps.Update.Editor
         {
             var cell = element as Label;
 
-            cell.text = (index + 1).ToString();
+            cell.text = UpdateSchemaUtils.GetIdOfGroup(GetGroupByIndex(index)).ToString();
         }
 
         private void UnbindGroupIdCell(VisualElement element, int index)
@@ -184,7 +184,7 @@ namespace Paps.Update.Editor
 
             parent.Remove(cell);
 
-            cell.Initialize(_frameGroupsSequenceGroupItemVTA, GetAvailableGroupsFor);
+            cell.Initialize(_frameGroupsSequenceGroupItemVTA, GetAvailableGroupsFor, GetAvailableGroups);
 
             return cell;
         }
@@ -203,7 +203,7 @@ namespace Paps.Update.Editor
             cell.CleanUp();
         }
 
-        private string[] GetAvailableGroupsFor(int frameGroupSequenceIndex)
+        private UpdatableGroup[] GetAvailableGroupsFor(int frameGroupSequenceIndex)
         {
             var frameGroupsSequenceProperty = _frameSequenceProperty.GetArrayElementAtIndex(frameGroupSequenceIndex);
 
@@ -211,23 +211,26 @@ namespace Paps.Update.Editor
 
             var availableGroups = GetAvailableGroups();
 
-            var list = new List<string>(availableGroups);
+            var list = new List<UpdatableGroup>(availableGroups);
 
             for(int i = 0; i < groupsSequenceProperty.arraySize; i++)
             {
                 var groupItemProperty = groupsSequenceProperty.GetArrayElementAtIndex(i);
 
-                list.Remove(groupItemProperty.stringValue);
+                if(UpdateSchemaUtils.TryGetGroupById(groupItemProperty.intValue, list, out var group))
+                {
+                    list.Remove(group);
+                }
             }
 
             return list.ToArray();
         }
 
-        private HashSet<string> GetAvailableGroups()
+        private HashSet<UpdatableGroup> GetAvailableGroups()
         {
-            var hashset = new HashSet<string>(_groupsProperty.arraySize + 1);
+            var hashset = new HashSet<UpdatableGroup>(_groupsProperty.arraySize + 1);
 
-            hashset.Add(UpdatableGroup.DEFAULT_GROUP_NAME);
+            hashset.Add(UpdatableGroup.DEFAULT_GROUP);
 
             for(int i = 0; i < _groupsProperty.arraySize; i++)
             {
@@ -235,10 +238,17 @@ namespace Paps.Update.Editor
 
                 var nameProperty = groupProperty.FindPropertyRelative(nameof(UpdatableGroup.Name));
 
-                hashset.Add(nameProperty.stringValue);
+                hashset.Add(new UpdatableGroup() { Name = nameProperty.stringValue });
             }
 
             return hashset;
+        }
+
+        private UpdatableGroup GetGroupByIndex(int index)
+        {
+            var property = _groupsProperty.GetArrayElementAtIndex(index).FindPropertyRelative(nameof(UpdatableGroup.Name));
+
+            return new UpdatableGroup() { Name = property.stringValue };
         }
     }
 }

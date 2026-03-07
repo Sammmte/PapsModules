@@ -7,7 +7,15 @@ namespace Paps.Update
     public struct UpdatableGroup : IEquatable<UpdatableGroup>
     {
         public const string DEFAULT_GROUP_NAME = "Default";
-        public const int DEFAULT_GROUP_ID = 0;
+
+        public static readonly UpdatableGroup DEFAULT_GROUP = new UpdatableGroup()
+        {
+            Name = DEFAULT_GROUP_NAME
+        };
+
+        public static readonly UpdatableGroup NONE = default;
+
+        public bool IsDefault => Name == DEFAULT_GROUP_NAME;
 
         [SerializeField] public string Name;
         public bool Equals(UpdatableGroup other)

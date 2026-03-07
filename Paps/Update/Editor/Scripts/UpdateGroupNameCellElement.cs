@@ -3,6 +3,7 @@ using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Paps.Update.Editor
 {
@@ -13,11 +14,11 @@ namespace Paps.Update.Editor
         private TextField _renameField;
         private Button _renameButton;
 
-        private Func<HashSet<string>> _getGroups;
+        private Func<HashSet<UpdatableGroup>> _getGroups;
 
         public SerializedProperty SerializedProperty { get; private set; }
 
-        public void Initialize(Func<HashSet<string>> getGroups)
+        public void Initialize(Func<HashSet<UpdatableGroup>> getGroups)
         {
             _getGroups = getGroups;
 
@@ -76,7 +77,7 @@ namespace Paps.Update.Editor
 
         private bool IsValidRename(string newName)
         {
-            return !(string.IsNullOrEmpty(newName) || _getGroups.Invoke().Contains(newName));
+            return !(string.IsNullOrEmpty(newName) || _getGroups.Invoke().Any(g => g.Name == newName));
         }
 
         public void CleanUp()

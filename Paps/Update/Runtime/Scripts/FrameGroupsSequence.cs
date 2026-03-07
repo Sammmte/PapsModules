@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Paps.Update
 {
     [Serializable]
-    public struct FrameGroupsSequence
+    public class FrameGroupsSequence
     {
-        [SerializeField] public string[] GroupsSequence;
+        [SerializeField] public List<int> GroupsSequence;
     }
 }

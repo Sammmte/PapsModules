@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -11,15 +12,15 @@ namespace Paps.Update.Editor
     {
         private Button _groupButton;
         private int _frameGroupsSequenceIndex;
-        private Func<int, string[]> _getAvailableGroups;
+        private Func<int, UpdatableGroup[]> _getAvailableGroups;
+        private Func<HashSet<UpdatableGroup>> _getGroups;
 
         private SerializedProperty _property;
 
-        public string CurrentGroup => _property.stringValue;
-
-        public void Initialize(Func<int, string[]> getAvailableGroups)
+        public void Initialize(Func<int, UpdatableGroup[]> getAvailableGroupsForSequence, Func<HashSet<UpdatableGroup>> getGroups)
         {
-            _getAvailableGroups = getAvailableGroups;
+            _getAvailableGroups = getAvailableGroupsForSequence;
+            _getGroups = getGroups;
 
             _groupButton = this.Q<Button>();
             _groupButton.clicked += OnButtonClicked;
@@ -32,7 +33,7 @@ namespace Paps.Update.Editor
             _property = property;
             _frameGroupsSequenceIndex = frameGroupSequenceIndex;
 
-            _groupButton.text = _property.stringValue;
+            _groupButton.text = GetCurrentGroupName();
         }
 
         public void CleanUp()
@@ -49,7 +50,9 @@ namespace Paps.Update.Editor
             if(availableGroups.Length == 0)
                 return;
 
-            var menuGroups = availableGroups.Append(CurrentGroup).OrderBy(g => g).ToArray();
+            var currentGroup = GetCurrentGroup();
+
+            var menuGroups = availableGroups.Append(currentGroup).OrderBy(group => group.Name).ToArray();
 
             var genericMenu = new GenericMenu();
 
@@ -57,13 +60,13 @@ namespace Paps.Update.Editor
             {
                 var group = menuGroups[i];
 
-                if(group == CurrentGroup)
+                if(group.Equals(currentGroup))
                 {
-                    genericMenu.AddItem(new GUIContent(group), true, () => { });
+                    genericMenu.AddItem(new GUIContent(group.Name), true, () => { });
                 }
                 else
                 {
-                    genericMenu.AddItem(new GUIContent(group), false, OnGroupSelected, group);
+                    genericMenu.AddItem(new GUIContent(group.Name), false, OnGroupSelected, UpdateSchemaUtils.GetIdOfGroup(group));
                 }
             }
 
@@ -72,12 +75,32 @@ namespace Paps.Update.Editor
 
         private void OnGroupSelected(object groupObj)
         {
-            var group = groupObj as string;
+            var group = (int)groupObj;
 
-            _property.stringValue = group;
+            _property.intValue = group;
             _property.serializedObject.ApplyModifiedProperties();
 
-            _groupButton.text = group;
+            _groupButton.text = GetCurrentGroupName();
+        }
+
+        private string GetCurrentGroupName()
+        {
+            if(UpdateSchemaUtils.TryGetGroupById(_property.intValue, _getGroups().ToList(), out var group))
+            {
+                return group.Name;
+            }
+
+            return "NO_GROUP_NAME";
+        }
+
+        private UpdatableGroup GetCurrentGroup()
+        {
+            if(UpdateSchemaUtils.TryGetGroupById(_property.intValue, _getGroups().ToList(), out var group))
+            {
+                return group;
+            }
+
+            throw new InvalidOperationException("Invalid group");
         }
     }
 }

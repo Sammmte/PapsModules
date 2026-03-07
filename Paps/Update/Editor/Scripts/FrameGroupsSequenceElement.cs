@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -10,17 +11,19 @@ namespace Paps.Update.Editor
     {
         private ListView _listView;
         private VisualTreeAsset _groupItemVTA;
-        private Func<int, string[]> _getAvailableGroups;
+        private Func<int, UpdatableGroup[]> _getAvailableGroups;
+        private Func<HashSet<UpdatableGroup>> _getGroups;
 
         private SerializedProperty _frameGroupSequenceProperty;
         private SerializedProperty _groupsSequenceProperty;
 
         private int _frameGroupsSequenceIndex;
 
-        public void Initialize(VisualTreeAsset groupItemVTA, Func<int, string[]> getAvailableGroups)
+        public void Initialize(VisualTreeAsset groupItemVTA, Func<int, UpdatableGroup[]> getAvailableGroups, Func<HashSet<UpdatableGroup>> getGroups)
         {
             _groupItemVTA = groupItemVTA;
             _getAvailableGroups = getAvailableGroups;
+            _getGroups = getGroups;
 
             _listView = this.Q<ListView>();
 
@@ -44,7 +47,7 @@ namespace Paps.Update.Editor
 
             parent.Remove(item);
 
-            item.Initialize(_getAvailableGroups);
+            item.Initialize(_getAvailableGroups, _getGroups);
 
             return item;
         }
@@ -94,7 +97,7 @@ namespace Paps.Update.Editor
             _groupsSequenceProperty.InsertArrayElementAtIndex(newIndex);
 
             var newProperty = _groupsSequenceProperty.GetArrayElementAtIndex(newIndex);
-            newProperty.stringValue = availableGroups[0];
+            newProperty.intValue = UpdateSchemaUtils.GetIdOfGroup(availableGroups[0]);
 
             newProperty.serializedObject.ApplyModifiedProperties();
         }

@@ -1,5 +1,4 @@
 using Paps.Logging;
-using SaintsField.Playa;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,61 +9,34 @@ namespace Paps.Update
     {
         [SerializeField] private int _updatableGroupCapacity;
         [SerializeField] private List<UpdatableGroup> _groups;
-        [SerializeField] private FrameGroupsSequence[] _frameSequence;
+        [SerializeField] private List<FrameGroupsSequence> _frameSequence;
 
-        [ShowInInspector] private Dictionary<int, UpdateList<T>> _updatableGroups;
-        
-        private int _groupCount;
-        private List<int>[] _cookedFrameSequence;
+        private Dictionary<int, UpdateList<T>> _updatableGroups;
 
         [NonSerialized] private int _currentFrameIndex;
 
         public void Initialize()
         {
-            CookFrameSequence();
+            _updatableGroups = new Dictionary<int, UpdateList<T>>(_groups.Count);
 
-            _groupCount = _groups.Count + 1;
-
-            _updatableGroups = new Dictionary<int, UpdateList<T>>(_groupCount);
-
-            for(int i = 0; i < _groupCount; i++)
-            {
-                _updatableGroups[i] = new UpdateList<T>(_updatableGroupCapacity);
-            }
-
-            _currentFrameIndex = 0;
-        }
-
-        private void CookFrameSequence()
-        {
-            _cookedFrameSequence = new List<int>[_frameSequence.Length];
-
-            for(int i = 0; i < _frameSequence.Length; i++)
-            {
-                var frameUpdateGroup = _frameSequence[i];
-                var newList = new List<int>(frameUpdateGroup.GroupsSequence.Length);
-
-                for(int j = 0; j < frameUpdateGroup.GroupsSequence.Length; j++)
-                {
-                    newList.Add(GetIdOfGroup(frameUpdateGroup.GroupsSequence[j]));
-                }
-
-                _cookedFrameSequence[i] = newList;
-            }
-        }
-
-        private int GetIdOfGroup(string groupName)
-        {
-            if(groupName == UpdatableGroup.DEFAULT_GROUP_NAME)
-                return UpdatableGroup.DEFAULT_GROUP_ID;
+            _updatableGroups[UpdatableGroup.DEFAULT_GROUP.GetId()] = new UpdateList<T>(_updatableGroupCapacity);
 
             for(int i = 0; i < _groups.Count; i++)
             {
-                if(_groups[i].Name == groupName)
-                    return i + 1;
+                _updatableGroups[UpdateSchemaUtils.GetIdOfGroup(_groups[i])] = new UpdateList<T>(_updatableGroupCapacity);
             }
 
-            return -1;
+            _currentFrameIndex = 0;
+
+            CreateDefaultSequenceIfEmpty();
+        }
+
+        private void CreateDefaultSequenceIfEmpty()
+        {
+            if(_frameSequence.Count == 0)
+            {
+                _frameSequence.Add(new FrameGroupsSequence() { GroupsSequence = new List<int>() { UpdatableGroup.DEFAULT_GROUP.GetId() } });
+            }
         }
 
         public void Dispose()
@@ -74,11 +46,9 @@ namespace Paps.Update
 
         public bool HasListeners()
         {
-            for(int i = 0; i < _groupCount; i++)
+            foreach(var keyValue in _updatableGroups)
             {
-                var updatables = _updatableGroups[i];
-
-                if(updatables.Count > 0)
+                if(keyValue.Value.Count > 0)
                     return true;
             }
 
@@ -87,7 +57,7 @@ namespace Paps.Update
 
         public void Register(T listener)
         {
-            Register(listener, UpdatableGroup.DEFAULT_GROUP_ID);
+            Register(listener, UpdatableGroup.DEFAULT_GROUP.GetId());
         }
 
         public void Register(T listener, int updatableGroupId)
@@ -103,7 +73,7 @@ namespace Paps.Update
 
         public void Unregister(T listener)
         {
-            Unregister(listener, UpdatableGroup.DEFAULT_GROUP_ID);
+            Unregister(listener, UpdatableGroup.DEFAULT_GROUP.GetId());
         }
 
         public void Unregister(T listener, int updatableGroupId)
@@ -119,20 +89,14 @@ namespace Paps.Update
 
         public void Update()
         {
-            if(_cookedFrameSequence.Length == 0)
-            {
-                this.LogWarning($"Update schema {name} has no frame sequence!");
-                return;
-            }
-
-            var frameUpdateGroupIds = _cookedFrameSequence[_currentFrameIndex];
+            var frameUpdateGroupIds = _frameSequence[_currentFrameIndex].GroupsSequence;
 
             if(frameUpdateGroupIds.Count > 0)
             {
                 ExecuteUpdatesFor(frameUpdateGroupIds, _updatableGroups);
             }
 
-            if(_currentFrameIndex == _cookedFrameSequence.Length - 1)
+            if(_currentFrameIndex == _frameSequence.Count - 1)
                 _currentFrameIndex = 0;
             else
                 _currentFrameIndex++;
