@@ -14,11 +14,11 @@ namespace Paps.Update.Editor
         private TextField _renameField;
         private Button _renameButton;
 
-        private Func<HashSet<UpdatableGroup>> _getGroups;
+        private Func<HashSet<string>> _getGroups;
 
         public SerializedProperty SerializedProperty { get; private set; }
 
-        public void Initialize(Func<HashSet<UpdatableGroup>> getGroups)
+        public void Initialize(Func<HashSet<string>> getGroups)
         {
             _getGroups = getGroups;
 
@@ -77,7 +77,7 @@ namespace Paps.Update.Editor
 
         private bool IsValidRename(string newName)
         {
-            return !(string.IsNullOrEmpty(newName) || _getGroups.Invoke().Any(g => g.Name == newName));
+            return !(string.IsNullOrEmpty(newName) || _getGroups.Invoke().Any(g => g == newName));
         }
 
         public void CleanUp()

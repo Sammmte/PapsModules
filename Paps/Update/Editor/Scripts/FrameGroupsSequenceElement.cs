@@ -11,15 +11,15 @@ namespace Paps.Update.Editor
     {
         private ListView _listView;
         private VisualTreeAsset _groupItemVTA;
-        private Func<int, UpdatableGroup[]> _getAvailableGroups;
-        private Func<HashSet<UpdatableGroup>> _getGroups;
+        private Func<int, string[]> _getAvailableGroups;
+        private Func<HashSet<string>> _getGroups;
 
         private SerializedProperty _frameGroupSequenceProperty;
         private SerializedProperty _groupsSequenceProperty;
 
         private int _frameGroupsSequenceIndex;
 
-        public void Initialize(VisualTreeAsset groupItemVTA, Func<int, UpdatableGroup[]> getAvailableGroups, Func<HashSet<UpdatableGroup>> getGroups)
+        public void Initialize(VisualTreeAsset groupItemVTA, Func<int, string[]> getAvailableGroups, Func<HashSet<string>> getGroups)
         {
             _groupItemVTA = groupItemVTA;
             _getAvailableGroups = getAvailableGroups;

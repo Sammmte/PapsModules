@@ -12,12 +12,12 @@ namespace Paps.Update.Editor
     {
         private Button _groupButton;
         private int _frameGroupsSequenceIndex;
-        private Func<int, UpdatableGroup[]> _getAvailableGroups;
-        private Func<HashSet<UpdatableGroup>> _getGroups;
+        private Func<int, string[]> _getAvailableGroups;
+        private Func<HashSet<string>> _getGroups;
 
         private SerializedProperty _property;
 
-        public void Initialize(Func<int, UpdatableGroup[]> getAvailableGroupsForSequence, Func<HashSet<UpdatableGroup>> getGroups)
+        public void Initialize(Func<int, string[]> getAvailableGroupsForSequence, Func<HashSet<string>> getGroups)
         {
             _getAvailableGroups = getAvailableGroupsForSequence;
             _getGroups = getGroups;
@@ -52,7 +52,7 @@ namespace Paps.Update.Editor
 
             var currentGroup = GetCurrentGroup();
 
-            var menuGroups = availableGroups.Append(currentGroup).OrderBy(group => group.Name).ToArray();
+            var menuGroups = availableGroups.Append(currentGroup).OrderBy(group => group).ToArray();
 
             var genericMenu = new GenericMenu();
 
@@ -62,11 +62,11 @@ namespace Paps.Update.Editor
 
                 if(group.Equals(currentGroup))
                 {
-                    genericMenu.AddItem(new GUIContent(group.Name), true, () => { });
+                    genericMenu.AddItem(new GUIContent(group), true, () => { });
                 }
                 else
                 {
-                    genericMenu.AddItem(new GUIContent(group.Name), false, OnGroupSelected, UpdateSchemaUtils.GetIdOfGroup(group));
+                    genericMenu.AddItem(new GUIContent(group), false, OnGroupSelected, UpdateSchemaUtils.GetIdOfGroup(group));
                 }
             }
 
@@ -87,13 +87,13 @@ namespace Paps.Update.Editor
         {
             if(UpdateSchemaUtils.TryGetGroupById(_property.intValue, _getGroups().ToList(), out var group))
             {
-                return group.Name;
+                return group;
             }
 
             return "NO_GROUP_NAME";
         }
 
-        private UpdatableGroup GetCurrentGroup()
+        private string GetCurrentGroup()
         {
             if(UpdateSchemaUtils.TryGetGroupById(_property.intValue, _getGroups().ToList(), out var group))
             {

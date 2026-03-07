@@ -1,4 +1,3 @@
-using Paps.Logging;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,7 +7,7 @@ namespace Paps.Update
     public abstract class UpdateSchema<T> : ScriptableObject, IDisposable where T : IUpdateMethodListener
     {
         [SerializeField] private int _updatableGroupCapacity;
-        [SerializeField] private List<UpdatableGroup> _groups;
+        [SerializeField] private List<string> _groups;
         [SerializeField] private List<FrameGroupsSequence> _frameSequence;
 
         private Dictionary<int, UpdateList<T>> _updatableGroups;
@@ -19,7 +18,7 @@ namespace Paps.Update
         {
             _updatableGroups = new Dictionary<int, UpdateList<T>>(_groups.Count);
 
-            _updatableGroups[UpdatableGroup.DEFAULT_GROUP.GetId()] = new UpdateList<T>(_updatableGroupCapacity);
+            _updatableGroups[UpdateSchemaUtils.DEFAULT_GROUP.GetId()] = new UpdateList<T>(_updatableGroupCapacity);
 
             for(int i = 0; i < _groups.Count; i++)
             {
@@ -35,7 +34,7 @@ namespace Paps.Update
         {
             if(_frameSequence.Count == 0)
             {
-                _frameSequence.Add(new FrameGroupsSequence() { GroupsSequence = new List<int>() { UpdatableGroup.DEFAULT_GROUP.GetId() } });
+                _frameSequence.Add(new FrameGroupsSequence() { GroupsSequence = new List<int>() { UpdateSchemaUtils.DEFAULT_GROUP.GetId() } });
             }
         }
 
@@ -57,7 +56,7 @@ namespace Paps.Update
 
         public void Register(T listener)
         {
-            Register(listener, UpdatableGroup.DEFAULT_GROUP.GetId());
+            Register(listener, UpdateSchemaUtils.DEFAULT_GROUP.GetId());
         }
 
         public void Register(T listener, int updatableGroupId)
@@ -73,7 +72,7 @@ namespace Paps.Update
 
         public void Unregister(T listener)
         {
-            Unregister(listener, UpdatableGroup.DEFAULT_GROUP.GetId());
+            Unregister(listener, UpdateSchemaUtils.DEFAULT_GROUP.GetId());
         }
 
         public void Unregister(T listener, int updatableGroupId)
