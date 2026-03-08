@@ -11,9 +11,9 @@ namespace Paps.UnityExtensions
             GameObject.DontDestroyOnLoad(obj);
         }
 
-        public static string GetUnityName<T>(this T component) where T : class
+        public static string GetUnityName<T>(this T unityObject) where T : class
         {
-            return component.AsUnityComponent().name;
+            return unityObject.AsUnityObject().name;
         }
 
         public static GameObject GetGameObject<T>(this T component) where T : class
@@ -29,6 +29,16 @@ namespace Paps.UnityExtensions
             }
 
             throw new InvalidOperationException($"Object of type {classOrInterfaceInstance.GetType().Name} is not a Unity component");
+        }
+
+        public static UnityEngine.Object AsUnityObject<T>(this T classOrInterafaceInstance) where T : class
+        {
+            if(classOrInterafaceInstance is UnityEngine.Object obj)
+            {
+                return obj;
+            }
+
+            throw new InvalidOperationException($"Object of type {classOrInterafaceInstance.GetType().Name} is not a Unity Object");
         }
     }
 }
