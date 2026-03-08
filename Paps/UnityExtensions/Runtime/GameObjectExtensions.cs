@@ -21,6 +21,18 @@ namespace Paps.UnityExtensions
             return component.AsUnityComponent().gameObject;
         }
 
+        public static TComponentResult GetComponent<TComponentExtended, TComponentResult>(this TComponentExtended extended) 
+            where TComponentExtended : class where TComponentResult : class
+        {
+            return extended.AsUnityComponent().GetComponent<TComponentResult>();
+        }
+
+        public static bool TryGetComponent<TComponentExtended, TComponentResult>(this TComponentExtended extended, out TComponentResult result)
+            where TComponentExtended : class where TComponentResult : class
+        {
+            return extended.AsUnityComponent().TryGetComponent(out result);
+        }
+
         public static Component AsUnityComponent<T>(this T classOrInterfaceInstance) where T : class
         {
             if(classOrInterfaceInstance is Component component)
