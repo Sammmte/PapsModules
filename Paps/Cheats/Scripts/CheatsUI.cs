@@ -99,6 +99,10 @@ namespace Paps.Cheats
                 {
                     HideSubmenu();
                 }
+                else
+                {
+                    _openedSubmenu.OnShow();
+                }
             }
 
             if (_notAvailableContainer.style.display == DisplayStyle.Flex)
