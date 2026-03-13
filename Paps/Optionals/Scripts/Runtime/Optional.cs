@@ -85,5 +85,10 @@ namespace Paps.Optionals
                 HasValue = false;
             }
         }
+
+        public override string ToString()
+        {
+            return Value?.ToString() ?? "null";
+        }
     }
 }
