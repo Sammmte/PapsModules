@@ -32,15 +32,13 @@ namespace Paps.Levels
 
         public static LevelManager Instance { get; private set; }
 
-        [SerializeField] private int _everPresentObjectsCapacity = 50;
         [SerializeField] private int _levelScenesCapacity = 10;
         [SerializeField] private int _rootGameObjectsCapacity = 1000;
         [SerializeField] private int _allBoundsCapacity = 10000;
         
         public Level CurrentLevel { get; private set; }
         public Stage CurrentStage { get; private set; }
-        private List<ILevelBound> _everPresentBounds;
-        private List<ILevelBound> _activeNonEverPresentBounds;
+        private List<ILevelBound> _activeBounds;
         private FastRemoveList<ILevelReadinessContributor> _readinessContributors;
         private List<Scene> _levelScenes;
         private List<GameObject> _rootGameObjectsList;
@@ -56,8 +54,7 @@ namespace Paps.Levels
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            _everPresentBounds = new List<ILevelBound>(_everPresentObjectsCapacity);
-            _activeNonEverPresentBounds = new List<ILevelBound>(_allBoundsCapacity);
+            _activeBounds = new List<ILevelBound>(_allBoundsCapacity);
             _readinessContributors = new FastRemoveList<ILevelReadinessContributor>(_allBoundsCapacity);
             _levelScenes = new List<Scene>(_levelScenesCapacity);
             _rootGameObjectsList = new List<GameObject>(_rootGameObjectsCapacity);
@@ -71,6 +68,8 @@ namespace Paps.Levels
 
         public async UniTask LoadInitialLevel(Level level, Optional<LoadLevelOptions> loadLevelOptions = default)
         {
+            this.Log($"Loading initial level <color=green>{level.Id}</color>");
+
             var loadedScenes = SceneLoader.GetLoadedScenes();
 
             await SceneLoader.LoadNewSceneAndWaitOneFrame("LevelSetup_EmptyScene");
@@ -84,6 +83,8 @@ namespace Paps.Levels
 
         public async UniTask LoadLevel(Level level, Func<UniTask> onUnload = null, Optional<LoadLevelOptions> loadLevelOptions = default)
         {
+            this.Log($"Unloading level <color=red>{CurrentLevel.Id}</color>");
+
             CurrentStage = Stage.Unloding;
 
             await Unload();
@@ -93,6 +94,8 @@ namespace Paps.Levels
 
             if(loadLevelOptions.HasValue)
                 await ApplyGCCollectOrAssetUnload(loadLevelOptions);
+
+            this.Log($"Loading level <color=green>{level.Id}</color>");
 
             await Load(level);
         }
@@ -110,11 +113,15 @@ namespace Paps.Levels
 
             await UniTask.NextFrame();
 
+            await LoadLevelSetups();
+
             LoadLevelBounds();
 
             await WaitForLevelToBeReady();
 
             CurrentStage = Stage.LevelLoaded;
+
+            await KickstartLevelSetups();
 
             KickstartLevelBounds();
         }
@@ -125,25 +132,14 @@ namespace Paps.Levels
 
             UnloadLevelBounds();
 
+            await UnloadLevelSetups();
+
             await SceneLoader.UnloadAsync(sceneGroup);
 
             _levelScenes.Clear();
 
             if (onUnload != null)
                 await onUnload();
-        }
-
-        public void RegisterEverPresent(ILevelBound levelSetuppable)
-        {
-            if(CurrentStage != Stage.NotInitialized)
-            {
-                throw new IllegalOperationOnLevelStageException($"Cannot register ever present after {Stage.NotInitialized} stage");
-            }
-
-            if(_everPresentBounds.Contains(levelSetuppable))
-                return;
-            
-            _everPresentBounds.Add(levelSetuppable);
         }
 
         public void RegisterReadinessContributor(ILevelReadinessContributor contributor)
@@ -157,11 +153,13 @@ namespace Paps.Levels
             _readinessContributors.Add(contributor);
         }
 
+        private async UniTask LoadLevelSetups()
+        {
+            await UniTask.WhenAll(CurrentLevel.LevelSetups.Select(s => s.Loaded()));
+        }
+
         private void LoadLevelBounds()
         {
-            _kickstartPendingList.AddRange(_everPresentBounds);
-            _loadedPendingList.AddRange(_everPresentBounds);
-
             GatherLevelBounds(CurrentLevel.InitialScenesGroup);
 
             for(int i = 0; i < _loadedPendingList.Count; i++)
@@ -186,7 +184,7 @@ namespace Paps.Levels
                 {
                     _rootGameObjectsList[j].GetComponentsInChildren(true, _tempGetComponentList);
 
-                    _activeNonEverPresentBounds.AddRange(_tempGetComponentList);
+                    _activeBounds.AddRange(_tempGetComponentList);
                     
                     _loadedPendingList.AddRange(_tempGetComponentList);
                     _loadedPendingList.RemoveAll(b => _loadedDoneList.Contains(b));
@@ -214,6 +212,11 @@ namespace Paps.Levels
             }
         }
 
+        private async UniTask KickstartLevelSetups()
+        {
+            await UniTask.WhenAll(CurrentLevel.LevelSetups.Select(s => s.Kickstart()));
+        }
+
         private void KickstartLevelBounds()
         {
             foreach(var bound in _kickstartPendingList)
@@ -225,10 +228,14 @@ namespace Paps.Levels
             _kickstartPendingList.Clear();
         }
 
+        private async UniTask UnloadLevelSetups()
+        {
+            await UniTask.WhenAll(CurrentLevel.LevelSetups.Select(s => s.Unload()));
+        }
+
         private void UnloadLevelBounds()
         {
-            _unloadPendingList.AddRange(_activeNonEverPresentBounds);
-            _unloadPendingList.AddRange(_everPresentBounds);
+            _unloadPendingList.AddRange(_activeBounds);
 
             for(int i = 0; i < _unloadPendingList.Count; i++)
             {
@@ -240,7 +247,7 @@ namespace Paps.Levels
             _loadedDoneList.Clear();
             _kickstartPendingList.Clear();
             _kickstartDoneList.Clear();
-            _activeNonEverPresentBounds.Clear();
+            _activeBounds.Clear();
         }
 
         private async UniTask ApplyGCCollectOrAssetUnload(LoadLevelOptions loadLevelOptions)
@@ -264,7 +271,7 @@ namespace Paps.Levels
             if(CurrentStage == Stage.Loading)
             {
                 var component = gameObject.AddComponent<T>();
-                _activeNonEverPresentBounds.Add(component);
+                _activeBounds.Add(component);
                 _kickstartPendingList.Add(component);
 
                 _loadedDoneList.Add(component);
@@ -275,7 +282,7 @@ namespace Paps.Levels
             else if(CurrentStage == Stage.LevelLoaded)
             {
                 var component = gameObject.AddComponent<T>();
-                _activeNonEverPresentBounds.Add(component);
+                _activeBounds.Add(component);
 
                 _loadedDoneList.Add(component);
                 component.Loaded();

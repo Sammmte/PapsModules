@@ -164,5 +164,40 @@ namespace Paps.Levels.Editor
 
             return false;
         }
+
+        public static Level GetBestLevelMatchForScenes(Scene[] scenes)
+        {
+            var levels = GetLevels();
+
+            for(int i = 0; i < levels.Length; i++)
+            {
+                if(ContainsAllScenes(levels[i].InitialScenesGroup, scenes))
+                    return levels[i];
+            }
+
+            return null;
+        }
+
+        private static bool ContainsAllScenes(Scene[] arrayContained, Scene[] arrayContainer)
+        {
+            for(int i = 0; i < arrayContained.Length; i++)
+            {
+                if(!Contains(arrayContained[i], arrayContainer))
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static bool Contains(Scene scene, Scene[] array)
+        {
+            for(int i = 0; i < array.Length; i++)
+            {
+                if(array[i].Equals(scene))
+                    return true;
+            }
+
+            return false;
+        }
     }
 }

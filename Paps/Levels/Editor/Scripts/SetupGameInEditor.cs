@@ -81,9 +81,22 @@ namespace Paps.Levels.Editor
 
             await setupper.Setup();
 
-            var level = Level.Create("EditorSetupLevel", editorSceneState.OpenedScenes.Select<SceneDTO, Scene>(s => s).ToArray());
+            var scenes = editorSceneState.OpenedScenes.Select<SceneDTO, Scene>(s => s).ToArray();
 
-            await LevelManager.Instance.LoadInitialLevel(level);
+            var bestMatchLevel = EditorLevelManager.GetBestLevelMatchForScenes(scenes);
+
+            Level finalLevel = null;
+
+            if(bestMatchLevel != null)
+            {
+                finalLevel = Level.Create($"EditorSetupLevel_{bestMatchLevel.Id}", scenes, bestMatchLevel.LevelSetups);
+            }
+            else
+            {
+                finalLevel = Level.Create("EditorSetupLevel", scenes);
+            }
+
+            await LevelManager.Instance.LoadInitialLevel(finalLevel);
         }
 
         private static async UniTaskVoid AwaitSetupAndOpenLevel(EditorLevelState editorLevelState)
