@@ -46,6 +46,8 @@ namespace Paps.Levels
         private List<ILevelBound> _tempGetComponentList;
         private List<ILevelBound> _loadedPendingList;
         private HashSet<ILevelBound> _loadedDoneList;
+        private List<ILevelBound> _setupPendingList;
+        private HashSet<ILevelBound> _setupDoneList;
         private List<ILevelBound> _kickstartPendingList;
         private HashSet<ILevelBound> _kickstartDoneList;
         private List<ILevelBound> _unloadPendingList;
@@ -63,6 +65,8 @@ namespace Paps.Levels
             _tempGetComponentList = new List<ILevelBound>(_allBoundsCapacity);
             _loadedPendingList = new List<ILevelBound>(_allBoundsCapacity);
             _loadedDoneList = new HashSet<ILevelBound>(_allBoundsCapacity);
+            _setupPendingList = new List<ILevelBound>(_allBoundsCapacity);
+            _setupDoneList = new HashSet<ILevelBound>(_allBoundsCapacity);
             _kickstartPendingList = new List<ILevelBound>(_allBoundsCapacity);
             _kickstartDoneList = new HashSet<ILevelBound>(_allBoundsCapacity);
             _unloadPendingList = new List<ILevelBound>(_allBoundsCapacity);
@@ -120,6 +124,10 @@ namespace Paps.Levels
             await LoadLevelSetups(extraLevelSetups);
 
             LoadLevelBounds();
+
+            await SetupLevelSetups();
+
+            SetupLevelBounds();
 
             await WaitForLevelToBeReady();
 
@@ -200,6 +208,7 @@ namespace Paps.Levels
                     _loadedPendingList.AddRange(_tempGetComponentList);
                     _loadedPendingList.RemoveAll(b => _loadedDoneList.Contains(b));
 
+                    _setupPendingList.AddRange(_tempGetComponentList);
                     _kickstartPendingList.AddRange(_tempGetComponentList);
                     
                     _tempGetComponentList.Clear();
@@ -223,9 +232,25 @@ namespace Paps.Levels
             }
         }
 
+        private async UniTask SetupLevelSetups()
+        {
+            await UniTask.WhenAll(_currentLevelSetups.Select(s => s.Setup()));
+        }
+
+        private void SetupLevelBounds()
+        {
+            foreach(var bound in _setupPendingList)
+            {
+                _setupDoneList.Add(bound);
+                bound.Setup();
+            }
+
+            _setupPendingList.Clear();
+        }
+
         private async UniTask KickstartLevelSetups()
         {
-            await UniTask.WhenAll(CurrentLevel.LevelSetups.Select(s => s.Kickstart()));
+            await UniTask.WhenAll(_currentLevelSetups.Select(s => s.Kickstart()));
         }
 
         private void KickstartLevelBounds()
@@ -258,6 +283,8 @@ namespace Paps.Levels
             _unloadPendingList.Clear();
             _loadedPendingList.Clear();
             _loadedDoneList.Clear();
+            _setupPendingList.Clear();
+            _setupDoneList.Clear();
             _kickstartPendingList.Clear();
             _kickstartDoneList.Clear();
             _activeBounds.Clear();
@@ -285,6 +312,7 @@ namespace Paps.Levels
             {
                 var component = gameObject.AddComponent<T>();
                 _activeBounds.Add(component);
+                _setupPendingList.Add(component);
                 _kickstartPendingList.Add(component);
 
                 _loadedDoneList.Add(component);
@@ -299,6 +327,9 @@ namespace Paps.Levels
 
                 _loadedDoneList.Add(component);
                 component.Loaded();
+
+                _setupDoneList.Add(component);
+                component.Setup();
 
                 _kickstartDoneList.Add(component);
                 component.Kickstart();

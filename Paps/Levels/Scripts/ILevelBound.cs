@@ -4,19 +4,9 @@ namespace Paps.Levels
 {
     public interface ILevelBound
     {
-        public void Loaded()
-        {
-            
-        }
-
-        public void Kickstart()
-        {
-
-        }
-
-        public void Unload()
-        {
-            
-        }
+        public void Loaded() {}
+        public void Setup() { }
+        public void Kickstart() { }
+        public void Unload() { }
     }
 }
