@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Paps.Levels
 {
-    public abstract class LevelSetup : ScriptableObject
+    public abstract class LevelSetupAsset : ScriptableObject, ILevelSetup
     {
         public virtual UniTask Loaded() => UniTask.CompletedTask;
         public virtual UniTask Kickstart() => UniTask.CompletedTask;

@@ -38,6 +38,7 @@ namespace Paps.Levels
         
         public Level CurrentLevel { get; private set; }
         public Stage CurrentStage { get; private set; }
+        
         private List<ILevelBound> _activeBounds;
         private FastRemoveList<ILevelReadinessContributor> _readinessContributors;
         private List<Scene> _levelScenes;
@@ -48,6 +49,7 @@ namespace Paps.Levels
         private List<ILevelBound> _kickstartPendingList;
         private HashSet<ILevelBound> _kickstartDoneList;
         private List<ILevelBound> _unloadPendingList;
+        private List<ILevelSetup> _currentLevelSetups;
 
         private void Awake()
         {
@@ -64,6 +66,7 @@ namespace Paps.Levels
             _kickstartPendingList = new List<ILevelBound>(_allBoundsCapacity);
             _kickstartDoneList = new HashSet<ILevelBound>(_allBoundsCapacity);
             _unloadPendingList = new List<ILevelBound>(_allBoundsCapacity);
+            _currentLevelSetups = new List<ILevelSetup>();
         }
 
         public async UniTask LoadInitialLevel(Level level, Optional<LoadLevelOptions> loadLevelOptions = default)
@@ -78,10 +81,11 @@ namespace Paps.Levels
             if(loadLevelOptions.HasValue)
                 await ApplyGCCollectOrAssetUnload(loadLevelOptions.Value);
                 
-            await Load(level);
+            await Load(level, null);
         }
 
-        public async UniTask LoadLevel(Level level, Func<UniTask> onUnload = null, Optional<LoadLevelOptions> loadLevelOptions = default)
+        public async UniTask LoadLevel(Level level, Func<UniTask> onUnload = null, Optional<LoadLevelOptions> loadLevelOptions = default,
+            IEnumerable<ILevelSetup> extraLevelSetups = null)
         {
             this.Log($"Unloading level <color=red>{CurrentLevel.Id}</color>");
 
@@ -97,10 +101,10 @@ namespace Paps.Levels
 
             this.Log($"Loading level <color=green>{level.Id}</color>");
 
-            await Load(level);
+            await Load(level, extraLevelSetups);
         }
 
-        private async UniTask Load(Level level)
+        private async UniTask Load(Level level, IEnumerable<ILevelSetup> extraLevelSetups)
         {
             CurrentStage = Stage.Loading;
 
@@ -113,7 +117,7 @@ namespace Paps.Levels
 
             await UniTask.NextFrame();
 
-            await LoadLevelSetups();
+            await LoadLevelSetups(extraLevelSetups);
 
             LoadLevelBounds();
 
@@ -153,9 +157,16 @@ namespace Paps.Levels
             _readinessContributors.Add(contributor);
         }
 
-        private async UniTask LoadLevelSetups()
+        private async UniTask LoadLevelSetups(IEnumerable<ILevelSetup> extraLevelSetups)
         {
-            await UniTask.WhenAll(CurrentLevel.LevelSetups.Select(s => s.Loaded()));
+            if(extraLevelSetups != null)
+            {
+                _currentLevelSetups.AddRange(extraLevelSetups);
+            }
+
+            _currentLevelSetups.AddRange(CurrentLevel.LevelSetups);
+
+            await UniTask.WhenAll(_currentLevelSetups.Select(s => s.Loaded()));
         }
 
         private void LoadLevelBounds()
@@ -230,7 +241,9 @@ namespace Paps.Levels
 
         private async UniTask UnloadLevelSetups()
         {
-            await UniTask.WhenAll(CurrentLevel.LevelSetups.Select(s => s.Unload()));
+            await UniTask.WhenAll(_currentLevelSetups.Select(s => s.Unload()));
+
+            _currentLevelSetups.Clear();
         }
 
         private void UnloadLevelBounds()

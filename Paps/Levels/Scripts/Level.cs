@@ -9,7 +9,7 @@ namespace Paps.Levels
     [CreateAssetMenu(menuName = "Paps/Levels/Level", fileName = "Level Asset")]
     public class Level : ScriptableObject
     {
-        public static Level Create(string id, Scene[] initialScenes, params LevelSetup[] levelSetups)
+        public static Level Create(string id, Scene[] initialScenes, params LevelSetupAsset[] levelSetups)
         {
             var newLevel = CreateInstance<Level>();
 
@@ -22,12 +22,12 @@ namespace Paps.Levels
 
         [SerializeField] private string _id;
         [SerializeField] private Scene[] _initialScenesGroup;
-        [SerializeField] private LevelSetup[] _levelSetups;
+        [SerializeField] private LevelSetupAsset[] _levelSetups;
 
         public string Id => _id;
         public Scene[] InitialScenesGroup => _initialScenesGroup;
         [ShowInInspector] public Scene ActiveScene => InitialScenesGroup[0];
-        public LevelSetup[] LevelSetups => _levelSetups;
+        public LevelSetupAsset[] LevelSetups => _levelSetups;
 
 
 #if UNITY_EDITOR
