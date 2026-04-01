@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c44418a311f883044977c9af8bde74b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Paps.LevelSetup::Paps.LevelSetup.LevelSetupper
-  _everPresentObjectsCapacity: 50
   _levelScenesCapacity: 10
   _rootGameObjectsCapacity: 1000
-  _sceneBoundObjectsCapacity: 1000
+  _allBoundsCapacity: 10000
+  LevelList: {fileID: 11400000, guid: a81cdbc191167e0499b5ca2283961875, type: 2}

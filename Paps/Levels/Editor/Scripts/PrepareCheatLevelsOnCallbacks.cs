@@ -1,9 +1,8 @@
 using Paps.Build;
-using Paps.Levels.Editor;
 using System.Linq;
 using UnityEditor;
 
-namespace Paps.Levels.Cheats.Editor
+namespace Paps.Levels.Editor
 {
     public class PrepareCheatLevelsOnCallbacks : IBuildPreprocessor
     {   
@@ -21,15 +20,15 @@ namespace Paps.Levels.Cheats.Editor
 
         private static void UpdateLevelsCheatListAsset()
         {
-            var guid = AssetDatabase.FindAssets($"t:{nameof(LevelsCheatListAsset)}").FirstOrDefault();
+            var guid = AssetDatabase.FindAssets($"t:{nameof(LevelList)}").FirstOrDefault();
             if (guid == null)
                 return;
 
-            var listAsset = AssetDatabase.LoadAssetAtPath<LevelsCheatListAsset>(AssetDatabase.GUIDToAssetPath(guid));
+            var listAsset = AssetDatabase.LoadAssetAtPath<LevelList>(AssetDatabase.GUIDToAssetPath(guid));
 
             var levelAssets = EditorLevelManager.GetLevels();
 
-            listAsset.Levels = levelAssets.ToArray();
+            listAsset.Levels = levelAssets.ToList();
             
             EditorUtility.SetDirty(listAsset);
             AssetDatabase.SaveAssets();

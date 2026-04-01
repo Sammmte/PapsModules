@@ -6,9 +6,12 @@ using Paps.UnityExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Scene = Paps.SceneLoading.Scene;
+
+[assembly: InternalsVisibleTo("Paps.Levels.Editor")]
 
 namespace Paps.Levels
 {
@@ -35,6 +38,7 @@ namespace Paps.Levels
         [SerializeField] private int _levelScenesCapacity = 10;
         [SerializeField] private int _rootGameObjectsCapacity = 1000;
         [SerializeField] private int _allBoundsCapacity = 10000;
+        [field: SerializeField] public LevelList LevelList;
         
         public Level CurrentLevel { get; private set; }
         public Stage CurrentStage { get; private set; }

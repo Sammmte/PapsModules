@@ -11,25 +11,33 @@ namespace Paps.Levels.Cheats
         
         public async UniTask Load()
         {
-            var cheatLevels = await this.LoadAssetAsync<LevelsCheatListAsset>("LevelsCheatList");
-
             _container = new VisualElement();
-
-            if (cheatLevels == null || cheatLevels.Levels.Length == 0)
-            {
-                _container.Add(new Label("No levels found!"));
-                return;
-            }
-
-            for (int i = 0; i < cheatLevels.Levels.Length; i++)
-            {
-                _container.Add(CreateButtonForLevel(cheatLevels.Levels[i]));
-            }
         }
 
         public VisualElement GetVisualElement()
         {
             return _container;
+        }
+
+        public void OnShow()
+        {
+            PrepareLevelButtons();
+        }
+
+        private void PrepareLevelButtons()
+        {
+            _container.Clear();
+
+            if (LevelManager.Instance.LevelList.Count == 0)
+            {
+                _container.Add(new Label("No levels found!"));
+                return;
+            }
+
+            for (int i = 0; i < LevelManager.Instance.LevelList.Count; i++)
+            {
+                _container.Add(CreateButtonForLevel(LevelManager.Instance.LevelList[i]));
+            }
         }
 
         private Button CreateButtonForLevel(Level level)
