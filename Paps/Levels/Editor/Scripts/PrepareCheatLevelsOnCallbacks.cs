@@ -5,7 +5,7 @@ using UnityEditor;
 namespace Paps.Levels.Editor
 {
     public class PrepareCheatLevelsOnCallbacks : IBuildPreprocessor
-    {   
+    {
         [InitializeOnLoadMethod]
         public static void ListenCallbacks()
         {
@@ -28,9 +28,8 @@ namespace Paps.Levels.Editor
 
             var levelAssets = EditorLevelManager.GetLevels();
 
-            listAsset.Levels = levelAssets.ToList();
+            listAsset.SetLevels(levelAssets.ToList());
             
-            EditorUtility.SetDirty(listAsset);
             AssetDatabase.SaveAssets();
         }
 

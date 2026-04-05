@@ -199,5 +199,18 @@ namespace Paps.Levels.Editor
 
             return false;
         }
+
+        public static LevelList GetLevelsList()
+        {
+            var guid = AssetDatabase.FindAssets($"t:{nameof(LevelList)}").FirstOrDefault();
+            if (guid == null)
+            {
+                return null;
+            }
+
+            var listAsset = AssetDatabase.LoadAssetAtPath<LevelList>(AssetDatabase.GUIDToAssetPath(guid));
+
+            return listAsset;
+        }
     }
 }

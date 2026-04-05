@@ -6,17 +6,17 @@ namespace Paps.Levels
 {
     public class LevelList : ScriptableObject, IReadOnlyList<Level>
     {
-        [SerializeField] internal List<Level> Levels;
+        [SerializeField] private List<Level> _levels;
 
         private Dictionary<string, Level> _levelsDictionary;
 
-        public Level this[int index] => Levels[index];
+        public Level this[int index] => _levels[index];
 
-        public int Count => Levels.Count;
+        public int Count => _levels.Count;
 
         public IEnumerator<Level> GetEnumerator()
         {
-            return Levels.GetEnumerator();
+            return _levels.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -26,23 +26,46 @@ namespace Paps.Levels
 
         private void PrepareLevelsDictionary()
         {
-            _levelsDictionary = new Dictionary<string, Level>(Levels.Count);
+            _levelsDictionary = new Dictionary<string, Level>(_levels.Count);
 
-            for(int i = 0; i < Levels.Count; i++)
+            for(int i = 0; i < _levels.Count; i++)
             {
-                var current = Levels[i];
+                var current = _levels[i];
                 _levelsDictionary[current.Id] = current;
             }
         }
 
-        public Level GetById(string id)
+        private void EnsureDictionaryInitialized()
         {
             if(_levelsDictionary == null)
             {
                 PrepareLevelsDictionary();
             }
+        }
+
+        public Level GetById(string id)
+        {
+            EnsureDictionaryInitialized();
 
             return _levelsDictionary[id];
         }
+
+        public bool Contains(string levelId)
+        {
+            EnsureDictionaryInitialized();
+
+            return _levelsDictionary.ContainsKey(levelId);
+        }
+
+#if UNITY_EDITOR
+        public void SetLevels(List<Level> levels)
+        {
+            _levels.Clear();
+
+            _levels = levels;
+            
+            UnityEditor.EditorUtility.SetDirty(this);
+        }
+#endif
     }
 }

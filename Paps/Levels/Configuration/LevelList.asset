@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6ceedab1334d8a43be937e936b2e41d, type: 3}
   m_Name: LevelList
   m_EditorClassIdentifier: Paps.Levels::Paps.Levels.LevelList
-  Levels: []
+  _levels: []

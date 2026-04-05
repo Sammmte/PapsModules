@@ -43,6 +43,7 @@ namespace Paps.Build
 
             foreach (var preprocessor in buildPreprocessors)
             {
+                Debug.Log($"Executing build preprocessor of type: {preprocessor.GetType().Name}");
                 preprocessor.Process(buildSettings);
             }
 

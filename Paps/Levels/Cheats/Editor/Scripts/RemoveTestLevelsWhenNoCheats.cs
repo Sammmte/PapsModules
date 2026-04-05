@@ -2,6 +2,7 @@ using Paps.Build;
 using Paps.Levels.Editor;
 using System.Linq;
 using Unity.Serialization.Json;
+using UnityEditor;
 using UnityEngine;
 
 namespace Paps.Levels.Cheats.Editor
@@ -9,6 +10,8 @@ namespace Paps.Levels.Cheats.Editor
     public class RemoveTestLevelsWhenNoCheats : IBuildPreprocessor
     {
         private const string CHEATS_DEFINE = "CHEATS";
+
+        public int Order => 10;
 
         public void Process(BuildSettings currentBuildSettings)
         {
@@ -18,8 +21,13 @@ namespace Paps.Levels.Cheats.Editor
 
         private void RemoveTestLevels(BuildSettings buildSettings)
         {
-            var testLevelScenes = EditorLevelManager.GetLevels()
+            var allLevels = EditorLevelManager.GetLevels();
+
+            var testLevels = allLevels
                 .Where(l => l.IsTestLevel)
+                .ToArray();
+
+            var testLevelScenes = testLevels
                 .SelectMany(l => l.GetRelatedScenes())
                 .Select(s => s.GetSceneAssetPath());
 
@@ -33,7 +41,16 @@ namespace Paps.Levels.Cheats.Editor
             foreach(var scenePath in scenesToRemove)
                 buildSettings.RemoveScenePath(scenePath);
 
+            var levelList = EditorLevelManager.GetLevelsList();
+
+            var finalLevels = allLevels.Except(testLevels).ToList();
+
+            levelList.SetLevels(finalLevels);
+
+            AssetDatabase.SaveAssets();
+
             Debug.Log($"Removed test level scenes {JsonSerialization.ToJson(scenesToRemove)}");
+            Debug.Log($"Final build levels {JsonSerialization.ToJson(finalLevels.Select(l => l.Id).ToArray())}");
         }
     }
 }
