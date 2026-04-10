@@ -10,7 +10,7 @@ namespace Paps.GameSettings
     {
         public static GameSettingsManager Instance { get; private set; }
 
-        [SerializeField] private SaintsInterface<IGameSettingsStorage> _storage;
+        [SerializeField] private GameSettingsStorageProvider _storageProvider;
         [SerializeField] private SaintsInterface<IDynamicGameSettingCreator>[] _dynamicGameSettingCreators;
         [SerializeField] private SaintsDictionary<string, GameSetting> _gameSettings;
 
@@ -24,7 +24,7 @@ namespace Paps.GameSettings
         {
             PrepareDynamicSettings();
 
-            var saveInfoDictionary = await _storage.I.Load();
+            var saveInfoDictionary = await _storageProvider.Storage.Load();
 
             foreach(var key in _gameSettings.Keys)
             {
@@ -63,7 +63,7 @@ namespace Paps.GameSettings
 
             CommitAll();
 
-            await _storage.I.Save(CreateSaveDictionary());
+            await _storageProvider.Storage.Save(CreateSaveDictionary());
         }
 
         private Dictionary<string, GameSettingSaveInfo> CreateSaveDictionary()
