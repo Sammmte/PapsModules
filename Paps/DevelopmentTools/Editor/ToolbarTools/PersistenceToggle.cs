@@ -30,7 +30,7 @@ namespace Paps.DevelopmentTools.Editor
 
         private void SetPersistence()
         {
-            StorageHandler.PersistenceEnabled = _enabled;
+            Persistence.Persistence.PersistenceEnabled = _enabled;
         }
     }
 }

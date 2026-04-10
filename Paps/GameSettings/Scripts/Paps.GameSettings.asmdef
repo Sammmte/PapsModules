@@ -1,11 +1,15 @@
 {
-    "name": "Paps.Persistence",
-    "rootNamespace": "Paps.Persistence",
+    "name": "Paps.GameSettings",
+    "rootNamespace": "Paps.GameSettings",
     "references": [
-        "GUID:2765e68924a08a94ea0ea66b31c0168f",
         "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:a00d710b062668a46b8ebf64b9e61d6e",
         "GUID:276fb2fc1687fe74c9c6ce7174a1073f",
-        "GUID:9b261077c7a2ac34886513ec1345f8e0"
+        "GUID:4bb1096f5faa2b8489d34ce6d8c1e4d8",
+        "GUID:9b261077c7a2ac34886513ec1345f8e0",
+        "GUID:ecddbdb12aa1cc74d806fdd86a4c965a",
+        "GUID:235ce026b69921b4b99d52aaece5e139",
+        "GUID:677f4d7febad68e4194ce8008eff07f8"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

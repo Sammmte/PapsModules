@@ -18,9 +18,9 @@ namespace Paps.Persistence.Cheats
             _container = new VisualElement();
 
             _persistenceEnabledToggle = new Toggle("Enabled");
-            _persistenceEnabledToggle.value = StorageHandler.PersistenceEnabled;
+            _persistenceEnabledToggle.value = Persistence.PersistenceEnabled;
 
-            _persistenceEnabledToggle.RegisterValueChangedCallback(ev => StorageHandler.PersistenceEnabled = ev.newValue);
+            _persistenceEnabledToggle.RegisterValueChangedCallback(ev => Persistence.PersistenceEnabled = ev.newValue);
 
             _container.Add(_persistenceEnabledToggle);
         }
