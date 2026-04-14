@@ -1,5 +1,6 @@
 ﻿using Paps.Optionals;
 using Paps.Update;
+using SaintsField;
 using System;
 using UnityEngine;
 
@@ -8,11 +9,13 @@ namespace Paps.Audio
     [RequireComponent(typeof(AudioSource))]
     public class AudioEmitter : MonoBehaviour, IUpdatable
     {
-        [SerializeField, HideInInspector] private AudioSource _audioSource;
+        [SerializeField, GetComponent(typeof(AudioSource))] private AudioSource _audioSource;
         
-        internal event Action<AudioEmitter> OnStopped;
+        public event Action<AudioEmitter> OnStopped;
 
-        internal void Play(AudioParameters audioParameters)
+        public bool IsPlaying => _audioSource.isPlaying;
+
+        public void Play(AudioParameters audioParameters)
         {
             _audioSource.clip = audioParameters.AudioClip.ValueOrDefault(_audioSource.clip);
             _audioSource.outputAudioMixerGroup = audioParameters.AudioMixerGroup.ValueOrDefault(_audioSource.outputAudioMixerGroup);
@@ -25,24 +28,25 @@ namespace Paps.Audio
             Play();
         }
 
-        internal void Play()
+        public void Play()
         {
+            if(_audioSource.isPlaying)
+                return;
+
             _audioSource.Play();
             
             this.RegisterUpdate();
         }
 
-        internal void Stop()
+        public void Stop()
         {
+            if(!_audioSource.isPlaying)
+                return;
+
             this.UnregisterUpdate();
             
             _audioSource.Stop();
             OnStopped?.Invoke(this);
-        }
-        
-        private void OnValidate()
-        {
-            _audioSource = GetComponent<AudioSource>();
         }
 
         void IUpdatable.ManagedUpdate()
@@ -53,9 +57,7 @@ namespace Paps.Audio
 
         private void OnDestroy()
         {
-            this.UnregisterUpdate();
-            
-            _audioSource.Stop();
+            Stop();
         }
     }
 }

@@ -8,38 +8,14 @@ namespace Paps.Audio
     [Serializable]
     public struct AudioParameters
     {
-        [SerializeField] private Optional<AudioClip> _audioClip;
-        [SerializeField] private Optional<AudioMixerGroup> _audioMixerGroup;
-        [SerializeField] private Optional<float> _volume;
-        [SerializeField] private Optional<float> _spatialBlend;
+        [field: SerializeField] public Optional<AudioClip> AudioClip { get; private set; }
+        [field: SerializeField] public Optional<AudioMixerGroup> AudioMixerGroup  { get; private set; }
+        [field: SerializeField] public Optional<float> Volume { get; private set; }
+        [field: SerializeField] public Optional<float> SpatialBlend { get; private set; }
         [SerializeField] private Optional<Transform> _positionTransform;
         [SerializeField] private Optional<Vector3> _position;
-        [SerializeField] private Optional<bool> _loop;
-        [SerializeField] private Optional<float> _pitch;
-
-        public Optional<AudioClip> AudioClip
-        {
-            get => _audioClip;
-            set => _audioClip = value;
-        }
-
-        public Optional<AudioMixerGroup> AudioMixerGroup
-        {
-            get => _audioMixerGroup;
-            set => _audioMixerGroup = value;
-        }
-
-        public Optional<float> Volume
-        {
-            get => _volume;
-            set => _volume = value;
-        }
-
-        public Optional<float> SpatialBlend
-        {
-            get => _spatialBlend;
-            set => _spatialBlend = value;
-        }
+        [field: SerializeField] public Optional<bool> Loop { get; private set; }
+        [field: SerializeField] public Optional<float> Pitch { get; private set; }
 
         public Optional<Vector3> Position
         {
@@ -57,18 +33,6 @@ namespace Paps.Audio
 
                 _position = value;
             }
-        }
-
-        public Optional<bool> Loop
-        {
-            get => _loop;
-            set => _loop = value;
-        }
-
-        public Optional<float> Pitch
-        {
-            get => _pitch;
-            set => _pitch = value;
         }
     }
 }

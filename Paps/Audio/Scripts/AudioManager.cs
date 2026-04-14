@@ -5,22 +5,48 @@ using UnityEngine.Pool;
 
 namespace Paps.Audio
 {
-    public class AudioService
+    public class AudioManager : MonoBehaviour
     {
-        public AudioMixer AudioMixer { get; }
+        public static AudioManager Instance { get; private set; }
+
+        [field: SerializeField] public AudioMixer AudioMixer { get; private set; }
+        [field: SerializeField] private AudioEmitter _audioEmitterPrefab;
+        [SerializeField] private int _poolCapacity;
+        [SerializeField] private bool _prewarmPool;
         
         private Transform _audioEmittersParent;
-        private AudioEmitter _audioEmitterPrefab;
         private ObjectPool<AudioEmitter> _audioEmitterPool;
-        private List<AudioEmitter> _activePooledAudioEmitters = new List<AudioEmitter>();
+        private List<AudioEmitter> _activePooledAudioEmitters;
 
-        public AudioService(AudioMixer audioMixer, AudioEmitter audioEmitterPrefab)
+        private void Awake()
         {
-            AudioMixer = audioMixer;
-            _audioEmitterPrefab = audioEmitterPrefab;
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+
             _audioEmittersParent = new GameObject("AudioEmittersParent").transform;
             GameObject.DontDestroyOnLoad(_audioEmittersParent.gameObject);
-            _audioEmitterPool = new ObjectPool<AudioEmitter>(CreateAudioEmitter, OnGetAudioEmitter, OnReleaseAudioEmitter);
+            _audioEmitterPool = new ObjectPool<AudioEmitter>(CreateAudioEmitter, OnGetAudioEmitter, OnReleaseAudioEmitter,
+                defaultCapacity: _poolCapacity, collectionCheck: true);
+
+            _activePooledAudioEmitters = new List<AudioEmitter>(_poolCapacity);
+
+            if(_prewarmPool)
+                PrewarmPool();
+        }
+
+        private void PrewarmPool()
+        {
+            for(int i = 0; i < _poolCapacity; i++)
+            {
+                _activePooledAudioEmitters.Add(_audioEmitterPool.Get());
+            }
+
+            for(int i = 0; i < _poolCapacity; i++)
+            {
+                _audioEmitterPool.Release(_activePooledAudioEmitters[i]);
+            }
+
+            _activePooledAudioEmitters.Clear();
         }
 
         private AudioEmitter CreateAudioEmitter()
@@ -50,15 +76,6 @@ namespace Paps.Audio
             var audioEmitter = _audioEmitterPool.Get();
             audioEmitter.Play(audioParameters);
             return audioEmitter;
-        }
-        
-        public void Play(AudioEmitter audioEmitter, AudioParameters audioParameters) => audioEmitter.Play(audioParameters);
-
-        public void Play(AudioEmitter audioEmitter) => audioEmitter.Play();
-
-        public void Stop(AudioEmitter audioEmitter)
-        {
-            audioEmitter.Stop();
         }
     }
 }
