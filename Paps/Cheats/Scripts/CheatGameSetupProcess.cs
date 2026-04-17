@@ -1,19 +1,12 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
+using Paps.GameSetup;
 using UnityEngine;
 
 namespace Paps.Cheats
 {
-    public static class CheatsInitializer
+    public class CheatGameSetupProcess : GameSetupProcess
     {
-#if UNITY_EDITOR || CHEATS
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
-        public static void Initialize()
-        {
-            Load().Forget();
-        }
-#endif
-
-        private static async UniTaskVoid Load()
+        public override async UniTask Setup()
         {
             var cheatsPrefab = await CheatsHelper.LoadAssetAsync<GameObject>("CheatsPrefab");
 
