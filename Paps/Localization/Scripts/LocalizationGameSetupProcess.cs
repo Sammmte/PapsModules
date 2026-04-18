@@ -1,8 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Paps.GameSetup;
-using Paps.GlobalProvisioning;
 using UnityEngine;
-using UnityEngine.Localization.Settings;
 
 namespace Paps.Localization
 {
@@ -11,11 +9,7 @@ namespace Paps.Localization
     {
         public override async UniTask Setup()
         {
-            await LocalizationSettings.InitializationOperation.ToUniTask();
-            await UniTask.NextFrame(); // this prevents errors from calling localized strings the same frame initialization finishes
-
-            var localizationService = new LocalizationService();
-            Locator.Create(localizationService);
+            await LocalizationManager.Instance.Initialize();
         }
     }
 }
