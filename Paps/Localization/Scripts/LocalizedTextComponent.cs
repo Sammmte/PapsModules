@@ -1,44 +1,53 @@
-﻿using TMPro;
+﻿using SaintsField;
+using System;
+using TMPro;
 using UnityEngine;
 
 namespace Paps.Localization
 {
     public class LocalizedTextComponent : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI _textUIComponent;
+        [SerializeField, GetComponent] private TextMeshProUGUI _textUIComponent;
         [SerializeField] private LocalizedText _localizedText;
+
+        private Action<Language> _onLanguageChangedAction;
         
         private void Awake()
         {
-            SetLocalizedText(_localizedText);
+            _onLanguageChangedAction = OnLanguageChanged;
+        }
+
+        private void OnEnable()
+        {
+            LocalizationManager.Instance.OnLanguageChanged += _onLanguageChangedAction;
+            UpdateText();
+        }
+
+        private void OnDisable()
+        {
+            LocalizationManager.Instance.OnLanguageChanged -= _onLanguageChangedAction;
+        }
+
+        private void OnDestroy()
+        {
+            LocalizationManager.Instance.OnLanguageChanged -= _onLanguageChangedAction;
         }
 
         public void SetLocalizedText(LocalizedText localizedText)
         {
-            if (_localizedText != null)
-            {
-                _localizedText.OnTextChanged -= UpdateText;
-            }
-            
             _localizedText = localizedText;
-            _localizedText.OnTextChanged += UpdateText;
             
-            UpdateText(_localizedText.Text);
+            UpdateText();
         }
 
-        private void UpdateText(string text)
+        private void UpdateText()
         {
-            _textUIComponent.text = text;
+            _textUIComponent.text = _localizedText.Text;
         }
 
-        private void OnValidate()
+        private void OnLanguageChanged(Language language)
         {
-            var textMeshProUGUI = GetComponent<TextMeshProUGUI>();
-
-            if (textMeshProUGUI)
-                _textUIComponent = textMeshProUGUI;
-            else
-                _textUIComponent = null;
+            UpdateText();
         }
     }
 }
