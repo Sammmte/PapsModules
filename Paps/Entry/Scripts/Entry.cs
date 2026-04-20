@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
+using Paps.GameSetup;
 using Paps.Levels;
 using Paps.SceneLoading;
-using Paps.StartupSetup;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -26,9 +26,7 @@ namespace Paps.Entry
 
         private UniTask WaitForSetupProcess()
         {
-            var setupper = FindFirstObjectByType<StartupSetupper>();
-
-            return setupper.Setup();
+            return GameSetupManager.Instance.Setup();
         }
     }
 }

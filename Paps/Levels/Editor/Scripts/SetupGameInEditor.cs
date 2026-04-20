@@ -1,7 +1,5 @@
 using Cysharp.Threading.Tasks;
-using Paps.Levels;
-using Paps.SceneLoading;
-using Paps.StartupSetup;
+using Paps.GameSetup;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -77,9 +75,7 @@ namespace Paps.Levels.Editor
 
         private static async UniTaskVoid AwaitSetupAndOpenScene(EditorSceneState editorSceneState)
         {
-            var setupper = Object.FindFirstObjectByType<StartupSetupper>();
-
-            await setupper.Setup();
+            await GameSetupManager.Instance.Setup();
 
             var scenes = editorSceneState.OpenedScenes.Select<SceneDTO, Scene>(s => s).ToArray();
 
@@ -101,9 +97,7 @@ namespace Paps.Levels.Editor
 
         private static async UniTaskVoid AwaitSetupAndOpenLevel(EditorLevelState editorLevelState)
         {
-            var setupper = Object.FindFirstObjectByType<StartupSetupper>();
-
-            await setupper.Setup();
+            await GameSetupManager.Instance.Setup();
 
             var level = EditorLevelManager.GetLevelById(editorLevelState.LevelId);
 
