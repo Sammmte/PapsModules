@@ -1,0 +1,13 @@
+
+
+.localization-field-container {
+    flex-direction: row;
+}
+
+.localization-field-container__field-label {
+    flex-grow: 0.5;
+}
+
+.localization-field-container__dropdown-button-container {
+    flex-grow: 1;
+}

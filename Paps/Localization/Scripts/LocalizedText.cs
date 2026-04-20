@@ -6,8 +6,18 @@ namespace Paps.Localization
     [Serializable]
     public struct LocalizedText
     {
-        [field: SerializeField] public string TableId { get; set; }
-        [field: SerializeField] public string LocalizationId { get; set;}
+        [SerializeField] private LocalizationIdReference _localizationIdReference;
+
+        public string TableId
+        {
+            get => _localizationIdReference.TableId;
+            set => _localizationIdReference.TableId = value;
+        }
+        public string LocalizationId
+        {
+            get => _localizationIdReference.LocalizationId;
+            set => _localizationIdReference.LocalizationId = value;
+        }
 
         public string Text
         {
@@ -16,15 +26,9 @@ namespace Paps.Localization
                 LocalizationProfiling.GET_LOCALIZED_STRING_MARKER.Begin();
                 var text = LocalizationManager.Instance.GetLocalizedString(TableId, LocalizationId);
                 LocalizationProfiling.GET_LOCALIZED_STRING_MARKER.End();
-                
+
                 return text;
             }
-        }
-
-        public LocalizedText(string tableId, string localizationId)
-        {
-            TableId = tableId;
-            LocalizationId = localizationId;
         }
 
         public static implicit operator string(LocalizedText text) => text.Text;

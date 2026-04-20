@@ -75,11 +75,6 @@ namespace Paps.Localization
             return _availableLanguages;
         }
 
-        public LocalizedText CreateLocalizedText(string tableId, string localizationId)
-        {
-            return new LocalizedText(tableId, localizationId);
-        }
-
         public string GetLocalizedString(string tableId, string localizationId)
         {
             var tableIdEmpty = string.IsNullOrEmpty(tableId);

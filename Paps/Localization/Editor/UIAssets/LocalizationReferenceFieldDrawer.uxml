@@ -1,0 +1,7 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/PapsModules/Paps/Localization/Editor/UIAssets/LocalizationStyles.uss?fileID=7433441132597879392&amp;guid=6f8592c5763bddd45a1acd436cae0d8b&amp;type=3#LocalizationStyles"/>
+    <ui:VisualElement name="Container" class="localization-field-container">
+        <ui:Label text="Label" name="FieldLabel" class="localization-field-container__field-label"/>
+        <ui:VisualElement name="DropdownButtonIMGUIContainer" class="localization-field-container__dropdown-button-container"/>
+    </ui:VisualElement>
+</ui:UXML>
