@@ -1,20 +1,16 @@
 {
-    "name": "Paps.Levels.Editor",
-    "rootNamespace": "Paps.Levels.Editor",
+    "name": "Paps.EditorGameSetup",
+    "rootNamespace": "Paps.EditorGameSetup",
     "references": [
         "GUID:f51ebe6a0ceec4240a699833d6309b23",
         "GUID:a00d710b062668a46b8ebf64b9e61d6e",
         "GUID:276fb2fc1687fe74c9c6ce7174a1073f",
         "GUID:4bb1096f5faa2b8489d34ce6d8c1e4d8",
         "GUID:9b261077c7a2ac34886513ec1345f8e0",
-        "GUID:ecddbdb12aa1cc74d806fdd86a4c965a",
         "GUID:4d30a9cc5cb282744b5a2fe2728cb18c",
-        "GUID:2765e68924a08a94ea0ea66b31c0168f",
-        "GUID:8d62da4aabd2a19419c7378d23ea5849",
-        "GUID:1b69c9ae65d6a6e468348e472a8adfd7",
-        "GUID:4bb512abe950d9c468141756c9289b9e",
         "GUID:677f4d7febad68e4194ce8008eff07f8",
-        "GUID:9378442c3f315374eb2e106d5e1e9f2e"
+        "GUID:8d62da4aabd2a19419c7378d23ea5849",
+        "GUID:5f58541540927e048a4575a8db0a85cf"
     ],
     "includePlatforms": [
         "Editor"

@@ -21,7 +21,7 @@ namespace Paps.Entry
         {
             await SceneLoader.LoadAsync("Setup", LoadSceneMode.Additive);
             await WaitForSetupProcess();
-            await LevelManager.Instance.LoadInitialLevel(_startupLevel, _loadLevelOptions);
+            await LevelManager.Instance.LoadLevel(_startupLevel, loadLevelOptions: _loadLevelOptions);
         }
 
         private UniTask WaitForSetupProcess()

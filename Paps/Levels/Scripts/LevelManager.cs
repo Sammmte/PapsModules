@@ -77,7 +77,8 @@ namespace Paps.Levels
             _currentLevelSetups = new List<ILevelSetup>();
         }
 
-        public async UniTask LoadInitialLevel(Level level, Optional<LoadLevelOptions> loadLevelOptions = default)
+        private async UniTask LoadInitialLevel(Level level, Func<UniTask> onUnload = null, Optional<LoadLevelOptions> loadLevelOptions = default,
+            IEnumerable<ILevelSetup> extraLevelSetups = null)
         {
             this.Log($"Loading initial level <color=green>{level.Id}</color>");
 
@@ -86,13 +87,29 @@ namespace Paps.Levels
             await SceneLoader.LoadNewSceneAndWaitOneFrame("LevelSetup_EmptyScene");
             await SceneLoader.UnloadAsync(loadedScenes);
 
+            if (onUnload != null)
+                await onUnload();
+
             if(loadLevelOptions.HasValue)
                 await ApplyGCCollectOrAssetUnload(loadLevelOptions.Value);
                 
-            await Load(level, null);
+            await Load(level, extraLevelSetups);
         }
 
         public async UniTask LoadLevel(Level level, Func<UniTask> onUnload = null, Optional<LoadLevelOptions> loadLevelOptions = default,
+            IEnumerable<ILevelSetup> extraLevelSetups = null)
+        {
+            if(CurrentLevel == null)
+            {
+                await LoadInitialLevel(level, onUnload, loadLevelOptions, extraLevelSetups);
+            }
+            else
+            {
+                await LoadNonInitialLevel(level, onUnload, loadLevelOptions, extraLevelSetups);
+            }
+        }
+
+        private async UniTask LoadNonInitialLevel(Level level, Func<UniTask> onUnload = null, Optional<LoadLevelOptions> loadLevelOptions = default,
             IEnumerable<ILevelSetup> extraLevelSetups = null)
         {
             this.Log($"Unloading level <color=red>{CurrentLevel.Id}</color>");
