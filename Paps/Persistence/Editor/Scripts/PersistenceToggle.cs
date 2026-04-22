@@ -19,15 +19,14 @@ namespace Paps.Persistence.Editor
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         public static void InitializePersistence()
         {
-            if(UnityPrefs.UnityPrefs.GetPref(UnityPrefType.UserProjectPrefs, SCOPE).TryGet<bool>(SAVE_ID, out var value))
-            {
-                Persistence.PersistenceEnabled = value;
-            }
+            UpdatePersistenceState();
         }
 
         public void InitializeElement()
         {
             label = "Persistence";
+
+            UpdatePersistenceState();
 
             value = Persistence.PersistenceEnabled;
 
@@ -36,6 +35,14 @@ namespace Paps.Persistence.Editor
                 Persistence.PersistenceEnabled = ev.newValue;
                 UnityPrefs.UnityPrefs.GetPref(UnityPrefType.UserProjectPrefs, SCOPE).Set(SAVE_ID, ev.newValue);
             });
+        }
+
+        private static void UpdatePersistenceState()
+        {
+            if(UnityPrefs.UnityPrefs.GetPref(UnityPrefType.UserProjectPrefs, SCOPE).TryGet<bool>(SAVE_ID, out var value))
+            {
+                Persistence.PersistenceEnabled = value;
+            }
         }
     }
 }
