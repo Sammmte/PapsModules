@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Paps.ScreenTransitions
 {
-    public class BlackScreenTransition : ScreenTransition
+    public class AlphaScreenTransition : ScreenTransition
     {
         [SerializeField] private Image _image;
 
