@@ -10,7 +10,6 @@ namespace Paps.Optionals.Editor
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             var valueProperty = property.FindPropertyRelative("_value");
-            var serializedByUnityFlagProperty = property.FindPropertyRelative("_serializedByUnityFlag");
             var considerItHasValueProperty = property.FindPropertyRelative("_considerItHasValue");
             
             var container = new VisualElement();
@@ -23,9 +22,6 @@ namespace Paps.Optionals.Editor
             container.Add(foldout);
             foldout.Add(considerItHasValueField);
             foldout.Add(valueField);
-            
-            serializedByUnityFlagProperty.boolValue = true;
-            serializedByUnityFlagProperty.serializedObject.ApplyModifiedProperties();
 
             return container;
         }
