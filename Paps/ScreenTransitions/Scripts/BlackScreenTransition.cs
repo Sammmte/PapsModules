@@ -1,55 +1,32 @@
 ﻿using Cysharp.Threading.Tasks;
-using Paps.SceneLoading;
 using PrimeTween;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
-using Scene = Paps.SceneLoading.Scene;
+using UnityEngine.UI;
 
 namespace Paps.ScreenTransitions
 {
-    public class BlackScreenTransition : ScriptableObject, IScreenTransition
+    public class BlackScreenTransition : ScreenTransition
     {
-        [SerializeField] private UIDocument _uiDocumentPrefab;
-        [SerializeField] private bool _useUnscaledTime;
+        [SerializeField] private Image _image;
 
-        private Scene _scene;
-        private VisualElement _blackScreen;
+        private Tween _tween;
 
-        public async UniTask PlayIn()
+        public override async UniTask PlayIn(ScreenTransitionParameters parameters)
         {
-            CleanUp();
+            _tween.Stop();
 
-            _scene = SceneLoader.LoadNewScene("TransitionScene");
+            _tween = Tween.Alpha(_image, 0, 1, duration: parameters.Duration, useUnscaledTime: parameters.UseUnscaledTime);
 
-            await UniTask.NextFrame();
-
-            var prefabInstance = GameObject.Instantiate(_uiDocumentPrefab);
-            SceneLoader.MoveGameObjectToScene(prefabInstance.gameObject, _scene);
-
-            _blackScreen = prefabInstance.rootVisualElement.Q("BlackScreen");
-
-            var tween = Tween.VisualElementBackgroundColor(_blackScreen, endValue: Color.black, duration: 1, useUnscaledTime: _useUnscaledTime);
-
-            await tween;
+            await _tween;
         }
 
-        public async UniTask PlayOut()
+        public override async UniTask PlayOut(ScreenTransitionParameters parameters)
         {
-            var color = Color.black;
-            color.a = 0;
+            _tween.Stop();
 
-            await Tween.VisualElementBackgroundColor(_blackScreen, endValue: color, duration: 1, useUnscaledTime: _useUnscaledTime);
+            _tween = Tween.Alpha(_image, 1, 0, duration: parameters.Duration, useUnscaledTime: parameters.UseUnscaledTime);
 
-            await SceneLoader.UnloadAsync(_scene);
-
-            CleanUp();
-        }
-
-        private void CleanUp()
-        {
-            _blackScreen = null;
-            _scene = default;
+            await _tween;
         }
     }
 }
