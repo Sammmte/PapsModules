@@ -25,6 +25,26 @@ namespace Paps.EditorGameSetup
         private static void ListenForPlayModeStateChange()
         {
             EditorSceneManager.playModeStartScene = null;
+            _currentState = GetState();
+
+            EditorApplication.playModeStateChanged += OnPlayModeStateChange;
+        }
+
+        private static void OnPlayModeStateChange(PlayModeStateChange change)
+        {
+            if(change == PlayModeStateChange.ExitingEditMode)
+            {
+                SaveState(new EditorGameSetupParameters() { SetupMode = _currentState.SetupMode });
+
+                if(_currentState.SetupMode == EditorGameSetupMode.Custom)
+                {
+                    EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(GetSetupScenePath());
+                }
+                else if(_currentState.SetupMode == EditorGameSetupMode.Entry)
+                {
+                    EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(GetEntryScenePath());
+                }
+            }
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -51,23 +71,7 @@ namespace Paps.EditorGameSetup
             }
         }
 
-        public static void EnterPlayMode(EditorGameSetupParameters parameters)
-        {
-            SaveState(parameters);
-
-            if(parameters.SetupMode == EditorGameSetupMode.Custom)
-            {
-                EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(GetSetupScenePath());
-            }
-            else if(parameters.SetupMode == EditorGameSetupMode.Entry)
-            {
-                EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(GetEntryScenePath());
-            }
-
-            EditorApplication.EnterPlaymode();
-        }
-
-        private static void SaveState(EditorGameSetupParameters parameters)
+        public static void SaveState(EditorGameSetupParameters parameters)
         {
             var state = new EditorGameSetupState()
             {
@@ -75,12 +79,23 @@ namespace Paps.EditorGameSetup
                 LoadedScenes = GetLoadedScenes()
             };
 
+            _currentState = state;
+
             UnityPrefs.UnityPrefs.GetPref(UnityPrefs.UnityPrefType.UserProjectPrefs, SAVE_SCOPE).Set(SAVE_STATE_KEY, state);
         }
 
         private static EditorGameSetupState GetState()
         {
-            return UnityPrefs.UnityPrefs.GetPref(UnityPrefs.UnityPrefType.UserProjectPrefs, SAVE_SCOPE).Get<EditorGameSetupState>(SAVE_STATE_KEY);
+            if(UnityPrefs.UnityPrefs.GetPref(UnityPrefs.UnityPrefType.UserProjectPrefs, SAVE_SCOPE).TryGet<EditorGameSetupState>(SAVE_STATE_KEY, out var state))
+            {
+                return state;
+            }
+
+            return new EditorGameSetupState()
+            {
+                SetupMode = EditorGameSetupMode.Custom,
+                LoadedScenes = new string[0]
+            };
         }
 
         private static string GetSetupScenePath()
@@ -134,11 +149,5 @@ namespace Paps.EditorGameSetup
 
             return _settings;
         }
-    }
-
-    internal struct EditorGameSetupState
-    {
-        public EditorGameSetupMode SetupMode;
-        public string[] LoadedScenes;
     }
 }
