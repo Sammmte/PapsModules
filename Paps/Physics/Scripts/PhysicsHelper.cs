@@ -81,7 +81,7 @@ namespace Paps.Physics
             }
         }
 
-        public static bool OverlapBox(Vector3 center, float radius, out Collider collider, LayerMask layerMask,
+        public static bool OverlapSphere(Vector3 center, float radius, out Collider collider, LayerMask layerMask,
             QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
             OverlapSphere(center, radius, _simpleColliderBuffer, layerMask, queryTriggerInteraction);
