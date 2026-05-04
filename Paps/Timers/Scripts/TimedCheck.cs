@@ -1,5 +1,6 @@
 ﻿using Paps.Optionals;
 using Paps.Time;
+using Paps.Update;
 
 namespace Paps.Timers
 {
@@ -22,7 +23,7 @@ namespace Paps.Timers
             set => _timer.Interval = value;
         }
 
-        public Optional<int> UpdateUpdaterId
+        public Optional<Updater<IUpdatable>> UpdateUpdaterId
         {
             get => _timer.UpdateUpdaterId;
             set => _timer.UpdateUpdaterId = value;

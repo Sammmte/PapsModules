@@ -1,31 +1,18 @@
 using Paps.Optionals;
-using System;
 
 namespace Paps.Update
 {
     public partial class UpdateManager
     {
-        private IUpdater<IUpdatable> GetDefaultUpdateUpdater()
+        private Updater<IUpdatable> GetDefaultUpdateUpdater()
         {
-            return _updateUpdaters[0].Updater;
+            return _updateUpdaters[0];
         }
 
-        public IUpdater<IUpdatable> GetUpdateUpdaterById(int id)
-        {
-            if(_updateUpdatersDictionary.TryGetValue(id, out var updater))
-            {
-                return updater;
-            }
-            else
-            {
-                throw new ArgumentException($"No Update Updater found with Id {id}");
-            }
-        }
-
-        public void RegisterForUpdate(IUpdatable updatable, Optional<int> updaterId = default, 
+        public void RegisterForUpdate(IUpdatable updatable, Optional<Updater<IUpdatable>> updater = default, 
             Optional<int> updateSchemaGroupId = default)
         {
-            if(!updaterId.HasValue)
+            if(!updater.HasValue)
             {
                 if(updateSchemaGroupId.HasValue)
                     Register(GetDefaultUpdateUpdater(), updatable, updateSchemaGroupId);
@@ -35,23 +22,25 @@ namespace Paps.Update
                 return;
             }
 
-            if(_updateUpdatersDictionary.TryGetValue(updaterId, out var updater))
+            var updaterValue = updater.Value;
+
+            if(ContainsUpdater(updaterValue))
             {
                 if(updateSchemaGroupId.HasValue)
-                    Register(updater, updatable, updateSchemaGroupId);
+                    Register(updaterValue, updatable, updateSchemaGroupId);
                 else
-                    Register(updater, updatable);
+                    Register(updaterValue, updatable);
             }
             else
             {
-                throw new ArgumentException($"No Update Updater found with Id {updaterId}");
+                ThrowUpdaterNotFoundException(updaterValue);
             }
         }
 
-        public void UnregisterFromUpdate(IUpdatable updatable, Optional<int> updaterId = default, 
+        public void UnregisterFromUpdate(IUpdatable updatable, Optional<Updater<IUpdatable>> updater = default, 
             Optional<int> updateSchemaGroupId = default)
         {
-            if(!updaterId.HasValue)
+            if(!updater.HasValue)
             {
                 if(updateSchemaGroupId.HasValue)
                     Unregister(GetDefaultUpdateUpdater(), updatable, updateSchemaGroupId);
@@ -61,16 +50,18 @@ namespace Paps.Update
                 return;
             }
 
-            if(_updateUpdatersDictionary.TryGetValue(updaterId, out var updater))
+            var updaterValue = updater.Value;
+
+            if(ContainsUpdater(updaterValue))
             {
                 if(updateSchemaGroupId.HasValue)
-                    Unregister(updater, updatable, updateSchemaGroupId);
+                    Unregister(updaterValue, updatable, updateSchemaGroupId);
                 else
-                    Unregister(updater, updatable);
+                    Unregister(updaterValue, updatable);
             }
             else
             {
-                throw new ArgumentException($"No Update Updater found with Id {updaterId}");
+                ThrowUpdaterNotFoundException(updaterValue);
             }
         }
     }

@@ -16,9 +16,9 @@ namespace Paps.Timers
         public TimeChannel TimeChannel { get; set; }
         public bool UseTimeManager { get; set; }
         
-        private Optional<int> _updateUpdaterId;
+        private Optional<Updater<IUpdatable>> _updateUpdaterId;
 
-        public Optional<int> UpdateUpdaterId
+        public Optional<Updater<IUpdatable>> UpdateUpdaterId
         {
             get => _updateUpdaterId;
             set

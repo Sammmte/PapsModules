@@ -1,76 +1,67 @@
 using Paps.Optionals;
-using System;
 
 namespace Paps.Update
 {
     public partial class UpdateManager
     {
-        private IUpdater<ILateUpdatable> GetDefaultLateUpdateUpdater()
+        private Updater<ILateUpdatable> GetDefaultLateUpdateUpdater()
         {
-            return _lateUpdateUpdaters[0].Updater;
-        }
-
-        public IUpdater<ILateUpdatable> GetLateUpdateUpdaterById(int id)
-        {
-            if(_lateUpdateUpdatersDictionary.TryGetValue(id, out var updater))
-            {
-                return updater;
-            }
-            else
-            {
-                throw new ArgumentException($"No Late Update Updater found with Id {id}");
-            }
+            return _lateUpdateUpdaters[0];
         }
         
-        public void RegisterForLateUpdate(ILateUpdatable lateUpdatable, Optional<int> updaterId = default, 
+        public void RegisterForLateUpdate(ILateUpdatable updatable, Optional<Updater<ILateUpdatable>> updater = default, 
             Optional<int> updateSchemaGroupId = default)
         {
-            if(!updaterId.HasValue)
+            if(!updater.HasValue)
             {
                 if(updateSchemaGroupId.HasValue)
-                    Register(GetDefaultLateUpdateUpdater(), lateUpdatable, updateSchemaGroupId);
+                    Register(GetDefaultLateUpdateUpdater(), updatable, updateSchemaGroupId);
                 else
-                    Register(GetDefaultLateUpdateUpdater(), lateUpdatable);
+                    Register(GetDefaultLateUpdateUpdater(), updatable);
 
                 return;
             }
 
-            if(_lateUpdateUpdatersDictionary.TryGetValue(updaterId, out var updater))
+            var updaterValue = updater.Value;
+
+            if(ContainsUpdater(updaterValue))
             {
                 if(updateSchemaGroupId.HasValue)
-                    Register(updater, lateUpdatable, updateSchemaGroupId);
+                    Register(updaterValue, updatable, updateSchemaGroupId);
                 else
-                    Register(updater, lateUpdatable);
+                    Register(updaterValue, updatable);
             }
             else
             {
-                throw new ArgumentException($"No Late Update Updater found with Id {updaterId}");
+                ThrowUpdaterNotFoundException(updaterValue);
             }
         }
-        
-        public void UnregisterFromLateUpdate(ILateUpdatable lateUpdatable, Optional<int> updaterId = default, 
+
+        public void UnregisterFromLateUpdate(ILateUpdatable updatable, Optional<Updater<ILateUpdatable>> updater = default, 
             Optional<int> updateSchemaGroupId = default)
         {
-            if(!updaterId.HasValue)
+            if(!updater.HasValue)
             {
                 if(updateSchemaGroupId.HasValue)
-                    Unregister(GetDefaultLateUpdateUpdater(), lateUpdatable, updateSchemaGroupId);
+                    Unregister(GetDefaultLateUpdateUpdater(), updatable, updateSchemaGroupId);
                 else
-                    Unregister(GetDefaultLateUpdateUpdater(), lateUpdatable);
+                    Unregister(GetDefaultLateUpdateUpdater(), updatable);
 
                 return;
             }
 
-            if(_lateUpdateUpdatersDictionary.TryGetValue(updaterId, out var updater))
+            var updaterValue = updater.Value;
+
+            if(ContainsUpdater(updaterValue))
             {
                 if(updateSchemaGroupId.HasValue)
-                    Unregister(updater, lateUpdatable, updateSchemaGroupId);
+                    Unregister(updaterValue, updatable, updateSchemaGroupId);
                 else
-                    Unregister(updater, lateUpdatable);
+                    Unregister(updaterValue, updatable);
             }
             else
             {
-                throw new ArgumentException($"No Late Update Updater found with Id {updaterId}");
+                ThrowUpdaterNotFoundException(updaterValue);
             }
         }
     }

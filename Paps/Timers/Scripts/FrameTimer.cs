@@ -11,9 +11,9 @@ namespace Paps.Timers
         public event Action<FrameTimer> OnTick;
         public bool Active { get; private set; }
         
-        private Optional<int> _updateUpdaterId;
+        private Optional<Updater<IUpdatable>> _updateUpdaterId;
 
-        public Optional<int> UpdateUpdaterId
+        public Optional<Updater<IUpdatable>> UpdateUpdaterId
         {
             get => _updateUpdaterId;
             set

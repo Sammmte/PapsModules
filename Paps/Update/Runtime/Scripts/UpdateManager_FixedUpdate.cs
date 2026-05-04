@@ -1,76 +1,67 @@
 using Paps.Optionals;
-using System;
 
 namespace Paps.Update
 {
     public partial class UpdateManager
     {
-        private IUpdater<IFixedUpdatable> GetDefaultFixedUpdateUpdater()
+        private Updater<IFixedUpdatable> GetDefaultFixedUpdateUpdater()
         {
-            return _fixedUpdateUpdaters[0].Updater;
-        }
-
-        public IUpdater<IFixedUpdatable> GetFixedUpdateUpdaterById(int id)
-        {
-            if(_fixedUpdateUpdatersDictionary.TryGetValue(id, out var updater))
-            {
-                return updater;
-            }
-            else
-            {
-                throw new ArgumentException($"No Fixed Update Updater found with Id {id}");
-            }
+            return _fixedUpdateUpdaters[0];
         }
         
-        public void RegisterForFixedUpdate(IFixedUpdatable fixedUpdatable, Optional<int> updaterId = default, 
+        public void RegisterForFixedUpdate(IFixedUpdatable updatable, Optional<Updater<IFixedUpdatable>> updater = default, 
             Optional<int> updateSchemaGroupId = default)
         {
-            if(!updaterId.HasValue)
+            if(!updater.HasValue)
             {
                 if(updateSchemaGroupId.HasValue)
-                    Register(GetDefaultFixedUpdateUpdater(), fixedUpdatable, updateSchemaGroupId);
+                    Register(GetDefaultFixedUpdateUpdater(), updatable, updateSchemaGroupId);
                 else
-                    Register(GetDefaultFixedUpdateUpdater(), fixedUpdatable);
+                    Register(GetDefaultFixedUpdateUpdater(), updatable);
 
                 return;
             }
 
-            if(_fixedUpdateUpdatersDictionary.TryGetValue(updaterId, out var updater))
+            var updaterValue = updater.Value;
+
+            if(ContainsUpdater(updaterValue))
             {
                 if(updateSchemaGroupId.HasValue)
-                    Register(updater, fixedUpdatable, updateSchemaGroupId);
+                    Register(updaterValue, updatable, updateSchemaGroupId);
                 else
-                    Register(updater, fixedUpdatable);
+                    Register(updaterValue, updatable);
             }
             else
             {
-                throw new ArgumentException($"No Fixed Update Updater found with Id {updaterId}");
+                ThrowUpdaterNotFoundException(updaterValue);
             }
         }
-        
-        public void UnregisterFromFixedUpdate(IFixedUpdatable fixedUpdatable, Optional<int> updaterId = default, 
+
+        public void UnregisterFromFixedUpdate(IFixedUpdatable updatable, Optional<Updater<IFixedUpdatable>> updater = default, 
             Optional<int> updateSchemaGroupId = default)
         {
-            if(!updaterId.HasValue)
+            if(!updater.HasValue)
             {
                 if(updateSchemaGroupId.HasValue)
-                    Unregister(GetDefaultFixedUpdateUpdater(), fixedUpdatable, updateSchemaGroupId);
+                    Unregister(GetDefaultFixedUpdateUpdater(), updatable, updateSchemaGroupId);
                 else
-                    Unregister(GetDefaultFixedUpdateUpdater(), fixedUpdatable);
+                    Unregister(GetDefaultFixedUpdateUpdater(), updatable);
 
                 return;
             }
 
-            if(_fixedUpdateUpdatersDictionary.TryGetValue(updaterId, out var updater))
+            var updaterValue = updater.Value;
+
+            if(ContainsUpdater(updaterValue))
             {
                 if(updateSchemaGroupId.HasValue)
-                    Unregister(updater, fixedUpdatable, updateSchemaGroupId);
+                    Unregister(updaterValue, updatable, updateSchemaGroupId);
                 else
-                    Unregister(updater, fixedUpdatable);
+                    Unregister(updaterValue, updatable);
             }
             else
             {
-                throw new ArgumentException($"No Fixed Update Updater found with Id {updaterId}");
+                ThrowUpdaterNotFoundException(updaterValue);
             }
         }
     }
