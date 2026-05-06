@@ -1,6 +1,7 @@
 using Paps.Time;
 using Paps.Update;
 using System;
+using UnityEngine;
 using UnityTime = UnityEngine.Time;
 
 namespace Paps.Timers
@@ -36,6 +37,18 @@ namespace Paps.Timers
         }
 
         private float _accumulationTime;
+
+        public float Time
+        {
+            get => _accumulationTime;
+            set
+            {
+                if(!Active)
+                    return;
+
+                _accumulationTime = Mathf.Clamp(value, 0, Interval);
+            }
+        }
 
         public void Start()
         {
