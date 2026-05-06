@@ -12,20 +12,18 @@ namespace Paps.Update.Editor
     [CustomEditor(typeof(UpdateSchema<>), editorForChildClasses: true)]
     public class UpdateSchemaEditor : EditorObject
     {
-        private const string NEW_GROUP_NAME_BASE = "NewGroup";
-
         [SerializeField] private VisualTreeAsset _editorVTA;
-        [SerializeField] private VisualTreeAsset _updateGroupNameCellVTA;
-        [SerializeField] private VisualTreeAsset _updateGroupIdCellVTA;
         [SerializeField] private VisualTreeAsset _frameSequenceFrameCellVTA;
         [SerializeField] private VisualTreeAsset _frameGroupsSequenceCellVTA;
         [SerializeField] private VisualTreeAsset _frameGroupsSequenceGroupItemVTA;
 
         private VisualElement _mainContainer;
         private PropertyField _updatablesCapacityField;
+        private PropertyField _defaultGroupField;
         private MultiColumnListView _updateGroupsListView;
         private MultiColumnListView _frameSequenceListView;
 
+        private SerializedProperty _defaultGroupProperty;
         private SerializedProperty _groupsProperty;
         private SerializedProperty _frameSequenceProperty;
 
@@ -34,10 +32,19 @@ namespace Paps.Update.Editor
             _mainContainer = _editorVTA.CloneTree();
 
             _updatablesCapacityField = _mainContainer.Q<PropertyField>("UpdatablesCapacityField");
+            _defaultGroupField = new PropertyField();
+            _defaultGroupField.label = "Default Group";
+            
+            // Insert default group field before the list
+            var capacityFieldParent = _updatablesCapacityField.parent;
+            capacityFieldParent.Insert(capacityFieldParent.IndexOf(_updatablesCapacityField) + 1, _defaultGroupField);
+
             _updateGroupsListView = _mainContainer.Q<MultiColumnListView>("UpdateGroupsList");
             _frameSequenceListView = _mainContainer.Q<MultiColumnListView>("FrameSequenceList");
 
             _updatablesCapacityField.BindProperty(serializedObject.FindProperty("_updatableGroupCapacity"));
+            _defaultGroupProperty = serializedObject.FindProperty("_defaultGroup");
+            _defaultGroupField.BindProperty(_defaultGroupProperty);
 
             _groupsProperty = serializedObject.FindProperty("_groups");
             _frameSequenceProperty = serializedObject.FindProperty("_frameSequence");
@@ -50,96 +57,30 @@ namespace Paps.Update.Editor
 
         private void InitializeUpdateGroupsList()
         {
-            var nameColumn = _updateGroupsListView.columns[0];
-            var idColumn = _updateGroupsListView.columns[1];
+            var groupColumn = _updateGroupsListView.columns[0];
+            
+            // We only need one column for the group object reference now
+            groupColumn.title = "Group Asset";
+            groupColumn.makeCell += () => new ObjectField() { objectType = typeof(UpdateSchemaGroup) };
+            groupColumn.bindCell += (element, index) =>
+            {
+                var field = element as ObjectField;
+                field.BindProperty(_groupsProperty.GetArrayElementAtIndex(index));
+            };
+            groupColumn.unbindCell += (element, index) =>
+            {
+                var field = element as ObjectField;
+                field.Unbind();
+            };
 
-            nameColumn.makeCell += CreateGroupNameCell;
-            nameColumn.bindCell += BindGroupNameCell;
-            nameColumn.unbindCell += UnbindGroupNameCell;
-
-            idColumn.makeCell += CreateGroupIdCell;
-            idColumn.bindCell += BindGroupIdCell;
-            idColumn.unbindCell += UnbindGroupIdCell;
-
-            _updateGroupsListView.itemsAdded += OnNewGroupAdded;
+            // Remove ID column if it exists or hide it
+            if(_updateGroupsListView.columns.Count > 1)
+            {
+                _updateGroupsListView.columns[1].width = 0;
+                _updateGroupsListView.columns[1].visible = false;
+            }
 
             _updateGroupsListView.BindProperty(_groupsProperty);
-        }
-
-        private VisualElement CreateGroupNameCell()
-        {
-            var parent = _updateGroupNameCellVTA.CloneTree();
-
-            var cell = parent.Q<UpdateGroupNameCellElement>();
-
-            parent.Remove(cell);
-
-            cell.Initialize(GetAvailableGroups);
-
-            return cell;
-        }
-
-        private void BindGroupNameCell(VisualElement element, int index)
-        {
-            var cell = element as UpdateGroupNameCellElement;
-
-            var property = _groupsProperty.GetArrayElementAtIndex(index);
-
-            cell.SetData(property);
-        }
-
-        private void UnbindGroupNameCell(VisualElement element, int index)
-        {
-            var cell = element as UpdateGroupNameCellElement;
-
-            cell.CleanUp();
-        }
-
-        private VisualElement CreateGroupIdCell()
-        {
-            var parent = _updateGroupIdCellVTA.CloneTree();
-
-            var cell = parent.Q<Label>();
-
-            return cell;
-        }
-
-        private void BindGroupIdCell(VisualElement element, int index)
-        {
-            var cell = element as Label;
-
-            try
-            {
-                cell.text = UpdateSchemaUtils.GetIdOfGroup(GetGroupByIndex(index)).ToString();
-            }
-            catch
-            {
-                cell.text = "NO_ID";
-            }
-        }
-
-        private void UnbindGroupIdCell(VisualElement element, int index)
-        {
-            var cell = element as Label;
-
-            cell.text = string.Empty;
-        }
-
-        private void OnNewGroupAdded(IEnumerable<int> groupIndices)
-        {
-            var addedGroupIndex = groupIndices.First();
-
-            EditorApplication.delayCall += () =>
-            {
-                var rootElement = _updateGroupsListView.GetRootElementForIndex(addedGroupIndex);
-
-                var nameCell = rootElement.Q<UpdateGroupNameCellElement>();
-
-                nameCell.SerializedProperty.stringValue = Guid.NewGuid().ToString();
-                nameCell.SerializedProperty.serializedObject.ApplyModifiedProperties();
-
-                nameCell.ShowRenameView(NEW_GROUP_NAME_BASE);
-            };
         }
 
         private void InitializeFrameSequenceList()
@@ -210,7 +151,7 @@ namespace Paps.Update.Editor
             cell.CleanUp();
         }
 
-        private string[] GetAvailableGroupsFor(int frameGroupSequenceIndex)
+        private UpdateSchemaGroup[] GetAvailableGroupsFor(int frameGroupSequenceIndex)
         {
             var frameGroupsSequenceProperty = _frameSequenceProperty.GetArrayElementAtIndex(frameGroupSequenceIndex);
 
@@ -218,44 +159,39 @@ namespace Paps.Update.Editor
 
             var availableGroups = GetAvailableGroups();
 
-            var list = new List<string>(availableGroups);
+            var list = new List<UpdateSchemaGroup>(availableGroups);
 
             for(int i = 0; i < groupsSequenceProperty.arraySize; i++)
             {
                 var groupItemProperty = groupsSequenceProperty.GetArrayElementAtIndex(i);
+                var groupAsset = groupItemProperty.objectReferenceValue as UpdateSchemaGroup;
 
-                if(UpdateSchemaUtils.TryGetGroupById(groupItemProperty.intValue, list, out var group))
+                if(groupAsset != null)
                 {
-                    list.Remove(group);
+                    list.Remove(groupAsset);
                 }
             }
 
             return list.ToArray();
         }
 
-        private HashSet<string> GetAvailableGroups()
+        private HashSet<UpdateSchemaGroup> GetAvailableGroups()
         {
-            var hashset = new HashSet<string>(_groupsProperty.arraySize + 1);
+            var hashset = new HashSet<UpdateSchemaGroup>(_groupsProperty.arraySize + 1);
 
-            hashset.Add(UpdateSchemaUtils.DEFAULT_GROUP);
+            if (_defaultGroupProperty.objectReferenceValue != null)
+                hashset.Add(_defaultGroupProperty.objectReferenceValue as UpdateSchemaGroup);
 
             for(int i = 0; i < _groupsProperty.arraySize; i++)
             {
                 var groupProperty = _groupsProperty.GetArrayElementAtIndex(i);
+                var groupAsset = groupProperty.objectReferenceValue as UpdateSchemaGroup;
 
-                var nameProperty = groupProperty;
-
-                hashset.Add(nameProperty.stringValue);
+                if (groupAsset != null)
+                    hashset.Add(groupAsset);
             }
 
             return hashset;
-        }
-
-        private string GetGroupByIndex(int index)
-        {
-            var property = _groupsProperty.GetArrayElementAtIndex(index);
-
-            return property.stringValue;
         }
     }
 }

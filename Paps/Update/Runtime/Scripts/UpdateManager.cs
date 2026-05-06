@@ -56,45 +56,25 @@ namespace Paps.Update
         {
             throw new ArgumentException($"Updater {updater.name} not found on UpdateManager");
         }
-        
-        private void Register<TUpdater, TListener>(TUpdater updater, TListener listener)
+
+        private void Register<TUpdater, TListener>(TUpdater updater, TListener listener, UpdateSchemaGroup updateSchemaGroup)
             where TListener : IUpdateMethodListener 
             where TUpdater : Updater<TListener>
         {
             if(_aboutToQuit)
                 return;
             
-            updater.Register(listener);
+            updater.Register(listener, updateSchemaGroup);
         }
 
-        private void Register<TUpdater, TListener>(TUpdater updater, TListener listener, int updateSchemaGroupId)
+        private void Unregister<TUpdater, TListener>(TUpdater updater, TListener listener, UpdateSchemaGroup updateSchemaGroup)
             where TListener : IUpdateMethodListener 
             where TUpdater : Updater<TListener>
         {
             if(_aboutToQuit)
                 return;
             
-            updater.Register(listener, updateSchemaGroupId);
-        }
-        
-        private void Unregister<TUpdater, TListener>(TUpdater updater, TListener listener)
-            where TListener : IUpdateMethodListener 
-            where TUpdater : Updater<TListener>
-        {
-            if(_aboutToQuit)
-                return;
-            
-            updater.Unregister(listener);
-        }
-
-        private void Unregister<TUpdater, TListener>(TUpdater updater, TListener listener, int updateSchemaGroupId)
-            where TListener : IUpdateMethodListener 
-            where TUpdater : Updater<TListener>
-        {
-            if(_aboutToQuit)
-                return;
-            
-            updater.Unregister(listener, updateSchemaGroupId);
+            updater.Unregister(listener, updateSchemaGroup);
         }
 
         private void OnApplicationQuit()

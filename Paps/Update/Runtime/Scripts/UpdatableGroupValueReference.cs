@@ -5,19 +5,13 @@ using UnityEngine;
 namespace Paps.Update
 {
     [CreateAssetMenu(menuName = BASE_CREATE_ASSET_MENU_PATH + "Update/Updatable Group Reference")]
-    public class UpdatableGroupValueReference : ValueReferenceAsset<int>
+    public class UpdatableGroupValueReference : ValueReferenceAsset<UpdateSchemaGroup>
     {
-        [SerializeField] private string _group;
-        [SerializeField, ReadOnly] private int _groupId;
+        [SerializeField] private UpdateSchemaGroup _group;
 
-        private void OnValidate()
+        protected override UpdateSchemaGroup GetValue()
         {
-            _groupId = UpdateSchemaUtils.GetIdOfGroup(_group);
-        }
-
-        protected override int GetValue()
-        {
-            return _groupId;
+            return _group;
         }
     }
 }

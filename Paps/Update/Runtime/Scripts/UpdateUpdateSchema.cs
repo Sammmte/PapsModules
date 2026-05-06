@@ -7,13 +7,13 @@ namespace Paps.Update
     [CreateAssetMenu(menuName = "Paps/Update/Update Update Schema")]
     public class UpdateUpdateSchema : UpdateSchema<IUpdatable>
     {
-        protected override void ExecuteUpdatesFor(IReadOnlyList<int> groupIds, IReadOnlyDictionary<int, UpdateList<IUpdatable>> updatableGroups)
+        protected override void ExecuteUpdatesFor(IReadOnlyList<UpdateSchemaGroup> groups, IReadOnlyDictionary<UpdateSchemaGroup, UpdateList<IUpdatable>> updatableGroups)
         {
-            var count = groupIds.Count;
+            var count = groups.Count;
 
             for(int i = 0; i < count; i++)
             {
-                var updatables = updatableGroups[groupIds[i]];
+                var updatables = updatableGroups[groups[i]];
 
                 foreach (var updatable in updatables)
                 {

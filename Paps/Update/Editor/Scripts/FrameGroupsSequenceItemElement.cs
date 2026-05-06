@@ -12,12 +12,12 @@ namespace Paps.Update.Editor
     {
         private Button _groupButton;
         private int _frameGroupsSequenceIndex;
-        private Func<int, string[]> _getAvailableGroups;
-        private Func<HashSet<string>> _getGroups;
+        private Func<int, UpdateSchemaGroup[]> _getAvailableGroups;
+        private Func<HashSet<UpdateSchemaGroup>> _getGroups;
 
         private SerializedProperty _property;
 
-        public void Initialize(Func<int, string[]> getAvailableGroupsForSequence, Func<HashSet<string>> getGroups)
+        public void Initialize(Func<int, UpdateSchemaGroup[]> getAvailableGroupsForSequence, Func<HashSet<UpdateSchemaGroup>> getGroups)
         {
             _getAvailableGroups = getAvailableGroupsForSequence;
             _getGroups = getGroups;
@@ -52,21 +52,25 @@ namespace Paps.Update.Editor
 
             var currentGroup = GetCurrentGroup();
 
-            var menuGroups = availableGroups.Append(currentGroup).OrderBy(group => group).ToArray();
+            var menuGroups = availableGroups.ToList();
+            if (currentGroup != null)
+                menuGroups.Add(currentGroup);
+            
+            menuGroups = menuGroups.OrderBy(group => group.name).ToList();
 
             var genericMenu = new GenericMenu();
 
-            for(int i = 0; i < menuGroups.Length; i++)
+            for(int i = 0; i < menuGroups.Count; i++)
             {
                 var group = menuGroups[i];
 
-                if(group.Equals(currentGroup))
+                if(group == currentGroup)
                 {
-                    genericMenu.AddItem(new GUIContent(group), true, () => { });
+                    genericMenu.AddItem(new GUIContent(group.name), true, () => { });
                 }
                 else
                 {
-                    genericMenu.AddItem(new GUIContent(group), false, OnGroupSelected, UpdateSchemaUtils.GetIdOfGroup(group));
+                    genericMenu.AddItem(new GUIContent(group.name), false, OnGroupSelected, group);
                 }
             }
 
@@ -75,9 +79,9 @@ namespace Paps.Update.Editor
 
         private void OnGroupSelected(object groupObj)
         {
-            var group = (int)groupObj;
+            var group = (UpdateSchemaGroup)groupObj;
 
-            _property.intValue = group;
+            _property.objectReferenceValue = group;
             _property.serializedObject.ApplyModifiedProperties();
 
             _groupButton.text = GetCurrentGroupName();
@@ -85,22 +89,19 @@ namespace Paps.Update.Editor
 
         private string GetCurrentGroupName()
         {
-            if(UpdateSchemaUtils.TryGetGroupById(_property.intValue, _getGroups().ToList(), out var group))
+            var group = _property.objectReferenceValue as UpdateSchemaGroup;
+            
+            if(group != null)
             {
-                return group;
+                return group.name;
             }
 
             return "NO_GROUP_NAME";
         }
 
-        private string GetCurrentGroup()
+        private UpdateSchemaGroup GetCurrentGroup()
         {
-            if(UpdateSchemaUtils.TryGetGroupById(_property.intValue, _getGroups().ToList(), out var group))
-            {
-                return group;
-            }
-
-            throw new InvalidOperationException("Invalid group");
+            return _property.objectReferenceValue as UpdateSchemaGroup;
         }
     }
 }

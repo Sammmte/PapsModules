@@ -11,15 +11,15 @@ namespace Paps.Update.Editor
     {
         private ListView _listView;
         private VisualTreeAsset _groupItemVTA;
-        private Func<int, string[]> _getAvailableGroups;
-        private Func<HashSet<string>> _getGroups;
+        private Func<int, UpdateSchemaGroup[]> _getAvailableGroups;
+        private Func<HashSet<UpdateSchemaGroup>> _getGroups;
 
         private SerializedProperty _frameGroupSequenceProperty;
         private SerializedProperty _groupsSequenceProperty;
 
         private int _frameGroupsSequenceIndex;
 
-        public void Initialize(VisualTreeAsset groupItemVTA, Func<int, string[]> getAvailableGroups, Func<HashSet<string>> getGroups)
+        public void Initialize(VisualTreeAsset groupItemVTA, Func<int, UpdateSchemaGroup[]> getAvailableGroups, Func<HashSet<UpdateSchemaGroup>> getGroups)
         {
             _groupItemVTA = groupItemVTA;
             _getAvailableGroups = getAvailableGroups;
@@ -97,7 +97,7 @@ namespace Paps.Update.Editor
             _groupsSequenceProperty.InsertArrayElementAtIndex(newIndex);
 
             var newProperty = _groupsSequenceProperty.GetArrayElementAtIndex(newIndex);
-            newProperty.intValue = UpdateSchemaUtils.GetIdOfGroup(availableGroups[0]);
+            newProperty.objectReferenceValue = availableGroups[0];
 
             newProperty.serializedObject.ApplyModifiedProperties();
         }

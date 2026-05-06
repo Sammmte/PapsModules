@@ -7,22 +7,25 @@ namespace Paps.Update
     public abstract class UpdateSchema<T> : ScriptableObject, IDisposable where T : IUpdateMethodListener
     {
         [SerializeField] private int _updatableGroupCapacity;
-        [SerializeField] private List<string> _groups;
+        [SerializeField] private UpdateSchemaGroup _defaultGroup;
+        [SerializeField] private List<UpdateSchemaGroup> _groups;
         [SerializeField] private List<FrameGroupsSequence> _frameSequence;
-
-        private Dictionary<int, UpdateList<T>> _updatableGroups;
+        
+        [NonSerialized] private Dictionary<UpdateSchemaGroup, UpdateList<T>> _updatableGroups;
 
         [NonSerialized] private int _currentFrameIndex;
 
         public void Initialize()
         {
-            _updatableGroups = new Dictionary<int, UpdateList<T>>(_groups.Count);
+            _updatableGroups = new Dictionary<UpdateSchemaGroup, UpdateList<T>>(_groups.Count + 1);
 
-            _updatableGroups[UpdateSchemaUtils.DEFAULT_GROUP.GetId()] = new UpdateList<T>(_updatableGroupCapacity);
+            if (_defaultGroup != null)
+                _updatableGroups[_defaultGroup] = new UpdateList<T>(_updatableGroupCapacity);
 
             for(int i = 0; i < _groups.Count; i++)
             {
-                _updatableGroups[UpdateSchemaUtils.GetIdOfGroup(_groups[i])] = new UpdateList<T>(_updatableGroupCapacity);
+                if (_groups[i] != null && !_updatableGroups.ContainsKey(_groups[i]))
+                    _updatableGroups[_groups[i]] = new UpdateList<T>(_updatableGroupCapacity);
             }
 
             _currentFrameIndex = 0;
@@ -32,9 +35,9 @@ namespace Paps.Update
 
         private void CreateDefaultSequenceIfEmpty()
         {
-            if(_frameSequence.Count == 0)
+            if(_frameSequence.Count == 0 && _defaultGroup != null)
             {
-                _frameSequence.Add(new FrameGroupsSequence() { GroupsSequence = new List<int>() { UpdateSchemaUtils.DEFAULT_GROUP.GetId() } });
+                _frameSequence.Add(new FrameGroupsSequence() { GroupsSequence = new List<UpdateSchemaGroup>() { _defaultGroup } });
             }
         }
 
@@ -54,53 +57,87 @@ namespace Paps.Update
             return false;
         }
 
-        public void Register(T listener)
+        public void Register(T listener, UpdateSchemaGroup updatableGroup)
         {
-            Register(listener, UpdateSchemaUtils.DEFAULT_GROUP.GetId());
-        }
+            if (updatableGroup == null)
+                updatableGroup = _defaultGroup;
 
-        public void Register(T listener, int updatableGroupId)
-        {
-            if(_updatableGroups.TryGetValue(updatableGroupId, out var updatables))
+            if(_updatableGroups.TryGetValue(updatableGroup, out var updatables))
             {
                 updatables.Add(listener);
                 return;
             }
 
-            throw new InvalidOperationException($"There is no group with id {updatableGroupId} in schema {name}");
+            throw new InvalidOperationException($"There is no group {updatableGroup.name} in schema {name}");
         }
 
-        public void Unregister(T listener)
+        public void Unregister(T listener, UpdateSchemaGroup updatableGroup)
         {
-            Unregister(listener, UpdateSchemaUtils.DEFAULT_GROUP.GetId());
-        }
+            if (updatableGroup == null)
+                updatableGroup = _defaultGroup;
 
-        public void Unregister(T listener, int updatableGroupId)
-        {
-            if(_updatableGroups.TryGetValue(updatableGroupId, out var updatables))
+            if(_updatableGroups.TryGetValue(updatableGroup, out var updatables))
             {
                 updatables.Remove(listener);
                 return;
             }
 
-            throw new InvalidOperationException($"There is no group with id {updatableGroupId} in schema {name}");
+            throw new InvalidOperationException($"There is no group {updatableGroup.name} in schema {name}");
         }
 
         public void Update()
         {
-            var frameUpdateGroupIds = _frameSequence[_currentFrameIndex].GroupsSequence;
+            if (_frameSequence.Count == 0) return;
 
-            if(frameUpdateGroupIds.Count > 0)
+            var frameUpdateGroups = _frameSequence[_currentFrameIndex].GroupsSequence;
+
+            if(frameUpdateGroups != null && frameUpdateGroups.Count > 0)
             {
-                ExecuteUpdatesFor(frameUpdateGroupIds, _updatableGroups);
+                ExecuteUpdatesFor(frameUpdateGroups, _updatableGroups);
             }
 
-            if(_currentFrameIndex == _frameSequence.Count - 1)
+            if(_currentFrameIndex >= _frameSequence.Count - 1)
                 _currentFrameIndex = 0;
             else
                 _currentFrameIndex++;
         }
 
-        protected abstract void ExecuteUpdatesFor(IReadOnlyList<int> groupIds, IReadOnlyDictionary<int, UpdateList<T>> updatableGroups);
+        protected abstract void ExecuteUpdatesFor(IReadOnlyList<UpdateSchemaGroup> groups, IReadOnlyDictionary<UpdateSchemaGroup, UpdateList<T>> updatableGroups);
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if(Application.isPlaying)
+                return;
+
+            if (_groups == null) return;
+
+            for (int i = _groups.Count - 1; i >= 0; i--)
+            {
+                if (_groups[i] == null)
+                {
+                    Debug.LogWarning($"Removed null group at index {i}");
+                    _groups.RemoveAt(i);
+                    continue;
+                }
+
+                if (_groups[i] == _defaultGroup)
+                {
+                    Debug.LogWarning($"Removed default update schema group {_defaultGroup.name} from groups list");
+                    _groups.RemoveAt(i);
+                    continue;
+                }
+
+                for (int j = 0; j < i; j++)
+                {
+                    if (_groups[i] == _groups[j])
+                    {
+                        _groups.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+        }
+#endif
     }
 }

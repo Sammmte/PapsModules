@@ -1,4 +1,3 @@
-﻿using Paps.Optionals;
 using System;
 using UnityEngine;
 
@@ -87,31 +86,25 @@ namespace Paps.Update
             UpdateSchema.Initialize();
         }
 
-        public void Register(T listener, Optional<int> updateSchemaGroupId = default)
+        public void Register(T listener, UpdateSchemaGroup updateSchemaGroup = null)
         {
             if(IsDisposed)
                 return;
 
             ThrowIfNotInitialized();
 
-            if(updateSchemaGroupId.HasValue)
-                UpdateSchema.Register(listener, updateSchemaGroupId);
-            else
-                UpdateSchema.Register(listener);
+            UpdateSchema.Register(listener, updateSchemaGroup);
 
             OnRegister(listener);
         }
-        public void Unregister(T listener, Optional<int> updateSchemaGroupId = default)
+        public void Unregister(T listener, UpdateSchemaGroup updateSchemaGroup = null)
         {
             if(IsDisposed)
                 return;
 
             ThrowIfNotInitialized();
 
-            if(updateSchemaGroupId.HasValue)
-                UpdateSchema.Unregister(listener, updateSchemaGroupId);
-            else
-                UpdateSchema.Unregister(listener);
+            UpdateSchema.Unregister(listener, updateSchemaGroup);
 
             OnUnregister(listener);
         }
