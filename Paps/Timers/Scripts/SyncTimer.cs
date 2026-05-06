@@ -1,4 +1,3 @@
-using Paps.Optionals;
 using Paps.Time;
 using Paps.Update;
 using System;
@@ -16,22 +15,22 @@ namespace Paps.Timers
         public TimeChannel TimeChannel { get; set; }
         public bool UseTimeManager { get; set; }
         
-        private Optional<Updater<IUpdatable>> _updateUpdaterId;
+        private Updater<IUpdatable> _updateUpdater;
 
-        public Optional<Updater<IUpdatable>> UpdateUpdaterId
+        public Updater<IUpdatable> UpdateUpdater
         {
-            get => _updateUpdaterId;
+            get => _updateUpdater;
             set
             {
                 if (Active)
                 {
                     Unregister();
-                    _updateUpdaterId = value;
+                    _updateUpdater = value;
                     Register();
                 }
                 else
                 {
-                    _updateUpdaterId = value;
+                    _updateUpdater = value;
                 }
             }
         }
@@ -98,26 +97,12 @@ namespace Paps.Timers
 
         private void Register()
         {
-            if (UpdateUpdaterId.HasValue)
-            {
-                this.RegisterUpdate(UpdateUpdaterId);
-            }
-            else
-            {
-                this.RegisterUpdate();
-            }
+            this.RegisterUpdate(UpdateUpdater);
         }
 
         private void Unregister()
         {
-            if (UpdateUpdaterId.HasValue)
-            {
-                this.UnregisterUpdate(UpdateUpdaterId);
-            }
-            else
-            {
-                this.UnregisterUpdate();
-            }
+            this.UnregisterUpdate(UpdateUpdater);
         }
     }
 }
