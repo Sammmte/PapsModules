@@ -1,12 +1,13 @@
 using Cysharp.Threading.Tasks;
+using System.Threading;
 
 namespace Paps.Levels
 {
     public interface ILevelSetup
     {
-        public UniTask Loaded() => UniTask.CompletedTask;
-        public UniTask Setup() => UniTask.CompletedTask;
-        public UniTask Kickstart() => UniTask.CompletedTask;
-        public UniTask Unload() => UniTask.CompletedTask;
+        public UniTask Load(CancellationToken cancellationToken) => UniTask.CompletedTask;
+        public UniTask Setup(CancellationToken cancellationToken) => UniTask.CompletedTask;
+        public void Kickstart() { }
+        public void Unload() { }
     }
 }

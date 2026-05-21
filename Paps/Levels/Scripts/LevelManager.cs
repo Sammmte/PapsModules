@@ -3,10 +3,12 @@ using Paps.Logging;
 using Paps.Optionals;
 using Paps.SceneLoading;
 using Paps.UnityExtensions;
+using SaintsField.Playa;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Scene = Paps.SceneLoading.Scene;
@@ -25,12 +27,99 @@ namespace Paps.Levels
             [SerializeField] public bool UnloadUnusedAssets;
         }
 
+        private class LevelBoundWrapper
+        {
+            public ILevelBound LevelBound { get; }
+
+            public bool IsLoading { get; private set; }
+            public bool DidLoad { get; private set; }
+            public bool IsSetupping { get; private set; }
+            public bool DidSetup { get; private set; }
+            public bool IsKickstarting { get; private set; }
+            public bool DidKickstart { get; private set; }
+            public bool IsUnloading { get; private set; }
+            public bool DidUnload { get; private set; }
+
+            private CancellationTokenSource _cancellationTokenSource;
+
+            private CancellationToken CancellationToken => _cancellationTokenSource.Token;
+
+            public LevelBoundWrapper(ILevelBound levelBound, CancellationTokenSource unloadLevelTokenSource)
+            {
+                LevelBound = levelBound;
+                _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(unloadLevelTokenSource.Token);
+            }
+
+            public void Construct() => LevelBound.Construct();
+
+            public async UniTask Load()
+            {
+                if(IsLoading || DidLoad)
+                    return;
+
+                IsLoading = true;
+                await LevelBound.Load(CancellationToken);
+                DidLoad = true;
+            }
+
+            public async UniTask Setup()
+            {
+                if(IsSetupping || DidSetup)
+                    return;
+
+                await Load();
+                
+                if(CancellationToken.IsCancellationRequested)
+                    return;
+
+                IsSetupping = true;
+                await LevelBound.Setup(CancellationToken);
+                DidSetup = true;
+            }
+
+            public async UniTask Kickstart()
+            {
+                if(IsKickstarting || DidKickstart)
+                    return;
+
+                await Setup();
+
+                if(CancellationToken.IsCancellationRequested)
+                    return;
+
+                IsKickstarting = true;
+                LevelBound.Kickstart();
+                DidKickstart = true;
+            }
+
+            public void Unload()
+            {
+                if(IsUnloading || DidUnload)
+                    return;
+
+                IsUnloading = true;
+                
+                _cancellationTokenSource.Cancel();
+
+                LevelBound.Unload();
+                DidUnload = true;
+            }
+        }
+
         public enum Stage
         {
             NotInitialized,
             Loading,
             LevelLoaded,
             Unloding
+        }
+
+        public enum LoadingSubStage
+        {
+            None,
+            Construct,
+            Load,
+            Setup
         }
 
         public static LevelManager Instance { get; private set; }
@@ -40,41 +129,39 @@ namespace Paps.Levels
         [SerializeField] private int _allBoundsCapacity = 10000;
         [field: SerializeField] public LevelList LevelList;
         
-        public Level CurrentLevel { get; private set; }
-        public Stage CurrentStage { get; private set; }
+        [ShowInInspector] public Level CurrentLevel { get; private set; }
+        [ShowInInspector] public Stage CurrentStage { get; private set; }
+        [ShowInInspector] public LoadingSubStage CurrentLoadingSubStage { get; private set; }
+        [ShowInInspector] public int LevelBoundsCount => _activeBounds.Count;
         
-        private List<ILevelBound> _activeBounds;
-        private FastRemoveList<ILevelReadinessContributor> _readinessContributors;
+        private List<LevelBoundWrapper> _activeBounds;
+        private Dictionary<ILevelBound, LevelBoundWrapper> _activeBoundsByLevelBound;
         private List<Scene> _levelScenes;
         private List<GameObject> _rootGameObjectsList;
         private List<ILevelBound> _tempGetComponentList;
-        private List<ILevelBound> _loadedPendingList;
-        private HashSet<ILevelBound> _loadedDoneList;
-        private List<ILevelBound> _setupPendingList;
-        private HashSet<ILevelBound> _setupDoneList;
-        private List<ILevelBound> _kickstartPendingList;
-        private HashSet<ILevelBound> _kickstartDoneList;
-        private List<ILevelBound> _unloadPendingList;
         private List<ILevelSetup> _currentLevelSetups;
+
+        private List<LevelBoundWrapper> _initializationExecutionList;
+        private List<LevelBoundWrapper> _tempExecutionList;
+
+        private CancellationTokenSource _unloadLevelOrQuitTokenSource;
+
+        private CancellationToken LevelUnloadOrQuitCancellationToken => _unloadLevelOrQuitTokenSource.Token;
 
         private void Awake()
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            _activeBounds = new List<ILevelBound>(_allBoundsCapacity);
-            _readinessContributors = new FastRemoveList<ILevelReadinessContributor>(_allBoundsCapacity);
+            _activeBounds = new List<LevelBoundWrapper>(_allBoundsCapacity);
+            _activeBoundsByLevelBound = new Dictionary<ILevelBound, LevelBoundWrapper>(_allBoundsCapacity);
             _levelScenes = new List<Scene>(_levelScenesCapacity);
             _rootGameObjectsList = new List<GameObject>(_rootGameObjectsCapacity);
             _tempGetComponentList = new List<ILevelBound>(_allBoundsCapacity);
-            _loadedPendingList = new List<ILevelBound>(_allBoundsCapacity);
-            _loadedDoneList = new HashSet<ILevelBound>(_allBoundsCapacity);
-            _setupPendingList = new List<ILevelBound>(_allBoundsCapacity);
-            _setupDoneList = new HashSet<ILevelBound>(_allBoundsCapacity);
-            _kickstartPendingList = new List<ILevelBound>(_allBoundsCapacity);
-            _kickstartDoneList = new HashSet<ILevelBound>(_allBoundsCapacity);
-            _unloadPendingList = new List<ILevelBound>(_allBoundsCapacity);
             _currentLevelSetups = new List<ILevelSetup>();
+
+            _initializationExecutionList = new List<LevelBoundWrapper>(_allBoundsCapacity);
+            _tempExecutionList = new List<LevelBoundWrapper>(_allBoundsCapacity);
         }
 
         private async UniTask LoadInitialLevel(Level level, Func<UniTask> onUnload = null, Optional<LoadLevelOptions> loadLevelOptions = default,
@@ -99,6 +186,8 @@ namespace Paps.Levels
         public async UniTask LoadLevel(Level level, Func<UniTask> onUnload = null, Optional<LoadLevelOptions> loadLevelOptions = default,
             IEnumerable<ILevelSetup> extraLevelSetups = null)
         {
+            ThrowIfOnAnyStage(stackalloc Stage[] { Stage.Loading, Stage.Unloding }, nameof(LoadLevel));
+
             if(CurrentLevel == null)
             {
                 await LoadInitialLevel(level, onUnload, loadLevelOptions, extraLevelSetups);
@@ -133,6 +222,8 @@ namespace Paps.Levels
         {
             CurrentStage = Stage.Loading;
 
+            _unloadLevelOrQuitTokenSource = CreateCancellationTokenSource();
+
             await SceneLoader.LoadAsync(level.InitialScenesGroup, LoadSceneMode.Additive);
 
             CurrentLevel = level;
@@ -142,19 +233,26 @@ namespace Paps.Levels
 
             await UniTask.NextFrame();
 
+            CurrentLoadingSubStage = LoadingSubStage.Construct;
+
+            GatherLevelBounds(CurrentLevel.InitialScenesGroup);
+
+            CurrentLoadingSubStage = LoadingSubStage.Load;
+
             await LoadLevelSetups(extraLevelSetups);
 
-            LoadLevelBounds();
+            await LoadLevelBounds();
+
+            CurrentLoadingSubStage = LoadingSubStage.Setup;
 
             await SetupLevelSetups();
 
-            SetupLevelBounds();
-
-            await WaitForLevelToBeReady();
+            await SetupLevelBounds();
 
             CurrentStage = Stage.LevelLoaded;
+            CurrentLoadingSubStage = LoadingSubStage.None;
 
-            await KickstartLevelSetups();
+            KickstartLevelSetups();
 
             KickstartLevelBounds();
         }
@@ -163,9 +261,12 @@ namespace Paps.Levels
         {
             var sceneGroup = _levelScenes.ToArray();
 
+            _unloadLevelOrQuitTokenSource.Cancel();
+            _unloadLevelOrQuitTokenSource = null;
+
             UnloadLevelBounds();
 
-            await UnloadLevelSetups();
+            UnloadLevelSetups();
 
             await SceneLoader.UnloadAsync(sceneGroup);
 
@@ -173,17 +274,6 @@ namespace Paps.Levels
 
             if (onUnload != null)
                 await onUnload();
-        }
-
-        public void RegisterReadinessContributor(ILevelReadinessContributor contributor)
-        {
-            if(CurrentStage != Stage.Loading)
-            {
-                this.LogWarning($"Ignored add of LevelReadinessContributor because level manager is not on {Stage.Loading} stage. Current stage: {CurrentStage}");
-                return;
-            }
-
-            _readinessContributors.Add(contributor);
         }
 
         private async UniTask LoadLevelSetups(IEnumerable<ILevelSetup> extraLevelSetups)
@@ -195,22 +285,44 @@ namespace Paps.Levels
 
             _currentLevelSetups.AddRange(CurrentLevel.LevelSetups);
 
-            await UniTask.WhenAll(_currentLevelSetups.Select(s => s.Loaded()));
+            await UniTask.WhenAll(_currentLevelSetups.Select(s => s.Load(LevelUnloadOrQuitCancellationToken)));
         }
 
-        private void LoadLevelBounds()
+        private async UniTask LoadLevelBounds()
         {
-            GatherLevelBounds(CurrentLevel.InitialScenesGroup);
-
-            for(int i = 0; i < _loadedPendingList.Count; i++)
+            for(int i = 0; i < _activeBounds.Count; i++)
             {
-                var bound = _loadedPendingList[i];
+                var levelBound = _activeBounds[i];
 
-                _loadedDoneList.Add(bound);
-                bound.Loaded();
+                _initializationExecutionList.Add(levelBound);
+                _tempExecutionList.Add(levelBound);
             }
 
-            _loadedPendingList.Clear();
+            for(int i = 0; i < _tempExecutionList.Count; i++)
+            {
+                var levelBound = _tempExecutionList[i];
+
+                AwaitTaskAndRemove(levelBound, levelBound.Load());
+            }
+
+            _tempExecutionList.Clear();
+
+            await WaitForInitializationList();
+        }
+
+        private async UniTask AwaitTaskAndRemove(LevelBoundWrapper levelBound, UniTask task)
+        {
+            await task;
+
+            _initializationExecutionList.Remove(levelBound);
+        }
+
+        private async UniTask WaitForInitializationList()
+        {
+            while(_initializationExecutionList.Count > 0)
+            {
+                await UniTask.NextFrame();
+            }
         }
 
         private void GatherLevelBounds(Scene[] sceneGroup)
@@ -224,13 +336,10 @@ namespace Paps.Levels
                 {
                     _rootGameObjectsList[j].GetComponentsInChildren(true, _tempGetComponentList);
 
-                    _activeBounds.AddRange(_tempGetComponentList);
-                    
-                    _loadedPendingList.AddRange(_tempGetComponentList);
-                    _loadedPendingList.RemoveAll(b => _loadedDoneList.Contains(b));
-
-                    _setupPendingList.AddRange(_tempGetComponentList);
-                    _kickstartPendingList.AddRange(_tempGetComponentList);
+                    foreach(var levelBound in _tempGetComponentList)
+                    {
+                        var wrapper = CreateLevelBoundWrapper(levelBound);
+                    }
                     
                     _tempGetComponentList.Clear();
                 }
@@ -239,75 +348,88 @@ namespace Paps.Levels
             }
         }
 
-        private async UniTask WaitForLevelToBeReady()
-        {
-            while(_readinessContributors.Count > 0)
-            {
-                foreach(var contributor in _readinessContributors)
-                {
-                    if(contributor.IsReady)
-                        _readinessContributors.Remove(contributor);
-                }
-
-                await UniTask.NextFrame();
-            }
-        }
-
         private async UniTask SetupLevelSetups()
         {
-            await UniTask.WhenAll(_currentLevelSetups.Select(s => s.Setup()));
+            await UniTask.WhenAll(_currentLevelSetups.Select(s => s.Setup(LevelUnloadOrQuitCancellationToken)));
         }
 
-        private void SetupLevelBounds()
+        private async UniTask SetupLevelBounds()
         {
-            foreach(var bound in _setupPendingList)
+            for(int i = 0; i < _activeBounds.Count; i++)
             {
-                _setupDoneList.Add(bound);
-                bound.Setup();
+                var levelBound = _activeBounds[i];
+
+                _initializationExecutionList.Add(levelBound);
+                _tempExecutionList.Add(levelBound);
             }
 
-            _setupPendingList.Clear();
+            for(int i = 0; i < _tempExecutionList.Count; i++)
+            {
+                var levelBound = _tempExecutionList[i];
+
+                AwaitTaskAndRemove(levelBound, levelBound.Setup());
+            }
+
+            _tempExecutionList.Clear();
+
+            await WaitForInitializationList();
         }
 
-        private async UniTask KickstartLevelSetups()
+        private void KickstartLevelSetups()
         {
-            await UniTask.WhenAll(_currentLevelSetups.Select(s => s.Kickstart()));
+            for(int i = 0; i < _currentLevelSetups.Count; i++)
+            {
+                _currentLevelSetups[i].Kickstart();
+
+                if(LevelUnloadOrQuitCancellationToken.IsCancellationRequested)
+                    return;
+            }
         }
 
         private void KickstartLevelBounds()
         {
-            foreach(var bound in _kickstartPendingList)
+            for(int i = 0; i < _activeBounds.Count; i++)
             {
-                _kickstartDoneList.Add(bound);
-                bound.Kickstart();
+                var levelBound = _activeBounds[i];
+
+                _tempExecutionList.Add(levelBound);
             }
 
-            _kickstartPendingList.Clear();
+            for(int i = 0; i < _tempExecutionList.Count; i++)
+            {
+                var levelBound = _tempExecutionList[i];
+
+                levelBound.Kickstart().Forget();
+
+                if(LevelUnloadOrQuitCancellationToken.IsCancellationRequested)
+                {
+                    _tempExecutionList.Clear();
+                    return;
+                }
+            }
+
+            _tempExecutionList.Clear();
         }
 
-        private async UniTask UnloadLevelSetups()
+        private void UnloadLevelSetups()
         {
-            await UniTask.WhenAll(_currentLevelSetups.Select(s => s.Unload()));
+            for(int i = 0; i < _currentLevelSetups.Count; i++)
+            {
+                _currentLevelSetups[i].Unload();
+            }
 
             _currentLevelSetups.Clear();
         }
 
         private void UnloadLevelBounds()
         {
-            _unloadPendingList.AddRange(_activeBounds);
-
-            for(int i = 0; i < _unloadPendingList.Count; i++)
+            for(int i = 0; i < _activeBounds.Count; i++)
             {
-                _unloadPendingList[i].Unload();
+                _activeBounds[i].Unload();
             }
 
-            _unloadPendingList.Clear();
-            _loadedPendingList.Clear();
-            _loadedDoneList.Clear();
-            _setupPendingList.Clear();
-            _setupDoneList.Clear();
-            _kickstartPendingList.Clear();
-            _kickstartDoneList.Clear();
+            _initializationExecutionList.Clear();
+            _activeBoundsByLevelBound.Clear();
             _activeBounds.Clear();
         }
 
@@ -324,45 +446,201 @@ namespace Paps.Levels
             }
         }
 
-        public bool DidLoaded(ILevelBound levelBound) => _loadedDoneList.Contains(levelBound);
-        public bool DidKickstart(ILevelBound levelBound) => _kickstartDoneList.Contains(levelBound);
-
         public T AddLevelBoundComponent<T>(GameObject gameObject) where T : Component, ILevelBound
         {
-            if(CurrentStage == Stage.Loading)
-            {
-                var component = gameObject.AddComponent<T>();
-                _activeBounds.Add(component);
-                _setupPendingList.Add(component);
-                _kickstartPendingList.Add(component);
-
-                _loadedDoneList.Add(component);
-                component.Loaded();
-
-                return component;
-            }
-            else if(CurrentStage == Stage.LevelLoaded)
-            {
-                var component = gameObject.AddComponent<T>();
-                _activeBounds.Add(component);
-
-                _loadedDoneList.Add(component);
-                component.Loaded();
-
-                _setupDoneList.Add(component);
-                component.Setup();
-
-                _kickstartDoneList.Add(component);
-                component.Kickstart();
-
-                return component;
-            }
-            else if(CurrentStage == Stage.Unloding)
+            if(CurrentStage == Stage.Unloding)
             {
                 throw new IllegalOperationOnLevelStageException("It is not allowed to add a level bound component while unloading level");
             }
 
+            var levelBound = gameObject.AddComponent<T>();
+
+            var wrapper = CreateLevelBoundWrapper(levelBound);
+
+            if(CurrentStage == Stage.Loading)
+            {
+                AddExternalLevelBoundWhileOnLoading(wrapper);
+
+                return levelBound;
+            }
+            else if(CurrentStage == Stage.LevelLoaded)
+            {
+                AddExternalLevelBoundAfterLevelLoaded(wrapper);
+
+                return levelBound;
+            }
+
             throw new IllegalOperationOnLevelStageException($"It is not allowed to add a level bound component while on stage {CurrentStage}");
+        }
+
+        private void AddExternalLevelBoundWhileOnLoading(LevelBoundWrapper wrapper)
+        {
+            _initializationExecutionList.Add(wrapper);
+
+            switch(CurrentLoadingSubStage)
+            {
+                case LoadingSubStage.Load:
+                    AwaitTaskAndRemove(wrapper, wrapper.Load());
+                    return;
+
+                case LoadingSubStage.Setup:
+                    AwaitTaskAndRemove(wrapper, wrapper.Setup());
+                    return;
+            }
+        }
+
+        private async UniTask AddExternalLevelBoundAfterLevelLoaded(LevelBoundWrapper wrapper)
+        {
+            await wrapper.Kickstart();
+        }
+
+        private LevelBoundWrapper CreateLevelBoundWrapper(ILevelBound levelBound)
+        {
+            var wrapper = new LevelBoundWrapper(levelBound, _unloadLevelOrQuitTokenSource);
+
+            _activeBounds.Add(wrapper);
+            _activeBoundsByLevelBound.Add(levelBound, wrapper);
+
+            wrapper.Construct();
+
+            return wrapper;
+        }
+
+        private CancellationTokenSource CreateCancellationTokenSource()
+        {
+            return CancellationTokenSource.CreateLinkedTokenSource(Application.exitCancellationToken);
+        }
+
+        private void ThrowIfOnStage(Stage stage, string operationName)
+        {
+            if(CurrentStage == stage)
+            {
+                throw new IllegalOperationOnLevelStageException($"It is not allowed to execute operation {operationName} while on stage {CurrentStage}");
+            }
+        }
+
+        private void ThrowIfOnAnyStage(ReadOnlySpan<Stage> stages, string operationName)
+        {
+            for(int i = 0; i < stages.Length; i++)
+            {
+                if(CurrentStage == stages[i])
+                {
+                    throw new IllegalOperationOnLevelStageException($"It is not allowed to execute operation {operationName} while on stage {CurrentStage}");
+                }
+            }
+        }
+
+        private void ThrowIfNotOnStage(Stage stage, string operationName)
+        {
+            if(CurrentStage == stage)
+            {
+                throw new IllegalOperationOnLevelStageException($"It is not allowed to execute operation {operationName} while on stage {CurrentStage}");
+            }
+        }
+
+        public bool IsLoading(ILevelBound levelBound)
+        {
+            if(levelBound == null)
+                throw new ArgumentNullException(nameof(levelBound));
+
+            if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
+            {
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.IsLoading)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                return false;
+            }
+
+            return _activeBoundsByLevelBound[levelBound].IsLoading;
+        }
+        public bool DidLoad(ILevelBound levelBound)
+        {
+            if(levelBound == null)
+                throw new ArgumentNullException(nameof(levelBound));
+
+            if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
+            {
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.DidLoad)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                return false;
+            }
+
+            return _activeBoundsByLevelBound[levelBound].DidLoad;
+        }
+        public bool IsSetupping(ILevelBound levelBound)
+        {
+            if(levelBound == null)
+                throw new ArgumentNullException(nameof(levelBound));
+
+            if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
+            {
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.IsSetupping)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                return false;
+            }
+
+            return _activeBoundsByLevelBound[levelBound].IsSetupping;
+        }
+        public bool DidSetup(ILevelBound levelBound)
+        {
+            if(levelBound == null)
+                throw new ArgumentNullException(nameof(levelBound));
+
+            if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
+            {
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.DidSetup)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                return false;
+            }
+
+            return _activeBoundsByLevelBound[levelBound].DidSetup;
+        }
+        public bool IsKickstarting(ILevelBound levelBound)
+        {
+            if(levelBound == null)
+                throw new ArgumentNullException(nameof(levelBound));
+
+            if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
+            {
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.IsKickstarting)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                return false;
+            }
+
+            return _activeBoundsByLevelBound[levelBound].IsKickstarting;
+        }
+        public bool DidKickstart(ILevelBound levelBound)
+        {
+            if(levelBound == null)
+                throw new ArgumentNullException(nameof(levelBound));
+
+            if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
+            {
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.DidKickstart)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                return false;
+            }
+
+            return _activeBoundsByLevelBound[levelBound].DidKickstart;
+        }
+        public bool IsUnloading(ILevelBound levelBound)
+        {
+            if(levelBound == null)
+                throw new ArgumentNullException(nameof(levelBound));
+
+            if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
+            {
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.IsUnloading)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                return false;
+            }
+
+            return _activeBoundsByLevelBound[levelBound].IsUnloading;
+        }
+        public bool DidUnload(ILevelBound levelBound)
+        {
+            if(levelBound == null)
+                throw new ArgumentNullException(nameof(levelBound));
+
+            if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
+            {
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.DidUnload)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                return false;
+            }
+
+            return _activeBoundsByLevelBound[levelBound].DidUnload;
         }
     }
 }

@@ -9,8 +9,13 @@ namespace Paps.Levels
             return LevelManager.Instance.AddLevelBoundComponent<T>(gameObject);
         }
 
-        public static bool DidLoaded(this ILevelBound levelBound) => LevelManager.Instance.DidLoaded(levelBound);
-
+        public static bool IsLoading(this ILevelBound levelBound) => LevelManager.Instance.IsLoading(levelBound);
+        public static bool DidLoad(this ILevelBound levelBound) => LevelManager.Instance.DidLoad(levelBound);
+        public static bool IsSetupping(this ILevelBound levelBound) => LevelManager.Instance.IsSetupping(levelBound);
+        public static bool DidSetup(this ILevelBound levelBound) => LevelManager.Instance.DidSetup(levelBound);
+        public static bool IsKickstarting(this ILevelBound levelBound) => LevelManager.Instance.IsKickstarting(levelBound);
         public static bool DidKickstart(this ILevelBound levelBound) => LevelManager.Instance.DidKickstart(levelBound);
+        public static bool IsUnloading(this ILevelBound levelBound) => LevelManager.Instance.IsUnloading(levelBound);
+        public static bool DidUnload(this ILevelBound levelBound) => LevelManager.Instance.DidUnload(levelBound);
     }
 }

@@ -1,44 +1,45 @@
 using Cysharp.Threading.Tasks;
 using System;
+using System.Threading;
 
 namespace Paps.Levels
 {
     public class CustomCallbacksLevelSetup : ILevelSetup
     {
-        public Func<UniTask> OnLoaded;
-        public Func<UniTask> OnSetup;
-        public Func<UniTask> OnKickstart;
-        public Func<UniTask> OnUnload;
+        public Func<CancellationToken, UniTask> OnLoaded;
+        public Func<CancellationToken, UniTask> OnSetup;
+        public Action OnKickstart;
+        public Action OnUnload;
 
-        public async UniTask Loaded()
+        public async UniTask Load(CancellationToken cancellationToken)
         {
             if(OnLoaded != null)
             {
-                await OnLoaded();
+                await OnLoaded(cancellationToken);
             }
         }
 
-        public async UniTask Setup()
+        public async UniTask Setup(CancellationToken cancellationToken)
         {
             if(OnSetup != null)
             {
-                await OnSetup();
+                await OnSetup(cancellationToken);
             }
         }
 
-        public async UniTask Kickstart()
+        public void Kickstart()
         {
             if(OnKickstart != null)
             {
-                await OnKickstart();
+                OnKickstart();
             }
         }
 
-        public async UniTask Unload()
+        public void Unload()
         {
             if(OnUnload != null)
             {
-                await OnUnload();
+                OnUnload();
             }
         }
     }

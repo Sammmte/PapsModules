@@ -1,13 +1,14 @@
 using Cysharp.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
 
 namespace Paps.Levels
 {
     public abstract class LevelSetupAsset : ScriptableObject, ILevelSetup
     {
-        public virtual UniTask Loaded() => UniTask.CompletedTask;
-        public virtual UniTask Setup() => UniTask.CompletedTask;
-        public virtual UniTask Kickstart() => UniTask.CompletedTask;
-        public virtual UniTask Unload() => UniTask.CompletedTask;
+        public virtual UniTask Load(CancellationToken cancellationToken) => UniTask.CompletedTask;
+        public virtual UniTask Setup(CancellationToken cancellationToken) => UniTask.CompletedTask;
+        public virtual void Kickstart() { }
+        public virtual void Unload() { }
     }
 }

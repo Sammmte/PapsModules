@@ -6,7 +6,7 @@ namespace Paps.GameplayTags
     [DisallowMultipleComponent]
     public abstract class GameplayTagsBase : MonoBehaviour, ILevelBound
     {
-        public void Loaded()
+        public void Construct()
         {
             GameplayTagsManager.Instance.Register(this);
         }
