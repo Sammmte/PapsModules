@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 namespace Paps.Cheats
 {
     [UxmlElement]
-    public partial class CheatOverlaysScreenElement : VisualElement
+    public partial class CheatOverlaysScreenElement : VisualElement, IDisposable
     {
         private VisualElement _itemsContainer;
         private VisualTreeAsset _elementContainerVTA;
@@ -77,5 +77,7 @@ namespace Paps.Cheats
 
             container.SetPosition(position);
         }
+
+        public void Dispose() => _elementContainerPool?.Dispose();
     }
 }

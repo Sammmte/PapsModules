@@ -232,5 +232,10 @@ namespace Paps.Localization
                 LocalizationSettings.StringDatabase.ReleaseTable(finalTableIds[i]);
             }
         }
+
+        private void OnDestroy()
+        {
+            _cachedTextPool.Dispose();
+        }
     }
 }

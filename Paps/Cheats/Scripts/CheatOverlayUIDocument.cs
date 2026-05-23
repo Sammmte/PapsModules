@@ -23,5 +23,10 @@ namespace Paps.Cheats
 
             return _screenElement;
         }
+
+        private void OnDestroy()
+        {
+            _screenElement?.Dispose();
+        }
     }
 }

@@ -77,5 +77,10 @@ namespace Paps.Audio
             audioEmitter.Play(audioParameters);
             return audioEmitter;
         }
+
+        private void OnDestroy()
+        {
+            _audioEmitterPool.Dispose();
+        }
     }
 }
