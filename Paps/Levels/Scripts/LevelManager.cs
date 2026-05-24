@@ -235,11 +235,15 @@ namespace Paps.Levels
 
             CurrentLoadingSubStage = LoadingSubStage.Construct;
 
+            PrepareLevelSetups(extraLevelSetups);
+
+            CallLevelLoadedCallback();
+
             GatherLevelBounds(CurrentLevel.InitialScenesGroup);
 
             CurrentLoadingSubStage = LoadingSubStage.Load;
 
-            await LoadLevelSetups(extraLevelSetups);
+            await LoadLevelSetups();
 
             await LoadLevelBounds();
 
@@ -276,7 +280,12 @@ namespace Paps.Levels
                 await onUnload();
         }
 
-        private async UniTask LoadLevelSetups(IEnumerable<ILevelSetup> extraLevelSetups)
+        private async UniTask LoadLevelSetups()
+        {
+            await UniTask.WhenAll(_currentLevelSetups.Select(s => s.Load(LevelUnloadOrQuitCancellationToken)));
+        }
+
+        private void PrepareLevelSetups(IEnumerable<ILevelSetup> extraLevelSetups)
         {
             if(extraLevelSetups != null)
             {
@@ -284,8 +293,14 @@ namespace Paps.Levels
             }
 
             _currentLevelSetups.AddRange(CurrentLevel.LevelSetups);
+        }
 
-            await UniTask.WhenAll(_currentLevelSetups.Select(s => s.Load(LevelUnloadOrQuitCancellationToken)));
+        private void CallLevelLoadedCallback()
+        {
+            for(int i = 0; i < _currentLevelSetups.Count; i++)
+            {
+                _currentLevelSetups[i].LevelLoaded();
+            }
         }
 
         private async UniTask LoadLevelBounds()
@@ -338,7 +353,7 @@ namespace Paps.Levels
 
                     foreach(var levelBound in _tempGetComponentList)
                     {
-                        var wrapper = CreateLevelBoundWrapper(levelBound);
+                        CreateLevelBoundWrapperOnConstruct(levelBound);
                     }
                     
                     _tempGetComponentList.Clear();
@@ -504,6 +519,19 @@ namespace Paps.Levels
             wrapper.Construct();
 
             return wrapper;
+        }
+
+        private void CreateLevelBoundWrapperOnConstruct(ILevelBound levelBound)
+        {
+            if(_activeBoundsByLevelBound.ContainsKey(levelBound))
+                return;
+
+            var wrapper = new LevelBoundWrapper(levelBound, _unloadLevelOrQuitTokenSource);
+
+            _activeBounds.Add(wrapper);
+            _activeBoundsByLevelBound.Add(levelBound, wrapper);
+
+            wrapper.Construct();
         }
 
         private CancellationTokenSource CreateCancellationTokenSource()

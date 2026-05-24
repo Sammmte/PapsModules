@@ -6,6 +6,7 @@ namespace Paps.Levels
 {
     public abstract class LevelSetupAsset : ScriptableObject, ILevelSetup
     {
+        public virtual void LevelLoaded() { }
         public virtual UniTask Load(CancellationToken cancellationToken) => UniTask.CompletedTask;
         public virtual UniTask Setup(CancellationToken cancellationToken) => UniTask.CompletedTask;
         public virtual void Kickstart() { }
