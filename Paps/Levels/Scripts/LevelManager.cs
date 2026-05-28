@@ -30,6 +30,7 @@ namespace Paps.Levels
         private class LevelBoundWrapper
         {
             public ILevelBound LevelBound { get; }
+            public MonoBehaviour MonoBehaviour { get; }
 
             public bool IsLoading { get; private set; }
             public bool DidLoad { get; private set; }
@@ -42,12 +43,13 @@ namespace Paps.Levels
 
             private CancellationTokenSource _cancellationTokenSource;
 
-            private CancellationToken CancellationToken => _cancellationTokenSource.Token;
+            public CancellationToken UnloadCancellationToken => _cancellationTokenSource.Token;
 
             public LevelBoundWrapper(ILevelBound levelBound, CancellationTokenSource unloadLevelTokenSource)
             {
                 LevelBound = levelBound;
-                _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(unloadLevelTokenSource.Token);
+                MonoBehaviour = levelBound as MonoBehaviour;
+                _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(unloadLevelTokenSource.Token, MonoBehaviour.destroyCancellationToken);
             }
 
             public void Construct() => LevelBound.Construct();
@@ -58,7 +60,7 @@ namespace Paps.Levels
                     return;
 
                 IsLoading = true;
-                await LevelBound.Load(CancellationToken);
+                await LevelBound.Load(UnloadCancellationToken);
                 DidLoad = true;
             }
 
@@ -69,11 +71,11 @@ namespace Paps.Levels
 
                 await Load();
                 
-                if(CancellationToken.IsCancellationRequested)
+                if(UnloadCancellationToken.IsCancellationRequested)
                     return;
 
                 IsSetupping = true;
-                await LevelBound.Setup(CancellationToken);
+                await LevelBound.Setup(UnloadCancellationToken);
                 DidSetup = true;
             }
 
@@ -84,7 +86,7 @@ namespace Paps.Levels
 
                 await Setup();
 
-                if(CancellationToken.IsCancellationRequested)
+                if(UnloadCancellationToken.IsCancellationRequested)
                     return;
 
                 IsKickstarting = true;
@@ -669,6 +671,19 @@ namespace Paps.Levels
             }
 
             return _activeBoundsByLevelBound[levelBound].DidUnload;
+        }
+
+        public CancellationToken GetUnloadCancellationToken(ILevelBound levelBound)
+        {
+            if(levelBound == null)
+                throw new ArgumentNullException(nameof(levelBound));
+
+            if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
+            {
+                throw new InvalidOperationException($"Tried to query {nameof(LevelBoundWrapper.DidUnload)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+            }
+
+            return _activeBoundsByLevelBound[levelBound].UnloadCancellationToken;
         }
     }
 }
