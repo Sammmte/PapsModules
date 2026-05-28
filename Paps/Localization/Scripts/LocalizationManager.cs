@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using UnityEngine.Localization.Tables;
 using System.Linq;
 using UnityEngine.Pool;
+using System.Threading;
 
 namespace Paps.Localization
 {
@@ -173,7 +174,7 @@ namespace Paps.Localization
 
         public bool IsTableLoaded(string tableId) => _loadedTables.ContainsKey(tableId);
 
-        public async UniTask LoadTablesAsync(params string[] tableIds)
+        public async UniTask LoadTablesAsync(CancellationToken cancellationToken = default, params string[] tableIds)
         {
             var finalTableIds = tableIds.Where(id => !IsTableLoaded(id)).ToArray();
 
@@ -182,7 +183,8 @@ namespace Paps.Localization
                 return;
             }
 
-            var stringTables = await UniTask.WhenAll(finalTableIds.Select(id => LocalizationSettings.StringDatabase.GetTableAsync(id).ToUniTask()));
+            var stringTables = await UniTask.WhenAll(finalTableIds.Select(id => 
+                LocalizationSettings.StringDatabase.GetTableAsync(id).WithCancellation(cancellationToken)));
 
             for(int i = 0; i < stringTables.Length; i++)
             {

@@ -13,7 +13,7 @@ namespace Paps.Localization
         {
             await LocalizationManager.Instance.Initialize();
 
-            await LocalizationManager.Instance.LoadTablesAsync(_preloadTableIds);
+            await LocalizationManager.Instance.LoadTablesAsync(default, _preloadTableIds);
         }
     }
 }
