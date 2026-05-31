@@ -60,8 +60,28 @@ namespace Paps.Levels
                     return;
 
                 IsLoading = true;
-                await LevelBound.Load(UnloadCancellationToken);
-                DidLoad = true;
+                try
+                {
+                    await LevelBound.Load(UnloadCancellationToken);
+                }
+                catch(OperationCanceledException)
+                {
+                    this.LogWarning($"Load of level bound {LevelBound.GetDebugName()} was cancelled");
+                }
+                catch(Exception e)
+                {
+                    this.LogError($"Exception occurred during Load of level bound {LevelBound.GetDebugName()}. Type: {e.GetType().Name} Message: {e.Message}");
+                    this.LogException(e, LevelBound.AsUnityComponent());
+                }
+                finally
+                {
+                    IsLoading = false;
+
+                    if(!UnloadCancellationToken.IsCancellationRequested)
+                    {
+                        DidLoad = true;
+                    }
+                }
             }
 
             public async UniTask Setup()
@@ -75,8 +95,28 @@ namespace Paps.Levels
                     return;
 
                 IsSetupping = true;
-                await LevelBound.Setup(UnloadCancellationToken);
-                DidSetup = true;
+                try
+                {
+                    await LevelBound.Setup(UnloadCancellationToken);
+                }
+                catch(OperationCanceledException)
+                {
+                    this.LogWarning($"Setup of level bound {LevelBound.GetDebugName()} was cancelled");
+                }
+                catch(Exception e)
+                {
+                    this.LogError($"Exception occurred during Setup of level bound {LevelBound.GetDebugName()}. Type: {e.GetType().Name} Message: {e.Message}");
+                    this.LogException(e, LevelBound.AsUnityComponent());
+                }
+                finally
+                {
+                    IsSetupping = false;
+
+                    if(!UnloadCancellationToken.IsCancellationRequested)
+                    {
+                        DidSetup = true;
+                    }
+                }
             }
 
             public async UniTask Kickstart()
@@ -90,8 +130,21 @@ namespace Paps.Levels
                     return;
 
                 IsKickstarting = true;
-                LevelBound.Kickstart();
-                DidKickstart = true;
+                
+                try
+                {
+                    LevelBound.Kickstart();
+                }
+                catch(Exception e)
+                {
+                    this.LogError($"Exception occurred during Kickstart of level bound {LevelBound.GetDebugName()}. Type: {e.GetType().Name} Message: {e.Message}");
+                    this.LogException(e, LevelBound.AsUnityComponent());
+                }
+                finally
+                {
+                    IsKickstarting = false;
+                    DidKickstart = true;
+                }
             }
 
             public void Unload()
@@ -103,8 +156,20 @@ namespace Paps.Levels
                 
                 _cancellationTokenSource.Cancel();
 
-                LevelBound.Unload();
-                DidUnload = true;
+                try
+                {
+                    LevelBound.Unload();
+                }
+                catch(Exception e)
+                {
+                    this.LogError($"Exception occurred during Unload of level bound {LevelBound.GetDebugName()}. Type: {e.GetType().Name} Message: {e.Message}");
+                    this.LogException(e, LevelBound.AsUnityComponent());
+                }
+                finally
+                {
+                    IsUnloading = false;
+                    DidUnload = true;
+                }
             }
         }
 
@@ -575,7 +640,7 @@ namespace Paps.Levels
 
             if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
             {
-                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.IsLoading)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.IsLoading)} state but level bound {levelBound.GetDebugName()} is not yet/anymore tracked by LevelManager");
                 return false;
             }
 
@@ -588,7 +653,7 @@ namespace Paps.Levels
 
             if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
             {
-                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.DidLoad)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.DidLoad)} state but level bound {levelBound.GetDebugName()} is not yet/anymore tracked by LevelManager");
                 return false;
             }
 
@@ -601,7 +666,7 @@ namespace Paps.Levels
 
             if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
             {
-                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.IsSetupping)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.IsSetupping)} state but level bound {levelBound.GetDebugName()} is not yet/anymore tracked by LevelManager");
                 return false;
             }
 
@@ -614,7 +679,7 @@ namespace Paps.Levels
 
             if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
             {
-                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.DidSetup)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.DidSetup)} state but level bound {levelBound.GetDebugName()} is not yet/anymore tracked by LevelManager");
                 return false;
             }
 
@@ -627,7 +692,7 @@ namespace Paps.Levels
 
             if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
             {
-                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.IsKickstarting)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.IsKickstarting)} state but level bound {levelBound.GetDebugName()} is not yet/anymore tracked by LevelManager");
                 return false;
             }
 
@@ -640,7 +705,7 @@ namespace Paps.Levels
 
             if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
             {
-                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.DidKickstart)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.DidKickstart)} state but level bound {levelBound.GetDebugName()} is not yet/anymore tracked by LevelManager");
                 return false;
             }
 
@@ -653,7 +718,7 @@ namespace Paps.Levels
 
             if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
             {
-                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.IsUnloading)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.IsUnloading)} state but level bound {levelBound.GetDebugName()} is not yet/anymore tracked by LevelManager");
                 return false;
             }
 
@@ -666,7 +731,7 @@ namespace Paps.Levels
 
             if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
             {
-                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.DidUnload)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                this.LogWarning($"Tried to query {nameof(LevelBoundWrapper.DidUnload)} state but level bound {levelBound.GetDebugName()} is not yet/anymore tracked by LevelManager");
                 return false;
             }
 
@@ -680,7 +745,7 @@ namespace Paps.Levels
 
             if(!_activeBoundsByLevelBound.ContainsKey(levelBound))
             {
-                throw new InvalidOperationException($"Tried to query {nameof(LevelBoundWrapper.DidUnload)} state but level bound {levelBound.GetUnityName()} is not yet/anymore tracked by LevelManager");
+                throw new InvalidOperationException($"Tried to query {nameof(LevelBoundWrapper.DidUnload)} state but level bound {levelBound.GetDebugName()} is not yet/anymore tracked by LevelManager");
             }
 
             return _activeBoundsByLevelBound[levelBound].UnloadCancellationToken;

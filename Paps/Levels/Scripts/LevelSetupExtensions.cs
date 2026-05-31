@@ -1,3 +1,4 @@
+using Paps.UnityExtensions;
 using System.Threading;
 using UnityEngine;
 
@@ -19,5 +20,6 @@ namespace Paps.Levels
         public static bool IsUnloading(this ILevelBound levelBound) => LevelManager.Instance.IsUnloading(levelBound);
         public static bool DidUnload(this ILevelBound levelBound) => LevelManager.Instance.DidUnload(levelBound);
         public static CancellationToken GetUnloadCancellationToken(this ILevelBound levelBound) => LevelManager.Instance.GetUnloadCancellationToken(levelBound);
+        public static string GetDebugName(this ILevelBound levelBound) => $"{levelBound.GetUnityName()}_Component:{levelBound.GetType().Name}";
     }
 }

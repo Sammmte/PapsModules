@@ -77,6 +77,18 @@ namespace Paps.Logging
                 Debug.LogError($"[{typeof(T).Name}] {message}");
         }
 
+        [Conditional("PAPS_LOG"), Conditional("UNITY_EDITOR")]
+        public static void LogException<T>(this T caller, Exception exception, Object contextObject = null)
+        {
+            if (!IsLogEnabled(typeof(T)))
+                return;
+
+            if (contextObject != null)
+                Debug.LogException(exception, contextObject);
+            else
+                Debug.LogException(exception);
+        }
+
         private static bool IsLogEnabled(Type type)
         {
             if (!LogEnabled)
