@@ -1,12 +1,13 @@
 using Cysharp.Threading.Tasks;
 using Paps.GameSetup;
+using System.Threading;
 using UnityEngine;
 
 namespace Paps.Cheats
 {
     public class CheatGameSetupProcess : GameSetupProcess
     {
-        public override async UniTask Setup()
+        public override async UniTask Setup(CancellationToken cancellationToken)
         {
             var cheatsPrefab = await CheatsHelper.LoadAssetAsync<GameObject>("CheatsPrefab");
 

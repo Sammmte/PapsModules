@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using Paps.GameSetup;
 using Paps.Levels;
 using Paps.SceneLoading;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,19 +15,16 @@ namespace Paps.Entry
 
         private void Awake()
         {
-            DoEntry().Forget();
+            DoEntry(Application.exitCancellationToken).Forget();
         }
 
-        private async UniTaskVoid DoEntry()
+        private async UniTaskVoid DoEntry(CancellationToken cancellationToken)
         {
             await SceneLoader.LoadAsync("Setup", LoadSceneMode.Additive);
-            await WaitForSetupProcess();
+            cancellationToken.ThrowIfCancellationRequested();
+            await GameSetupManager.Instance.Setup(cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
             await LevelManager.Instance.LoadLevel(_startupLevel, loadLevelOptions: _loadLevelOptions);
-        }
-
-        private UniTask WaitForSetupProcess()
-        {
-            return GameSetupManager.Instance.Setup();
         }
     }
 }

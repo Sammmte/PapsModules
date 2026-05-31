@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Paps.GameSetup;
+using System.Threading;
 using UnityEngine;
 
 namespace Paps.Localization
@@ -9,11 +10,11 @@ namespace Paps.Localization
     {
         [SerializeField] private string[] _preloadTableIds;
 
-        public override async UniTask Setup()
+        public override async UniTask Setup(CancellationToken cancellationToken)
         {
             await LocalizationManager.Instance.Initialize();
 
-            await LocalizationManager.Instance.LoadTablesAsync(default, _preloadTableIds);
+            await LocalizationManager.Instance.LoadTablesAsync(cancellationToken, _preloadTableIds);
         }
     }
 }

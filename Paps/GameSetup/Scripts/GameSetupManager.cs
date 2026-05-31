@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
 
 namespace Paps.GameSetup
@@ -15,9 +16,9 @@ namespace Paps.GameSetup
             DontDestroyOnLoad(gameObject);
         }
 
-        public async UniTask Setup()
+        public async UniTask Setup(CancellationToken cancellationToken)
         {
-            await _pipeline.Execute();
+            await _pipeline.Execute(cancellationToken);
         }
     }
 }

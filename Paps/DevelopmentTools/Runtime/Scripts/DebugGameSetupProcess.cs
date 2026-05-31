@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Paps.GameSetup;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,7 +10,7 @@ namespace Paps.DevelopmentTools.Runtime
     {
         [SerializeField] private EventSystem _eventSystemPrefab;
 
-        public override async UniTask Setup()
+        public override async UniTask Setup(CancellationToken cancellationToken)
         {
 #if CHEATS || UNITY_EDITOR
             var eventSystemInstance = Instantiate(_eventSystemPrefab);

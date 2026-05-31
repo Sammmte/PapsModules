@@ -60,7 +60,12 @@ namespace Paps.EditorGameSetup
 
         private static async UniTask AwaitSetupAndCallCustomSetuppers()
         {
-            await GameSetupManager.Instance.Setup();
+            var cancellationToken = Application.exitCancellationToken;
+
+            await GameSetupManager.Instance.Setup(cancellationToken);
+
+            if(cancellationToken.IsCancellationRequested)
+                return;
 
             var settings = GetSettings();
             var context = new EditorGameSetupContext(GetFullScenesFromNames(_currentState.LoadedScenes));
