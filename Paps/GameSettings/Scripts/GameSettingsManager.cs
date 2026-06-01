@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using SaintsField;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace Paps.GameSettings
@@ -20,11 +21,11 @@ namespace Paps.GameSettings
             DontDestroyOnLoad(gameObject);
         }
 
-        public async UniTask Initialize()
+        public async UniTask Initialize(CancellationToken cancellationToken = default)
         {
-            PrepareDynamicSettings();
+            var saveInfoDictionary = await _storageProvider.Storage.Load(cancellationToken);
 
-            var saveInfoDictionary = await _storageProvider.Storage.Load();
+            PrepareDynamicSettings();
 
             foreach(var key in _gameSettings.Keys)
             {

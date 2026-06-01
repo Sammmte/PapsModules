@@ -12,7 +12,7 @@ namespace Paps.Localization
 
         public override async UniTask Setup(CancellationToken cancellationToken)
         {
-            await LocalizationManager.Instance.Initialize();
+            await LocalizationManager.Instance.Initialize(cancellationToken);
 
             await LocalizationManager.Instance.LoadTablesAsync(cancellationToken, _preloadTableIds);
         }

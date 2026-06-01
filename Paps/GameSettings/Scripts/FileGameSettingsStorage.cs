@@ -4,6 +4,7 @@ using Paps.Persistence;
 using SaintsField;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using UnityEngine;
 
 namespace Paps.GameSettings
@@ -13,14 +14,14 @@ namespace Paps.GameSettings
         [SerializeField] private string _relativeFilePath;
         [SerializeField] private SaintsInterface<ISerializer> _serializer;
 
-        public async UniTask<Dictionary<string, GameSettingSaveInfo>> Load()
+        public async UniTask<Dictionary<string, GameSettingSaveInfo>> Load(CancellationToken cancellationToken)
         {
             var absoluteFilePath = GetFilePath();
 
             if(!File.Exists(absoluteFilePath))
                 return new Dictionary<string, GameSettingSaveInfo>();
 
-            var serializedData = await File.ReadAllTextAsync(absoluteFilePath);
+            var serializedData = await File.ReadAllTextAsync(absoluteFilePath, cancellationToken);
 
             this.Log($"Loaded game settings:\n\n{serializedData}");
 

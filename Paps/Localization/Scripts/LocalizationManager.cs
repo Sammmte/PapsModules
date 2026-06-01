@@ -46,10 +46,12 @@ namespace Paps.Localization
                 actionOnRelease: dict => dict.Clear(), collectionCheck: true, defaultCapacity: _maxTableCount);
         }
 
-        public async UniTask Initialize()
+        public async UniTask Initialize(CancellationToken cancellationToken = default)
         {
-            await LocalizationSettings.InitializationOperation.ToUniTask();
-            await UniTask.NextFrame(); // this prevents errors from calling localized strings the same frame initialization finishes
+            await LocalizationSettings.InitializationOperation.WithCancellation(cancellationToken);
+            await UniTask.NextFrame(cancellationToken); // this prevents errors from calling localized strings the same frame initialization finishes
+
+            cancellationToken.ThrowIfCancellationRequested();
 
             PrewarmCachedTextDictionaries();
         }
@@ -183,12 +185,19 @@ namespace Paps.Localization
                 return;
             }
 
-            var stringTables = await UniTask.WhenAll(finalTableIds.Select(id => 
+            try
+            {
+                var stringTables = await UniTask.WhenAll(finalTableIds.Select(id => 
                 LocalizationSettings.StringDatabase.GetTableAsync(id).WithCancellation(cancellationToken)));
 
-            for(int i = 0; i < stringTables.Length; i++)
+                for(int i = 0; i < stringTables.Length; i++)
+                {
+                    _loadedTables[stringTables[i].TableCollectionName] = stringTables[i];
+                }
+            }
+            catch(OperationCanceledException)
             {
-                _loadedTables[stringTables[i].TableCollectionName] = stringTables[i];
+                UnloadTables(tableIds);
             }
         }
 

@@ -8,7 +8,7 @@ namespace Paps.GameSettings
     {
         public override async UniTask Setup(CancellationToken cancellationToken)
         {
-            await GameSettingsManager.Instance.Initialize();
+            await GameSettingsManager.Instance.Initialize(cancellationToken);
         }
     }
 }
