@@ -114,27 +114,11 @@ namespace Paps.Update
 
             for (int i = _groups.Count - 1; i >= 0; i--)
             {
-                if (_groups[i] == null)
-                {
-                    Debug.LogWarning($"Removed null group at index {i}");
-                    _groups.RemoveAt(i);
-                    continue;
-                }
-
                 if (_groups[i] == _defaultGroup)
                 {
                     Debug.LogWarning($"Removed default update schema group {_defaultGroup.name} from groups list");
                     _groups.RemoveAt(i);
                     continue;
-                }
-
-                for (int j = 0; j < i; j++)
-                {
-                    if (_groups[i] == _groups[j])
-                    {
-                        _groups.RemoveAt(i);
-                        break;
-                    }
                 }
             }
         }

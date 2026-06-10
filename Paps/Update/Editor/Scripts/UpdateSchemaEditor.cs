@@ -20,7 +20,7 @@ namespace Paps.Update.Editor
         private VisualElement _mainContainer;
         private PropertyField _updatablesCapacityField;
         private PropertyField _defaultGroupField;
-        private MultiColumnListView _updateGroupsListView;
+        private ListView _updateGroupsListView;
         private MultiColumnListView _frameSequenceListView;
 
         private SerializedProperty _defaultGroupProperty;
@@ -39,7 +39,7 @@ namespace Paps.Update.Editor
             var capacityFieldParent = _updatablesCapacityField.parent;
             capacityFieldParent.Insert(capacityFieldParent.IndexOf(_updatablesCapacityField) + 1, _defaultGroupField);
 
-            _updateGroupsListView = _mainContainer.Q<MultiColumnListView>("UpdateGroupsList");
+            _updateGroupsListView = _mainContainer.Q<ListView>("UpdateGroupsList");
             _frameSequenceListView = _mainContainer.Q<MultiColumnListView>("FrameSequenceList");
 
             _updatablesCapacityField.BindProperty(serializedObject.FindProperty("_updatableGroupCapacity"));
@@ -57,29 +57,6 @@ namespace Paps.Update.Editor
 
         private void InitializeUpdateGroupsList()
         {
-            var groupColumn = _updateGroupsListView.columns[0];
-            
-            // We only need one column for the group object reference now
-            groupColumn.title = "Group Asset";
-            groupColumn.makeCell += () => new ObjectField() { objectType = typeof(UpdateSchemaGroup) };
-            groupColumn.bindCell += (element, index) =>
-            {
-                var field = element as ObjectField;
-                field.BindProperty(_groupsProperty.GetArrayElementAtIndex(index));
-            };
-            groupColumn.unbindCell += (element, index) =>
-            {
-                var field = element as ObjectField;
-                field.Unbind();
-            };
-
-            // Remove ID column if it exists or hide it
-            if(_updateGroupsListView.columns.Count > 1)
-            {
-                _updateGroupsListView.columns[1].width = 0;
-                _updateGroupsListView.columns[1].visible = false;
-            }
-
             _updateGroupsListView.BindProperty(_groupsProperty);
         }
 

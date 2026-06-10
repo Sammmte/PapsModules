@@ -3,12 +3,7 @@
     <ui:VisualElement name="MainContainer" style="flex-grow: 1;">
         <uie:PropertyField name="UpdatablesCapacityField" label="Updatables Capacity"/>
         <ui:VisualElement name="Space" style="height: 20px;"/>
-        <ui:MultiColumnListView columns="" sort-column-descriptions="" name="UpdateGroupsList" header-title="Update Groups" show-add-remove-footer="true" reorderable="true" reorder-mode="Animated" show-foldout-header="true" show-border="true">
-            <ui:Columns>
-                <ui:Column name="Name" title="Name" width="80%"/>
-                <ui:Column name="Id" title="Id" width="20%"/>
-            </ui:Columns>
-        </ui:MultiColumnListView>
+        <ui:ListView name="UpdateGroupsList" reorderable="true" show-foldout-header="true" show-add-remove-footer="true" header-title="Groups" show-border="true"/>
         <ui:VisualElement name="Space" style="height: 50px;"/>
         <ui:MultiColumnListView columns="" sort-column-descriptions="" name="FrameSequenceList" header-title="Frame Sequence" show-add-remove-footer="true" reorderable="true" reorder-mode="Animated" show-foldout-header="true" show-border="true" virtualization-method="DynamicHeight">
             <ui:Columns>
