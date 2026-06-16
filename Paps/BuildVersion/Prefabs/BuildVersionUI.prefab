@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1661151025517033992}
   - component: {fileID: -3732604511135335129}
   m_Layer: 0
-  m_Name: BuildVersionMenu
+  m_Name: BuildVersionUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
