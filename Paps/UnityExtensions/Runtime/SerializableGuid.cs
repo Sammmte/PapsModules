@@ -11,27 +11,27 @@ namespace Paps.UnityExtensions
     {
         #region Fields
 
-        [SerializeField, HideInInspector]
+        [SerializeField]
         public int A;
-        [SerializeField, HideInInspector]
+        [SerializeField]
         public short B;
-        [SerializeField, HideInInspector]
+        [SerializeField]
         public short C;
-        [SerializeField, HideInInspector]
+        [SerializeField]
         public byte D;
-        [SerializeField, HideInInspector]
+        [SerializeField]
         public byte E;
-        [SerializeField, HideInInspector]
+        [SerializeField]
         public byte F;
-        [SerializeField, HideInInspector]
+        [SerializeField]
         public byte G;
-        [SerializeField, HideInInspector]
+        [SerializeField]
         public byte H;
-        [SerializeField, HideInInspector]
+        [SerializeField]
         public byte I;
-        [SerializeField, HideInInspector]
+        [SerializeField]
         public byte J;
-        [SerializeField, HideInInspector]
+        [SerializeField]
         public byte K;
 
         #endregion
