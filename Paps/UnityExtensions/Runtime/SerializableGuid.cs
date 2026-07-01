@@ -260,6 +260,11 @@ namespace Paps.UnityExtensions
             return a.ToGuid() != b;
         }
 
+        public static unsafe Guid FromUnityGUID(UnityEngine.GUID unityGuid)
+        {
+            return *(Guid*)&unityGuid;
+        }
+
         #endregion
     }
 }
