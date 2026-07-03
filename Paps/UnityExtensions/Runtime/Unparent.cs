@@ -6,7 +6,7 @@ namespace Paps.UnityExtensions
     {
         [SerializeField] private Transform[] _transforms;
 
-        private void Awake()
+        private void Start()
         {
             for (int i = 0; i < _transforms.Length; i++)
             {
