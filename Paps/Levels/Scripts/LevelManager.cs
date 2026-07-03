@@ -750,5 +750,11 @@ namespace Paps.Levels
 
             return _activeBoundsByLevelBound[levelBound].UnloadCancellationToken;
         }
+
+        private void OnApplicationQuit()
+        {
+            UnloadLevelBounds();
+            UnloadLevelSetups();
+        }
     }
 }
