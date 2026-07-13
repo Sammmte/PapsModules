@@ -1,4 +1,4 @@
-﻿namespace Paps.Time
+﻿namespace Paps.TimeManagement
 {
     internal struct TimeChannelConfiguration
     {

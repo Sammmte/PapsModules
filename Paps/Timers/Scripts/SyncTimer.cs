@@ -1,4 +1,4 @@
-using Paps.Time;
+using Paps.TimeManagement;
 using Paps.Update;
 using System;
 using UnityEngine;

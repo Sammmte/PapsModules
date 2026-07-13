@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-namespace Paps.Time
+namespace Paps.TimeManagement
 {
     [CreateAssetMenu(menuName = "Paps/Time/Time Channel")]
     public class TimeChannel : ScriptableObject

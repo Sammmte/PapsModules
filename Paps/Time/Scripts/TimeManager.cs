@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityTime = UnityEngine.Time;
 
-namespace Paps.Time
+namespace Paps.TimeManagement
 {
     [DefaultExecutionOrder(-10000)]
     public class TimeManager : MonoBehaviour
