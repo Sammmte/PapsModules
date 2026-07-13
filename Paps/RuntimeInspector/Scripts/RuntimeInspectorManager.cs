@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using DynamicPanels;
 using RuntimeInspectorNamespace;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,12 +12,14 @@ namespace Paps.RuntimeInspector.Cheats
     {
         public static RuntimeInspectorManager Instance { get; private set; }
 
-        [SerializeField] private GameObject _runtimeHierarchyContainer;
-        [SerializeField] private GameObject _runtimeInspectorContainer;
+        [SerializeField] private Canvas _canvas;
         [SerializeField] private Button _hideHierarchyButton;
         [SerializeField] private Button _hideInspectorButton;
         [SerializeField] private RuntimeHierarchy _runtimeHierarchy;
         [SerializeField] private Inspector _runtimeInspector;
+
+        private Panel _runtimeHierarchyContainer;
+        private Panel _runtimeInspectorContainer;
 
         public bool IsHierarchyEnabled => _runtimeHierarchyContainer.gameObject.activeSelf;
 
@@ -24,13 +28,27 @@ namespace Paps.RuntimeInspector.Cheats
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            HideHierarchy();
-            HideInspector();
+            _canvas.enabled = false;
 
             _hideHierarchyButton.onClick.AddListener(HideHierarchy);
             _hideInspectorButton.onClick.AddListener(HideInspector);
 
             _runtimeHierarchy.OnSelectionChanged += OnHierarchySelectionChanged;
+
+            InitializeAfterDynamicPanels();
+        }
+
+        private async UniTask InitializeAfterDynamicPanels()
+        {
+            await UniTask.Yield(PlayerLoopTiming.EarlyUpdate);
+
+            _runtimeHierarchyContainer = _runtimeHierarchy.GetComponentInParent<Panel>();
+            _runtimeInspectorContainer = _runtimeInspector.GetComponentInParent<Panel>();
+
+            HideHierarchy();
+            HideInspector();
+
+            _canvas.enabled = true;
         }
 
         public void HideHierarchy()
