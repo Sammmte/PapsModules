@@ -6,6 +6,8 @@ namespace Paps.Localization
     [Serializable]
     public struct LocalizedText
     {
+        public static readonly LocalizedText INVALID = new LocalizedText();
+
         [SerializeField] private LocalizationIdReference _localizationIdReference;
 
         public string TableId
@@ -18,6 +20,8 @@ namespace Paps.Localization
             get => _localizationIdReference.LocalizationId;
             set => _localizationIdReference.LocalizationId = value;
         }
+
+        public bool IsValid => !string.IsNullOrEmpty(TableId) && !string.IsNullOrEmpty(LocalizationId);
 
         public string Text
         {

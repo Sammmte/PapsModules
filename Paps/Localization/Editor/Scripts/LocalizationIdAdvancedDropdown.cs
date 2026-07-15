@@ -19,6 +19,8 @@ namespace Paps.Localization.Editor
             }
         }
 
+        private const string NONE_ITEM = "None";
+
         private Dictionary<string, string[]> _localizationIdsPerTable;
 
         public event Action<LocalizationIdReference> OnItemSelected;
@@ -33,6 +35,8 @@ namespace Paps.Localization.Editor
         protected override AdvancedDropdownItem BuildRoot()
         {
             var root = new AdvancedDropdownItem("Localization Ids");
+
+            root.AddChild(new AdvancedDropdownItem(NONE_ITEM));
 
             foreach(var tableWithKeys in _localizationIdsPerTable)
             {
@@ -50,6 +54,15 @@ namespace Paps.Localization.Editor
 
         protected override void ItemSelected(AdvancedDropdownItem item)
         {
+            if(item.name == NONE_ITEM)
+            {
+                OnItemSelected?.Invoke(new LocalizationIdReference
+                {
+                    TableId = string.Empty,
+                    LocalizationId = string.Empty,
+                });
+            }
+
             if(item is LocalizationIdItem localizationItem)
             {
                 OnItemSelected?.Invoke(new LocalizationIdReference

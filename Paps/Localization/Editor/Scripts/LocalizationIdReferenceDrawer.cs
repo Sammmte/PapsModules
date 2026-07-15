@@ -12,15 +12,10 @@ namespace Paps.Localization.Editor
     [CustomPropertyDrawer(typeof(LocalizationIdReference))]
     public class LocalizationIdReferenceDrawer : PropertyDrawer
     {
-        private bool _selectSourceButtonClicked;
-
-        private SerializedProperty _tableIdProperty;
-        private SerializedProperty _localizationIdProperty;
-
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            _tableIdProperty = property.FindPropertyRelativeBakingField(nameof(LocalizationIdReference.TableId)).FindPropertyRelativeBakingField(nameof(TableReference.TableId));
-            _localizationIdProperty = property.FindPropertyRelativeBakingField(nameof(LocalizationIdReference.LocalizationId));
+            var tableIdProperty = property.FindPropertyRelativeBakingField(nameof(LocalizationIdReference.TableId)).FindPropertyRelativeBakingField(nameof(TableReference.TableId));
+            var localizationIdProperty = property.FindPropertyRelativeBakingField(nameof(LocalizationIdReference.LocalizationId));
 
             var container = LocalizationEditorConfiguration.Instance.LocalizationFieldTreeAsset.CloneTree();
 
@@ -29,67 +24,67 @@ namespace Paps.Localization.Editor
 
             label.text = property.displayName;
 
-            buttonContainer.Add(new IMGUIContainer(() => DrawTableSourceButton()));
+            var selectSourceButtonClicked = false;
+
+            buttonContainer.Add(new IMGUIContainer(() =>
+            {
+                GUILayout.BeginVertical();
+
+                GUILayout.FlexibleSpace();
+
+                GUILayout.BeginHorizontal();
+
+                if (GUILayout.Button(GetSelectSourceButtonStringState()))
+                {
+                    selectSourceButtonClicked = true;
+                }
+
+                GUILayout.EndHorizontal();
+
+                GUILayout.FlexibleSpace();
+
+                GUILayout.EndVertical();
+
+                if(selectSourceButtonClicked && Event.current.type == EventType.Repaint)
+                {
+                    ShowDropdown();
+                    selectSourceButtonClicked = false;
+                }
+            }));
 
             return container;
-        }
 
-        private void DrawTableSourceButton()
-        {
-            GUILayout.BeginVertical();
-
-            GUILayout.FlexibleSpace();
-
-            GUILayout.BeginHorizontal();
-
-            if (GUILayout.Button(GetSelectSourceButtonStringState()))
+            void ShowDropdown()
             {
-                _selectSourceButtonClicked = true;
-            }
-            
-            GUILayout.EndHorizontal();
+                var rect = GUILayoutUtility.GetLastRect();
 
-            GUILayout.FlexibleSpace();
-
-            GUILayout.EndVertical();
-
-            if(_selectSourceButtonClicked && Event.current.type == EventType.Repaint)
-            {
-                ShowDropdown();
-                _selectSourceButtonClicked = false;
-            }
-        }
-
-        private void ShowDropdown()
-        {
-            var rect = GUILayoutUtility.GetLastRect();
-
-            var advancedDropdown = new LocalizationIdAdvancedDropdown(new AdvancedDropdownState(), 
-                LocalizationEditorSettings.GetStringTableCollections()
-                    .ToDictionary(
-                        c => c.name, 
-                        c => c.SharedData.Entries.Select(e => e.Key).ToArray())
-                );
-            advancedDropdown.OnItemSelected += OnItemSelected;
-            advancedDropdown.Show(rect);
-        }
-
-        private string GetSelectSourceButtonStringState()
-        {
-            if(string.IsNullOrEmpty(_localizationIdProperty.stringValue) || string.IsNullOrEmpty(_tableIdProperty.stringValue))
-            {
-                return "No Localization Key Selected";
+                var advancedDropdown = new LocalizationIdAdvancedDropdown(new AdvancedDropdownState(), 
+                    LocalizationEditorSettings.GetStringTableCollections()
+                        .ToDictionary(
+                            c => c.name, 
+                            c => c.SharedData.Entries.Select(e => e.Key).ToArray())
+                    );
+                advancedDropdown.OnItemSelected += OnItemSelected;
+                advancedDropdown.Show(rect);
             }
 
-            return $"{_tableIdProperty.stringValue}/{_localizationIdProperty.stringValue}";
-        }
+            string GetSelectSourceButtonStringState()
+            {
+                if(string.IsNullOrEmpty(localizationIdProperty.stringValue) || string.IsNullOrEmpty(tableIdProperty.stringValue))
+                {
+                    return "No Localization Key Selected";
+                }
 
-        private void OnItemSelected(LocalizationIdReference localizationId)
-        {
-            _localizationIdProperty.stringValue = localizationId.LocalizationId;
-            _tableIdProperty.stringValue = localizationId.TableId;
+                return $"{tableIdProperty.stringValue}/{localizationIdProperty.stringValue}";
+            }
 
-            _localizationIdProperty.serializedObject.ApplyModifiedProperties();
+            void OnItemSelected(LocalizationIdReference localizationId)
+            {
+                localizationIdProperty.stringValue = localizationId.LocalizationId;
+                tableIdProperty.stringValue = localizationId.TableId;
+
+                localizationIdProperty.serializedObject.ApplyModifiedProperties();
+            }
         }
     }
 }
