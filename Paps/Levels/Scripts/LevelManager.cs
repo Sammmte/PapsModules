@@ -52,7 +52,18 @@ namespace Paps.Levels
                 _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(unloadLevelTokenSource.Token, MonoBehaviour.destroyCancellationToken);
             }
 
-            public void Construct() => LevelBound.Construct();
+            public void Construct()
+            {
+                try
+                {
+                    LevelBound.Construct();
+                }
+                catch(Exception e)
+                {
+                    this.LogError($"Exception occurred during Construct of level bound {LevelBound.GetDebugName()}. Type: {e.GetType().Name} Message: {e.Message}");
+                    this.LogException(e, LevelBound.AsUnityComponent());
+                }
+            }
 
             public async UniTask Load()
             {
