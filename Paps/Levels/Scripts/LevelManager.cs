@@ -317,7 +317,7 @@ namespace Paps.Levels
 
             CallLevelLoadedCallback();
 
-            GatherLevelBounds(CurrentLevel.InitialScenesGroup);
+            GatherLevelBounds(CurrentLevel.InitialScenesGroup, includeDontDestroyOnLoadScene: true);
 
             CurrentLoadingSubStage = LoadingSubStage.Load;
 
@@ -418,27 +418,39 @@ namespace Paps.Levels
             }
         }
 
-        private void GatherLevelBounds(Scene[] sceneGroup)
+        private void GatherLevelBounds(Scene[] sceneGroup, bool includeDontDestroyOnLoadScene)
         {
             for (int i = 0; i < sceneGroup.Length; i++)
             {
                 var scene = sceneGroup[i];
-                scene.GetRootGameObjects(_rootGameObjectsList);
-
-                for (int j = 0; j < _rootGameObjectsList.Count; j++)
-                {
-                    _rootGameObjectsList[j].GetComponentsInChildren(true, _tempGetComponentList);
-
-                    foreach(var levelBound in _tempGetComponentList)
-                    {
-                        CreateLevelBoundWrapperOnConstruct(levelBound);
-                    }
-                    
-                    _tempGetComponentList.Clear();
-                }
-                
-                _rootGameObjectsList.Clear();
+                CreateLevelBoundsFromScene(scene);
             }
+
+            if (includeDontDestroyOnLoadScene)
+            {
+                var dontDestroyOnLoadScene = SceneLoader.GetDontDestroyOnLoadScene();
+
+                CreateLevelBoundsFromScene(dontDestroyOnLoadScene);
+            }
+        }
+
+        private void CreateLevelBoundsFromScene(Scene scene)
+        {
+            scene.GetRootGameObjects(_rootGameObjectsList);
+
+            for (int j = 0; j < _rootGameObjectsList.Count; j++)
+            {
+                _rootGameObjectsList[j].GetComponentsInChildren(true, _tempGetComponentList);
+
+                foreach (var levelBound in _tempGetComponentList)
+                {
+                    CreateLevelBoundWrapperOnConstruct(levelBound);
+                }
+
+                _tempGetComponentList.Clear();
+            }
+
+            _rootGameObjectsList.Clear();
         }
 
         private async UniTask SetupLevelSetups()

@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,6 +8,8 @@ namespace Paps.SceneLoading
 {
     public static class SceneLoader
     {
+        private static GameObject _dontDestroyOnLoadAccessor;
+
         public static void Load(ReadOnlySpan<Scene> sceneGroup, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
         {
             if (!IsValidSceneGroup(ref sceneGroup))
@@ -107,6 +110,17 @@ namespace Paps.SceneLoading
         public static void MoveGameObjectToScene(GameObject gameObject, Scene scene)
         {
             SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetSceneByName(scene.Name));
+        }
+
+        public static Scene GetDontDestroyOnLoadScene()
+        {
+            if(_dontDestroyOnLoadAccessor == null)
+            {
+                _dontDestroyOnLoadAccessor = new GameObject("SceneLoader_DontDestroyOnLoadAccessor");
+                GameObject.DontDestroyOnLoad(_dontDestroyOnLoadAccessor);
+            }
+
+            return _dontDestroyOnLoadAccessor.scene;
         }
     }
 }

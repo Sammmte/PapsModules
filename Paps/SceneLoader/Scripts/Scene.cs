@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using PathClass = System.IO.Path;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 
 namespace Paps.SceneLoading
 {
@@ -12,6 +13,21 @@ namespace Paps.SceneLoading
     public struct Scene : IEquatable<Scene>, ISerializationCallbackReceiver
     {
         [SerializeField] private SceneReference _sceneReference;
+        [NonSerialized] private UnityScene _unityScene;
+
+        private UnityScene LoadedUnityScene
+        {
+            get
+            {
+                if(!_unityScene.IsValid())
+                {
+                    _unityScene = SceneManager.GetSceneByName(Name);
+                }
+
+                return _unityScene;
+            }
+        }
+
         [field: ReadOnly] [ShowInInspector] public string Name { get; private set; }
         [field: ReadOnly] [ShowInInspector] public string Path { get; private set; }
         [field: ReadOnly] [ShowInInspector] public int BuildIndex { get; private set; }
@@ -23,6 +39,7 @@ namespace Paps.SceneLoading
             BuildIndex = buildIndex;
 
             _sceneReference = default;
+            _unityScene = default;
         }
 
         public Scene(string name)
@@ -32,23 +49,27 @@ namespace Paps.SceneLoading
             BuildIndex = -1;
 
             _sceneReference = default;
+            _unityScene = default;
+        }
+
+        private Scene(UnityScene unityScene)
+        {
+            Name = unityScene.name;
+            Path = unityScene.path;
+            BuildIndex = unityScene.buildIndex;
+
+            _sceneReference = default;
+            _unityScene = unityScene;
         }
 
         public void GetRootGameObjects(List<GameObject> list)
         {
-            var unityScene = SceneManager.GetSceneByName(Name);
-
-            unityScene.GetRootGameObjects(list);
+            LoadedUnityScene.GetRootGameObjects(list);
         }
 
-        public static implicit operator Scene(UnityEngine.SceneManagement.Scene scene)
+        public static implicit operator Scene(UnityScene unityScene)
         {
-            if(scene.buildIndex < 0)
-            {
-                return new Scene(scene.name);
-            }
-
-            return new Scene(scene.path, scene.buildIndex);
+            return new Scene(unityScene);
         }
 
         public bool Equals(Scene other)
