@@ -80,6 +80,15 @@ namespace Paps.Localization
 
         public string GetLocalizedString(string tableId, string localizationId)
         {
+            LocalizationProfiling.GET_LOCALIZED_STRING_MARKER.Begin();
+            var text = GetLocalizedStringInternal(tableId, localizationId);
+            LocalizationProfiling.GET_LOCALIZED_STRING_MARKER.End();
+            
+            return text;
+        }
+
+        private string GetLocalizedStringInternal(string tableId, string localizationId)
+        {
             var tableIdEmpty = string.IsNullOrEmpty(tableId);
             var localizationIdEmpty = string.IsNullOrEmpty(localizationId);
 
@@ -104,6 +113,29 @@ namespace Paps.Localization
             }
 
             return GetCachedOrAdd(tableId, localizationId);
+        }
+
+        public string GetLocalizedStringWithParameters(string tableId, string localizationId, 
+            params LocalizedTextParameter[] parameters)
+        {
+            LocalizationProfiling.GET_LOCALIZED_STRING_WITH_PARAMETERS_MARKER.Begin(1);
+            var text = GetLocalizedStringWithParametersInternal(tableId, localizationId, parameters);
+            LocalizationProfiling.GET_LOCALIZED_STRING_WITH_PARAMETERS_MARKER.End();
+
+            return text;
+        }
+
+        private string GetLocalizedStringWithParametersInternal(string tableId, string localizationId, 
+            LocalizedTextParameter[] parameters)
+        {
+            var finalString = GetLocalizedString(tableId, localizationId);
+
+            for(int i = 0; i < parameters.Length; i++)
+            {
+                finalString = finalString.Replace($"{{{parameters[i].Name}}}", parameters[i].Value);
+            }
+
+            return finalString;
         }
 
         private string GetCachedOrAdd(string tableId, string localizationId)

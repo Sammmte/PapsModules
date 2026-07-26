@@ -10,6 +10,8 @@ namespace Paps.Localization
 
         [SerializeField] private LocalizationIdReference _localizationIdReference;
 
+        [NonSerialized] private LocalizedTextParameter[] _parameters;
+
         public string TableId
         {
             get => _localizationIdReference.TableId;
@@ -27,14 +29,55 @@ namespace Paps.Localization
         {
             get
             {
-                LocalizationProfiling.GET_LOCALIZED_STRING_MARKER.Begin();
-                var text = LocalizationManager.Instance.GetLocalizedString(TableId, LocalizationId);
-                LocalizationProfiling.GET_LOCALIZED_STRING_MARKER.End();
+                if(_parameters == null)
+                    return LocalizationManager.Instance.GetLocalizedString(TableId, LocalizationId);
 
-                return text;
+                return LocalizationManager.Instance.GetLocalizedStringWithParameters(TableId, LocalizationId, _parameters);
             }
         }
 
+        public LocalizedText(string tableId, string localizationId)
+        {
+            _localizationIdReference = new LocalizationIdReference()
+            {
+                TableId = tableId,
+                LocalizationId = localizationId
+            };
+
+            _parameters = null;
+        }
+
+        public LocalizedText(string tableId, string localizationId, params LocalizedTextParameter[] parameters) : this(tableId, localizationId)
+        {
+            _parameters = parameters;
+        }
+
+        public LocalizedText WithParameters(params LocalizedTextParameter[] parameters)
+        {
+            var newLocalizedText = new LocalizedText
+            {
+                _localizationIdReference = this._localizationIdReference,
+                _parameters = parameters
+            };
+
+            return newLocalizedText;
+        }
+
         public static implicit operator string(LocalizedText text) => text.Text;
+    }
+
+    public readonly struct LocalizedTextParameter
+    {
+        public static LocalizedTextParameter FromValue<T>(string name, T value) => new LocalizedTextParameter(name, value.ToString());
+        public static LocalizedTextParameter FromValue(string name, string value) => new LocalizedTextParameter(name, value);
+
+        public string Name { get; }
+        public string Value { get; }
+
+        private LocalizedTextParameter(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
     }
 }
