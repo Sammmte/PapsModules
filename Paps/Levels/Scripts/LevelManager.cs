@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Paps.GameSetup;
 using Paps.Logging;
 using Paps.Optionals;
 using Paps.SceneLoading;
@@ -17,8 +18,7 @@ using Scene = Paps.SceneLoading.Scene;
 
 namespace Paps.Levels
 {
-    [DefaultExecutionOrder(-10000)]
-    public class LevelManager : MonoBehaviour
+    public class LevelManager : MonoBehaviour, IPreGameSetupInitialization
     {
         [Serializable]
         public struct LoadLevelOptions
@@ -226,7 +226,7 @@ namespace Paps.Levels
 
         private CancellationToken LevelUnloadOrQuitCancellationToken => _unloadLevelOrQuitTokenSource.Token;
 
-        private void Awake()
+        public void PreGameSetupInitialize()
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);

@@ -8,11 +8,11 @@ using UnityEngine.Localization.Tables;
 using System.Linq;
 using UnityEngine.Pool;
 using System.Threading;
+using Paps.GameSetup;
 
 namespace Paps.Localization
 {
-    [DefaultExecutionOrder(-10000)]
-    public class LocalizationManager : MonoBehaviour
+    public class LocalizationManager : MonoBehaviour, IPreGameSetupInitialization
     {
         private const string NO_LOCALIZED_KEY = "KEY {0} NOT FOUND IN TABLE {1}";
         private const string NO_LOCALIZED_TABLE = "REQUESTED KEY {0} BUT TABLE {1} IS NOT LOADED";
@@ -33,7 +33,7 @@ namespace Paps.Localization
         private Dictionary<string, Dictionary<string, string>> _cachedTexts;
         private ObjectPool<Dictionary<string, string>> _cachedTextPool;
 
-        private void Awake()
+        public void PreGameSetupInitialize()
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);

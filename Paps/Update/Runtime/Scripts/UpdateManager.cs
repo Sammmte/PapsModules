@@ -1,10 +1,11 @@
+using Paps.GameSetup;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Paps.Update
 {
-    public partial class UpdateManager : MonoBehaviour
+    public partial class UpdateManager : MonoBehaviour, IPreGameSetupInitialization
     {
         public static UpdateManager Instance { get; private set; }
         
@@ -14,7 +15,7 @@ namespace Paps.Update
 
         private bool _aboutToQuit;
 
-        private void Awake()
+        public void PreGameSetupInitialize()
         {
             Instance = this;
             

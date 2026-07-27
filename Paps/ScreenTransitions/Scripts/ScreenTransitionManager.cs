@@ -1,17 +1,18 @@
 ﻿using Cysharp.Threading.Tasks;
+using Paps.GameSetup;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Paps.ScreenTransitions
 {
-    public class ScreenTransitionManager : MonoBehaviour
+    public class ScreenTransitionManager : MonoBehaviour, IPreGameSetupInitialization
     {
         public static ScreenTransitionManager Instance { get; private set; }
 
         private Dictionary<ScreenTransition, ScreenTransition> _screenTransitionInstancesByPrefab;
 
-        private void Awake()
+        public void PreGameSetupInitialize()
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);

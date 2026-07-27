@@ -8,4 +8,9 @@ namespace Paps.GameSetup
     {
         public abstract UniTask Setup(CancellationToken cancellationToken);
     }
+
+    public interface IPreGameSetupInitialization
+    {
+        public void PreGameSetupInitialize();
+    }
 }

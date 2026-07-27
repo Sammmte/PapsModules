@@ -1,11 +1,12 @@
-﻿using SaintsField.Playa;
+﻿using Paps.GameSetup;
+using SaintsField.Playa;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Paps.GameplayTags
 {
-    public class GameplayTagsManager : MonoBehaviour
+    public class GameplayTagsManager : MonoBehaviour, IPreGameSetupInitialization
     {
         public static GameplayTagsManager Instance { get; private set; }
         
@@ -13,7 +14,7 @@ namespace Paps.GameplayTags
 
         [ShowInInspector] private Dictionary<GameObject, GameplayTagsBase> _taggedObjects;
 
-        private void Awake()
+        public void PreGameSetupInitialize()
         {
             _taggedObjects = new Dictionary<GameObject, GameplayTagsBase>(_gameObjectCapacity);
 

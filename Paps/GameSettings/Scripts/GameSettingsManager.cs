@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Paps.GameSetup;
 using SaintsField;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using UnityEngine;
 
 namespace Paps.GameSettings
 {
-    public class GameSettingsManager : MonoBehaviour
+    public class GameSettingsManager : MonoBehaviour, IPreGameSetupInitialization
     {
         public static GameSettingsManager Instance { get; private set; }
 
@@ -15,7 +16,7 @@ namespace Paps.GameSettings
         [SerializeField] private SaintsInterface<IDynamicGameSettingCreator>[] _dynamicGameSettingCreators;
         [SerializeField] private SaintsDictionary<string, GameSetting> _gameSettings;
 
-        private void Awake()
+        public void PreGameSetupInitialize()
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
