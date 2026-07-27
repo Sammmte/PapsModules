@@ -43,6 +43,16 @@ namespace Paps.UnityExtensions
             throw new InvalidOperationException($"Object of type {classOrInterfaceInstance.GetType().Name} is not a Unity component");
         }
 
+        public static U AsUnityComponent<T, U>(this T classOrInterfaceInstance) where T : class where U : Component
+        {
+            if(classOrInterfaceInstance is U component)
+            {
+                return component;
+            }
+
+            throw new InvalidOperationException($"Object of type {classOrInterfaceInstance.GetType().Name} is not a Unity component");
+        }
+
         public static UnityEngine.Object AsUnityObject<T>(this T classOrInterafaceInstance) where T : class
         {
             if(classOrInterafaceInstance is UnityEngine.Object obj)
