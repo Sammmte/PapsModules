@@ -42,6 +42,34 @@ namespace Paps.ScreenTransitions
             transition.gameObject.SetActive(false);
         }
 
+        public async UniTask PlayIn(ScreenTransitionConfiguration configuration)
+        {
+            var playInParameters = configuration.PlayInParameters;
+
+            SetDefaultValueOnParameters(ref playInParameters);
+
+            var transition = GetCachedInstanceOrInstantiate(configuration.TransitionPrefab);
+
+            transition.gameObject.SetActive(true);
+
+            await transition.PlayIn(playInParameters);
+        }
+
+        public async UniTask PlayOut(ScreenTransitionConfiguration configuration)
+        {
+            var playOutParamaters = configuration.PlayOutParameters;
+
+            SetDefaultValueOnParameters(ref playOutParamaters);
+
+            var transition = GetCachedInstanceOrInstantiate(configuration.TransitionPrefab);
+
+            transition.gameObject.SetActive(true);
+
+            await transition.PlayOut(playOutParamaters);
+
+            transition.gameObject.SetActive(false);
+        }
+
         private ScreenTransition GetCachedInstanceOrInstantiate(ScreenTransition prefab)
         {
             if(_screenTransitionInstancesByPrefab.TryGetValue(prefab, out var instance))

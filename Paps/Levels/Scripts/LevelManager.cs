@@ -38,18 +38,23 @@ namespace Paps.Levels
             public bool DidSetup { get; private set; }
             public bool IsKickstarting { get; private set; }
             public bool DidKickstart { get; private set; }
+            public bool IsOnWillUnload { get; private set; }
+            public bool DidWillUnload { get; private set; }
             public bool IsUnloading { get; private set; }
             public bool DidUnload { get; private set; }
 
-            private CancellationTokenSource _cancellationTokenSource;
+            private CancellationTokenSource _willUnloadCancellationTokenSource;
+            private CancellationTokenSource _unloadCancellationTokenSource;
 
-            public CancellationToken UnloadCancellationToken => _cancellationTokenSource.Token;
+            public CancellationToken UnloadCancellationToken => _unloadCancellationTokenSource.Token;
+            public CancellationToken WillUnloadCancellationToken => _willUnloadCancellationTokenSource.Token;
 
             public LevelBoundWrapper(ILevelBound levelBound, CancellationTokenSource unloadLevelTokenSource)
             {
                 LevelBound = levelBound;
                 MonoBehaviour = levelBound as MonoBehaviour;
-                _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(unloadLevelTokenSource.Token, MonoBehaviour.destroyCancellationToken);
+                _willUnloadCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(unloadLevelTokenSource.Token, MonoBehaviour.destroyCancellationToken);
+                _unloadCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(unloadLevelTokenSource.Token, MonoBehaviour.destroyCancellationToken);
             }
 
             public void Construct()
@@ -158,6 +163,31 @@ namespace Paps.Levels
                 }
             }
 
+            public void WillUnload()
+            {
+                if(IsOnWillUnload || DidWillUnload)
+                    return;
+
+                IsOnWillUnload = true;
+
+                _willUnloadCancellationTokenSource.Cancel();
+
+                try
+                {
+                    LevelBound.WillUnload();
+                }
+                catch(Exception e)
+                {
+                    this.LogError($"Exception occurred during WillUnload of level bound {LevelBound.GetDebugName()}. Type: {e.GetType().Name} Message: {e.Message}");
+                    this.LogException(e, LevelBound.AsUnityComponent());
+                }
+                finally
+                {
+                    IsOnWillUnload = false;
+                    DidWillUnload = true;
+                }
+            }
+
             public void Unload()
             {
                 if(IsUnloading || DidUnload)
@@ -165,7 +195,7 @@ namespace Paps.Levels
 
                 IsUnloading = true;
                 
-                _cancellationTokenSource.Cancel();
+                _unloadCancellationTokenSource.Cancel();
 
                 try
                 {
@@ -242,8 +272,8 @@ namespace Paps.Levels
             _tempExecutionList = new List<LevelBoundWrapper>(_allBoundsCapacity);
         }
 
-        private async UniTask LoadInitialLevel(Level level, Func<UniTask> onUnload = null, Optional<LoadLevelOptions> loadLevelOptions = default,
-            IEnumerable<ILevelSetup> extraLevelSetups = null)
+        private async UniTask LoadInitialLevel(Level level, Optional<LevelSetupCallbacks> callbacks = default, 
+            Optional<LoadLevelOptions> loadLevelOptions = default, IEnumerable<ILevelSetup> extraLevelSetups = null)
         {
             this.Log($"Loading initial level <color=green>{level.Id}</color>");
 
@@ -252,8 +282,8 @@ namespace Paps.Levels
             await SceneLoader.LoadNewSceneAndWaitOneFrame("LevelSetup_EmptyScene");
             await SceneLoader.UnloadAsync(loadedScenes);
 
-            if (onUnload != null)
-                await onUnload();
+            await TryCallAfterWillUnload(callbacks);
+            await TryCallAfterUnload(callbacks);
 
             if(loadLevelOptions.HasValue)
                 await ApplyGCCollectOrAssetUnload(loadLevelOptions.Value);
@@ -261,32 +291,29 @@ namespace Paps.Levels
             await Load(level, extraLevelSetups);
         }
 
-        public async UniTask LoadLevel(Level level, Func<UniTask> onUnload = null, Optional<LoadLevelOptions> loadLevelOptions = default,
-            IEnumerable<ILevelSetup> extraLevelSetups = null)
+        public async UniTask LoadLevel(Level level, Optional<LevelSetupCallbacks> callbacks = default, 
+            Optional<LoadLevelOptions> loadLevelOptions = default, IEnumerable<ILevelSetup> extraLevelSetups = null)
         {
             ThrowIfOnAnyStage(stackalloc Stage[] { Stage.Loading, Stage.Unloding }, nameof(LoadLevel));
 
             if(CurrentLevel == null)
             {
-                await LoadInitialLevel(level, onUnload, loadLevelOptions, extraLevelSetups);
+                await LoadInitialLevel(level, callbacks, loadLevelOptions, extraLevelSetups);
             }
             else
             {
-                await LoadNonInitialLevel(level, onUnload, loadLevelOptions, extraLevelSetups);
+                await LoadNonInitialLevel(level, callbacks, loadLevelOptions, extraLevelSetups);
             }
         }
 
-        private async UniTask LoadNonInitialLevel(Level level, Func<UniTask> onUnload = null, Optional<LoadLevelOptions> loadLevelOptions = default,
-            IEnumerable<ILevelSetup> extraLevelSetups = null)
+        private async UniTask LoadNonInitialLevel(Level level, Optional<LevelSetupCallbacks> callbacks = default, 
+            Optional<LoadLevelOptions> loadLevelOptions = default, IEnumerable<ILevelSetup> extraLevelSetups = null)
         {
             this.Log($"Unloading level <color=red>{CurrentLevel.Id}</color>");
 
             CurrentStage = Stage.Unloding;
 
-            await Unload();
-
-            if (onUnload != null)
-                await onUnload();
+            await Unload(callbacks);
 
             if(loadLevelOptions.HasValue)
                 await ApplyGCCollectOrAssetUnload(loadLevelOptions);
@@ -339,12 +366,18 @@ namespace Paps.Levels
             KickstartLevelBounds();
         }
 
-        private async UniTask Unload(Func<UniTask> onUnload = null)
+        private async UniTask Unload(Optional<LevelSetupCallbacks> callbacks = default)
         {
             var sceneGroup = _levelScenes.ToArray();
 
             _unloadLevelOrQuitTokenSource.Cancel();
             _unloadLevelOrQuitTokenSource = null;
+
+            WillUnloadLevelBounds();
+
+            WillUnloadLevelSetups();
+
+            await TryCallAfterWillUnload(callbacks);
 
             UnloadLevelBounds();
 
@@ -354,8 +387,25 @@ namespace Paps.Levels
 
             _levelScenes.Clear();
 
-            if (onUnload != null)
-                await onUnload();
+            await TryCallAfterUnload(callbacks);
+        }
+
+        private async UniTask TryCallAfterWillUnload(Optional<LevelSetupCallbacks> callbacks)
+        {
+            if(!callbacks.HasValue)
+                return;
+
+            if(callbacks.Value.AfterWillUnload != null)
+                await callbacks.Value.AfterWillUnload();
+        }
+
+        private async UniTask TryCallAfterUnload(Optional<LevelSetupCallbacks> callbacks)
+        {
+            if(!callbacks.HasValue)
+                return;
+
+            if(callbacks.Value.AfterUnload != null)
+                await callbacks.Value.AfterUnload();
         }
 
         private async UniTask LoadLevelSetups()
@@ -514,6 +564,22 @@ namespace Paps.Levels
             }
 
             _tempExecutionList.Clear();
+        }
+
+        private void WillUnloadLevelSetups()
+        {
+            for(int i = 0; i < _currentLevelSetups.Count; i++)
+            {
+                _currentLevelSetups[i].WillUnload();
+            }
+        }
+
+        private void WillUnloadLevelBounds()
+        {
+            for(int i = 0; i < _activeBounds.Count; i++)
+            {
+                _activeBounds[i].WillUnload();
+            }
         }
 
         private void UnloadLevelSetups()
@@ -776,6 +842,8 @@ namespace Paps.Levels
 
         private void OnApplicationQuit()
         {
+            WillUnloadLevelBounds();
+            WillUnloadLevelSetups();
             UnloadLevelBounds();
             UnloadLevelSetups();
         }

@@ -9,6 +9,7 @@ namespace Paps.Levels
         public UniTask Load(CancellationToken cancellationToken) => UniTask.CompletedTask;
         public UniTask Setup(CancellationToken cancellationToken) => UniTask.CompletedTask;
         public void Kickstart() { }
+        public void WillUnload() { }
         public void Unload() { }
     }
 }
