@@ -1,13 +1,12 @@
 using Cysharp.Threading.Tasks;
-using System.Collections.Generic;
+using Paps.Persistence;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Paps.GameSettings
 {
     public interface IGameSettingsStorage
     {
-        public UniTask Save(Dictionary<string, GameSettingSaveInfo> gameSettings);
-        public UniTask<Dictionary<string, GameSettingSaveInfo>> Load(CancellationToken cancellationToken);
+        public UniTask Save(DataStorage<string> gameSettings);
+        public UniTask<DataStorage<string>> Load(CancellationToken cancellationToken);
     }
 }

@@ -26,6 +26,7 @@ namespace Paps.Persistence
         {
             RegisterDefaultKeySerializers();
             RegisterDefaultEntryValueTypes();
+            RegisterDefaultDataStorageTypes();
         }
 
         private static void RegisterDefaultKeySerializers()
@@ -45,7 +46,13 @@ namespace Paps.Persistence
             RegisterDataStorageEntryValueType<DataStorage<string>>(DATA_STORAGE_STRING_DISCRIMINATOR);
         }
 
-        internal static void RegisterDataStorageWithKey<TKey>()
+        private static void RegisterDefaultDataStorageTypes()
+        {
+            RegisterDataStorageWithKey<Guid>();
+            RegisterDataStorageWithKey<string>();
+        }
+
+        public static void RegisterDataStorageWithKey<TKey>()
         {
             var type = typeof(DataStorage<TKey>);
 

@@ -14,21 +14,21 @@ namespace Paps.GameSettings
         [SerializeField] private string _relativeFilePath;
         [SerializeField] private SaintsInterface<ISerializer> _serializer;
 
-        public async UniTask<Dictionary<string, GameSettingSaveInfo>> Load(CancellationToken cancellationToken)
+        public async UniTask<DataStorage<string>> Load(CancellationToken cancellationToken)
         {
             var absoluteFilePath = GetFilePath();
 
             if(!File.Exists(absoluteFilePath))
-                return new Dictionary<string, GameSettingSaveInfo>();
+                return null;
 
             var serializedData = await File.ReadAllTextAsync(absoluteFilePath, cancellationToken);
 
             this.Log($"Loaded game settings:\n\n{serializedData}");
 
-            return _serializer.I.Deserialize<Dictionary<string, GameSettingSaveInfo>>(serializedData);
+            return _serializer.I.Deserialize<DataStorage<string>>(serializedData);
         }
 
-        public async UniTask Save(Dictionary<string, GameSettingSaveInfo> gameSettings)
+        public async UniTask Save(DataStorage<string> gameSettings)
         {
             EnsureDirectoryExists();
 

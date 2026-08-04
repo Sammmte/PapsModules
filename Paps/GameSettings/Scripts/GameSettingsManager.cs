@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Paps.GameSetup;
+using Paps.Persistence;
 using SaintsField;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,9 @@ namespace Paps.GameSettings
         [SerializeField] private SaintsInterface<IDynamicGameSettingCreator>[] _dynamicGameSettingCreators;
         [SerializeField] private SaintsDictionary<string, GameSetting> _gameSettings;
 
+        private DataStorageReader _reader = new DataStorageReader();
+        private DataStorageWriter _writer = new DataStorageWriter();
+
         public void PreGameSetupInitialize()
         {
             Instance = this;
@@ -24,21 +28,20 @@ namespace Paps.GameSettings
 
         public async UniTask Initialize(CancellationToken cancellationToken = default)
         {
-            var saveInfoDictionary = await _storageProvider.Storage.Load(cancellationToken);
+            var dataStorage = await _storageProvider.Storage.Load(cancellationToken);
 
             PrepareDynamicSettings();
 
-            foreach(var key in _gameSettings.Keys)
+            if(dataStorage == null)
+                dataStorage = DataStorage<string>.Rent();
+
+            foreach(var settingId in _gameSettings.Keys)
             {
-                if(saveInfoDictionary.ContainsKey(key))
-                {
-                    _gameSettings[key].Initialize(saveInfoDictionary[key]);
-                }
-                else
-                {
-                    _gameSettings[key].Initialize();
-                }
+                _reader.Prepare(settingId, dataStorage);
+                _gameSettings[settingId].Initialize(_reader);
             }
+
+            dataStorage.Return();
         }
 
         private void PrepareDynamicSettings()
@@ -65,24 +68,28 @@ namespace Paps.GameSettings
 
             CommitAll();
 
-            await _storageProvider.Storage.Save(CreateSaveDictionary());
+            var dataStorage = GetSaveDataStorage();
+
+            await _storageProvider.Storage.Save(dataStorage);
+
+            dataStorage.Return();
         }
 
-        private Dictionary<string, GameSettingSaveInfo> CreateSaveDictionary()
+        private DataStorage<string> GetSaveDataStorage()
         {
-            var saveDictionary = new Dictionary<string, GameSettingSaveInfo>(_gameSettings.Count);
+            var dataStorage = DataStorage<string>.Rent();
 
             foreach(var keyValue in _gameSettings)
             {
-                var maybeSaveInfo = keyValue.Value.GetSaveInfo();
+                if(keyValue.Value.IsDefault)
+                    continue;
 
-                if(maybeSaveInfo.HasValue)
-                {
-                    saveDictionary.Add(keyValue.Key, maybeSaveInfo);
-                }
+                _writer.Prepare(keyValue.Key, dataStorage);
+
+                keyValue.Value.Save(_writer);
             }
 
-            return saveDictionary;
+            return dataStorage;
         }
 
         public GameSetting GetSetting(string id)

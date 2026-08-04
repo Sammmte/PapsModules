@@ -1,19 +1,19 @@
 using Cysharp.Threading.Tasks;
-using System.Collections.Generic;
+using Paps.Persistence;
 using System.Threading;
 
 namespace Paps.GameSettings
 {
     public class InMemoryGameSettingsStorage : IGameSettingsStorage
     {
-        private Dictionary<string, GameSettingSaveInfo> _data = new Dictionary<string, GameSettingSaveInfo>();
+        private DataStorage<string> _data;
 
-        public async UniTask<Dictionary<string, GameSettingSaveInfo>> Load(CancellationToken cancellationToken)
+        public async UniTask<DataStorage<string>> Load(CancellationToken cancellationToken)
         {
             return _data;
         }
 
-        public async UniTask Save(Dictionary<string, GameSettingSaveInfo> gameSettings)
+        public async UniTask Save(DataStorage<string> gameSettings)
         {
             _data = gameSettings;
         }

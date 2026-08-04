@@ -24,11 +24,12 @@ namespace Paps.GameSettings
         }
 
         public abstract bool IsDirty { get; }
+        public abstract bool IsDefault { get; }
         public abstract void Reset();
         public abstract void ResetToDefault();
         public abstract void CommitChange();
-        public abstract Optional<GameSettingSaveInfo> GetSaveInfo();
-        public abstract void Initialize(Optional<GameSettingSaveInfo> saveInfo = default);
+        internal abstract void Initialize(DataStorageReader reader);
+        internal abstract void Save(DataStorageWriter writer);
     }
 
     public abstract class GameSetting<T> : GameSetting, IValueReferenceSource<T> where T : IEquatable<T>
@@ -54,7 +55,8 @@ namespace Paps.GameSettings
             }
         }
 
-        [ShowInInspector] public override bool IsDirty => _tempValue.HasValue;
+        [ShowInInspector] public override sealed bool IsDirty => _tempValue.HasValue;
+        [ShowInInspector] public override sealed bool IsDefault => Value.Equals(DefaultValue);
 
         public event Action<GameSetting<T>> OnChangeCommitted;
         public event Action<GameSetting<T>, ViewValueChangeReason> OnViewValueChanged;
@@ -126,29 +128,11 @@ namespace Paps.GameSettings
             }
         }
 
-        public sealed override Optional<GameSettingSaveInfo> GetSaveInfo()
+        internal sealed override void Initialize(DataStorageReader reader)
         {
-            if(Value.Equals(DefaultValue))
+            if(reader.TryRead<T>(out var value))
             {
-                return default;
-            }
-
-            return new GameSettingSaveInfo<T>(Value);
-        }
-
-        public sealed override void Initialize(Optional<GameSettingSaveInfo> saveInfo = default)
-        {
-            if(saveInfo.HasValue)
-            {
-                if(saveInfo.Value is GameSettingSaveInfo<T> casted)
-                {
-                    Value = casted.Value;
-                }
-                else
-                {
-                    this.LogError($"Tried to initialize GameSetting of type {GetType().Name} with a save info of differet type {saveInfo.Value.GetType().Name}");
-                    Value = DefaultValue;
-                }
+                Value = value;
             }
             else
             {
@@ -158,13 +142,11 @@ namespace Paps.GameSettings
             OnInitialized();
         }
 
-        protected virtual void OnInitialized() { }
-    }
+        internal sealed override void Save(DataStorageWriter writer)
+        {
+            writer.Write(Value);
+        }
 
-    public enum ViewValueChangeReason
-    {
-        ExternalSet,
-        Reset,
-        ResetToDefault
+        protected virtual void OnInitialized() { }
     }
 }

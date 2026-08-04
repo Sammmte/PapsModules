@@ -7,11 +7,6 @@ namespace Paps.Persistence
         private static ObjectPool<DataStorage<TKey>> _dataStoragePool;
         public static int GlobalCreationCapacity { get; set; }
 
-        static DataStorage()
-        {
-            DataStorageSerializationHelper.RegisterDataStorageWithKey<TKey>();
-        }
-
         private static ObjectPool<DataStorage<TKey>> GetPool()
         {
             if(_dataStoragePool == null)
