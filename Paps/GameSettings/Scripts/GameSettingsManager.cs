@@ -17,8 +17,8 @@ namespace Paps.GameSettings
         [SerializeField] private SaintsInterface<IDynamicGameSettingCreator>[] _dynamicGameSettingCreators;
         [SerializeField] private SaintsDictionary<string, GameSetting> _gameSettings;
 
-        private DataStorageReader _reader = new DataStorageReader();
-        private DataStorageWriter _writer = new DataStorageWriter();
+        private DataStorageReader<string> _reader = new DataStorageReader<string>();
+        private DataStorageWriter<string> _writer = new DataStorageWriter<string>();
 
         public void PreGameSetupInitialize()
         {

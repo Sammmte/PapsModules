@@ -1,5 +1,6 @@
 using Paps.Logging;
 using Paps.Optionals;
+using Paps.Persistence;
 using Paps.ValueReferences;
 using SaintsField.Playa;
 using System;
@@ -28,8 +29,8 @@ namespace Paps.GameSettings
         public abstract void Reset();
         public abstract void ResetToDefault();
         public abstract void CommitChange();
-        internal abstract void Initialize(DataStorageReader reader);
-        internal abstract void Save(DataStorageWriter writer);
+        internal abstract void Initialize(DataStorageReader<string> reader);
+        internal abstract void Save(DataStorageWriter<string> writer);
     }
 
     public abstract class GameSetting<T> : GameSetting, IValueReferenceSource<T> where T : IEquatable<T>
@@ -128,7 +129,7 @@ namespace Paps.GameSettings
             }
         }
 
-        internal sealed override void Initialize(DataStorageReader reader)
+        internal sealed override void Initialize(DataStorageReader<string> reader)
         {
             if(reader.TryRead<T>(out var value))
             {
@@ -142,7 +143,7 @@ namespace Paps.GameSettings
             OnInitialized();
         }
 
-        internal sealed override void Save(DataStorageWriter writer)
+        internal sealed override void Save(DataStorageWriter<string> writer)
         {
             writer.Write(Value);
         }
